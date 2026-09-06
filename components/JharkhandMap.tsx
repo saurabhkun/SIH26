@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { JHARKHAND_DISTRICTS, District } from "@/lib/data/districts";
-import { animate } from "animejs";
+import { animate, stagger } from "animejs";
+import { getJharkhandGeoPaths, DistrictGeoPath, MAP_VIEWBOX_WIDTH, MAP_VIEWBOX_HEIGHT } from "@/lib/geo";
 
 // Mock issue density data (0 - 100) and reported issue counts for 24 Jharkhand districts
 export const DEFAULT_DISTRICT_STATS: Record<string, { count: number; density: number }> = {
@@ -34,9 +34,9 @@ export const DEFAULT_DISTRICT_STATS: Record<string, { count: number; density: nu
 };
 
 /**
- * 3-Stop Color Interpolator:
+ * 3-Stop Color Scale for District Civic Issue Density:
  * Low (0-35): Green #4A7C59 -> rgb(74, 124, 89)
- * Medium (36-70): Amber #C9A227 -> rgb(201, 162, 39)
+ * Medium (36-70): Amber Gold #C9A227 -> rgb(201, 162, 39)
  * High (71-100): Deep Red #8B3A3A -> rgb(139, 58, 58)
  */
 function getDensityColor(density: number): string {
@@ -44,14 +44,12 @@ function getDensityColor(density: number): string {
 
   if (clamped <= 50) {
     const t = clamped / 50;
-    // Green (74, 124, 89) to Amber (201, 162, 39)
     const r = Math.round(74 + (201 - 74) * t);
     const g = Math.round(124 + (162 - 124) * t);
     const b = Math.round(89 + (39 - 89) * t);
     return `rgb(${r}, ${g}, ${b})`;
   } else {
     const t = (clamped - 50) / 50;
-    // Amber (201, 162, 39) to Deep Red (139, 58, 58)
     const r = Math.round(201 + (139 - 201) * t);
     const g = Math.round(162 + (58 - 162) * t);
     const b = Math.round(39 + (58 - 39) * t);
@@ -61,7 +59,7 @@ function getDensityColor(density: number): string {
 
 interface TooltipState {
   visible: boolean;
-  district: District | null;
+  district: DistrictGeoPath | null;
   count: number;
   density: number;
   x: number;
@@ -80,12 +78,18 @@ export default function JharkhandMap({
   const router = useRouter();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [hoveredDistrict, setHoveredDistrict] = useState<string | null>(null);
 
   const [liveData, setLiveData] = useState<Record<string, { count: number; density: number }>>(
     propData || DEFAULT_DISTRICT_STATS
   );
 
-  // Fetch live aggregated summary from backend
+  // Compute D3 geographic projections once (memoized)
+  const geoConfig = useMemo(() => {
+    return getJharkhandGeoPaths(MAP_VIEWBOX_WIDTH, MAP_VIEWBOX_HEIGHT);
+  }, []);
+
+  // Fetch live aggregated summary from backend /api/districts/summary
   useEffect(() => {
     if (propData) return;
 
@@ -124,26 +128,7 @@ export default function JharkhandMap({
     y: 0,
   });
 
-  // Sort districts in schematic reading order (row first, then col) for smooth staggered load animation
-  const sortedDistricts = useMemo(() => {
-    return [...JHARKHAND_DISTRICTS].sort((a, b) => {
-      if (a.row !== b.row) return a.row - b.row;
-      return a.col - b.col;
-    });
-  }, []);
-
-  // Map Layout Constants
-  const BOX_WIDTH = 92;
-  const BOX_HEIGHT = 68;
-  const GAP_X = 12;
-  const GAP_Y = 12;
-  const PADDING_LEFT = 20;
-  const PADDING_TOP = 20;
-  const VIEWBOX_WIDTH = 960;
-  const VIEWBOX_HEIGHT = 430;
-  const RECT_PERIMETER = 2 * (BOX_WIDTH + BOX_HEIGHT); // ~320px
-
-  // Orchestrated anime.js load animation (played once on mount)
+  // Anime.js v4 Entrance Animation (Played once on mount)
   useEffect(() => {
     if (typeof window === "undefined" || !svgRef.current) return;
 
@@ -151,48 +136,56 @@ export default function JharkhandMap({
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    const rectElements = svgRef.current.querySelectorAll<SVGRectElement>(".district-outline");
-    const fillElements = svgRef.current.querySelectorAll<SVGRectElement>(".district-fill");
-    const textElements = svgRef.current.querySelectorAll<SVGTextElement>(".district-label");
+    const boundaryPaths = svgRef.current.querySelectorAll<SVGPathElement>(".district-boundary-path");
+    const fillPaths = svgRef.current.querySelectorAll<SVGPathElement>(".district-fill-path");
+    const textLabels = svgRef.current.querySelectorAll<SVGTextElement>(".district-text-label");
 
     if (prefersReducedMotion) {
       // Instantly set final visible state without transition
-      rectElements.forEach((el) => {
+      boundaryPaths.forEach((el) => {
         el.style.strokeDashoffset = "0";
       });
-      fillElements.forEach((el) => {
-        el.style.opacity = "1";
+      fillPaths.forEach((el) => {
+        el.style.opacity = "0.9";
       });
-      textElements.forEach((el) => {
+      textLabels.forEach((el) => {
         el.style.opacity = "1";
       });
       return;
     }
 
-    // Step 1: Draw in SVG stroke-dashoffset with 30ms stagger
-    animate(rectElements, {
-      strokeDashoffset: [RECT_PERIMETER, 0],
-      duration: 650,
-      ease: "easeOutQuad",
-      delay: (_el, i) => (i ?? 0) * 30,
+    // Measure each boundary path for precise strokeDashoffset
+    boundaryPaths.forEach((path) => {
+      const len = Math.ceil(path.getTotalLength() || 1200);
+      path.style.strokeDasharray = `${len}`;
+      path.style.strokeDashoffset = `${len}`;
     });
 
-    // Step 2: Fade in fill color smoothly right after stroke outline
-    animate(fillElements, {
-      opacity: [0, 1],
+    // 1. Anime.js v4 stroke-dashoffset progressive draw-in (staggered ~25ms per district)
+    animate(boundaryPaths, {
+      strokeDashoffset: 0,
+      duration: 750,
+      ease: "outQuad",
+      delay: stagger(25),
+    });
+
+    // 2. Anime.js v4 fill reveal right as boundaries settle
+    animate(fillPaths, {
+      opacity: [0, 0.9],
       duration: 500,
-      ease: "easeOutQuad",
-      delay: (_el, i) => 250 + (i ?? 0) * 30,
+      ease: "outQuad",
+      delay: stagger(25, { start: 250 }),
     });
 
-    // Step 3: Fade in district text labels
-    animate(textElements, {
+    // 3. Anime.js v4 district labels fade & slide in
+    animate(textLabels, {
       opacity: [0, 1],
+      translateY: [4, 0],
       duration: 400,
-      ease: "easeOutQuad",
-      delay: (_el, i) => 350 + (i ?? 0) * 30,
+      ease: "outQuad",
+      delay: stagger(20, { start: 500 }),
     });
-  }, [RECT_PERIMETER]);
+  }, []);
 
   const handleDistrictClick = (districtName: string) => {
     if (onSelectDistrict) {
@@ -203,9 +196,10 @@ export default function JharkhandMap({
   };
 
   const handleMouseEnter = (
-    e: React.MouseEvent<SVGGElement>,
-    district: District
+    e: React.MouseEvent<SVGPathElement | SVGTextElement>,
+    district: DistrictGeoPath
   ) => {
+    setHoveredDistrict(district.name);
     const stat = activeData[district.name] || { count: 0, density: 0 };
     if (!containerRef.current) return;
 
@@ -221,9 +215,23 @@ export default function JharkhandMap({
       x,
       y,
     });
+
+    // Anime.js hover highlight on the target district
+    const group = svgRef.current?.querySelector(`#geo-district-${district.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`);
+    if (group) {
+      const fillEl = group.querySelector<SVGPathElement>(".district-fill-path");
+      if (fillEl) {
+        animate(fillEl, {
+          opacity: 1,
+          scale: 1.015,
+          duration: 180,
+          ease: "outQuad",
+        });
+      }
+    }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<SVGGElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<SVGPathElement | SVGTextElement>) => {
     if (!containerRef.current) return;
     const containerRect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - containerRect.left;
@@ -236,23 +244,38 @@ export default function JharkhandMap({
     }));
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (district: DistrictGeoPath) => {
+    setHoveredDistrict(null);
     setTooltip((prev) => ({ ...prev, visible: false }));
+
+    // Reset Anime.js hover highlight
+    const group = svgRef.current?.querySelector(`#geo-district-${district.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`);
+    if (group) {
+      const fillEl = group.querySelector<SVGPathElement>(".district-fill-path");
+      if (fillEl) {
+        animate(fillEl, {
+          opacity: 0.9,
+          scale: 1,
+          duration: 200,
+          ease: "outQuad",
+        });
+      }
+    }
   };
 
   return (
     <div className="w-full flex flex-col items-center" ref={containerRef}>
-      {/* Map Header & Disclaimer */}
+      {/* Map Header & Legend */}
       <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-3 border-b border-slate-200">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-navy inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-navy inline-block" />
             <h2 className="text-base sm:text-lg font-serif font-bold text-navy">
               Jharkhand District Civic Problem Density
             </h2>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Schematic administrative grid across all 24 districts (Click any district to view logged issues)
+          <p className="text-xs text-slate-600 mt-0.5">
+            Geographic choropleth map of all 24 districts (Click any district to view logged issues)
           </p>
         </div>
 
@@ -285,53 +308,49 @@ export default function JharkhandMap({
         </div>
       </div>
 
-      {/* SVG Container with Schematic Grid */}
-      <div className="w-full relative bg-slate-50 border border-slate-300 p-2 sm:p-4 overflow-x-auto">
+      {/* SVG Geographic Choropleth Map Container */}
+      <div className="w-full relative bg-[#F8FAFC] border border-slate-300 p-2 sm:p-4 rounded-sm overflow-hidden flex justify-center">
         <svg
           ref={svgRef}
-          viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-          className="w-full max-w-[960px] mx-auto block select-none"
-          style={{ minWidth: "680px" }}
-          aria-label="Schematic Map of Jharkhand Districts"
+          viewBox={`0 0 ${geoConfig.width} ${geoConfig.height}`}
+          className="w-full max-w-[920px] h-auto block select-none"
+          aria-label="Choropleth Map of Jharkhand Districts"
         >
-          {/* Subtle Division Group Labels / Background Grid */}
-          <g className="division-indicators" opacity="0.4">
-            <text x="35" y="16" fill="#0A2540" fontSize="10" fontWeight="bold" fontFamily="Inter, sans-serif">
-              WEST (PALAMU)
-            </text>
-            <text x="320" y="16" fill="#0A2540" fontSize="10" fontWeight="bold" fontFamily="Inter, sans-serif">
-              NORTH CHOTANAGPUR
-            </text>
-            <text x="680" y="16" fill="#0A2540" fontSize="10" fontWeight="bold" fontFamily="Inter, sans-serif">
-              SANTHAL PARGANA
-            </text>
-            <text x="210" y="420" fill="#0A2540" fontSize="10" fontWeight="bold" fontFamily="Inter, sans-serif">
-              SOUTH CHOTANAGPUR
-            </text>
-            <text x="490" y="420" fill="#0A2540" fontSize="10" fontWeight="bold" fontFamily="Inter, sans-serif">
-              KOLHAN
-            </text>
+          <defs>
+            <filter id="map-drop-shadow" x="-5%" y="-5%" width="110%" height="110%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#0A2540" floodOpacity="0.12" />
+            </filter>
+          </defs>
+
+          {/* Outer State Glow/Shadow & Overall Background Layer */}
+          <g filter="url(#map-drop-shadow)">
+            {geoConfig.districts.map((district) => (
+              <path
+                key={`bg-${district.name}`}
+                d={district.d}
+                fill="#E2E8F0"
+                stroke="#0A2540"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            ))}
           </g>
 
-          {/* 24 District Rectangles */}
-          {sortedDistricts.map((district) => {
-            const x = PADDING_LEFT + (district.col - 1) * (BOX_WIDTH + GAP_X);
-            const y = PADDING_TOP + (district.row - 1) * (BOX_HEIGHT + GAP_Y);
+          {/* 24 District Features: Fills, Boundaries & Labels */}
+          {geoConfig.districts.map((district) => {
             const stat = activeData[district.name] || { count: 0, density: 0 };
             const fillColor = getDensityColor(stat.density);
+            const isHovered = hoveredDistrict === district.name;
+            const [cx, cy] = district.centroid;
 
             return (
               <g
                 key={district.name}
-                id={`district-${district.name.toLowerCase().replace(/\s+/g, "-")}`}
-                className="district-node cursor-pointer transition-transform duration-150 ease-out origin-center focus:outline-none"
-                style={{
-                  transformOrigin: `${x + BOX_WIDTH / 2}px ${y + BOX_HEIGHT / 2}px`,
-                }}
+                id={`geo-district-${district.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
+                className="district-geo-group cursor-pointer focus:outline-none"
+                style={{ transformOrigin: `${cx}px ${cy}px` }}
                 onClick={() => handleDistrictClick(district.name)}
-                onMouseEnter={(e) => handleMouseEnter(e, district)}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
                 tabIndex={0}
                 role="button"
                 aria-label={`${district.name} district, ${stat.count} issues reported`}
@@ -341,75 +360,63 @@ export default function JharkhandMap({
                   }
                 }}
               >
-                {/* Background Fill Rect (Faded in via Anime.js) */}
-                <rect
-                  className="district-fill"
-                  x={x}
-                  y={y}
-                  width={BOX_WIDTH}
-                  height={BOX_HEIGHT}
-                  rx="4"
-                  ry="4"
+                {/* 1. Animated Fill Path */}
+                <path
+                  className="district-fill-path transition-colors duration-150"
+                  d={district.d}
                   fill={fillColor}
                   opacity="0"
+                  onMouseEnter={(e) => handleMouseEnter(e, district)}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={() => handleMouseLeave(district)}
                 />
 
-                {/* Drawn Stroke Outline (Animated via Anime.js stroke-dashoffset) */}
-                <rect
-                  className="district-outline"
-                  x={x}
-                  y={y}
-                  width={BOX_WIDTH}
-                  height={BOX_HEIGHT}
-                  rx="4"
-                  ry="4"
+                {/* 2. Animated Boundary Stroke Path */}
+                <path
+                  className="district-boundary-path pointer-events-none"
+                  d={district.d}
                   fill="none"
-                  stroke="#0A2540"
-                  strokeWidth="1.5"
-                  strokeDasharray={RECT_PERIMETER}
-                  strokeDashoffset={RECT_PERIMETER}
+                  stroke={isHovered ? "#B38B21" : "#0A2540"}
+                  strokeWidth={isHovered ? "2.2" : "1.2"}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
                 />
 
-                {/* District Name & Issue Count Labels */}
+                {/* 3. District Name Label Centered at D3 Centroid */}
                 <text
-                  className="district-label"
-                  x={x + BOX_WIDTH / 2}
-                  y={y + 28}
+                  className="district-text-label pointer-events-none select-none"
+                  x={cx}
+                  y={cy}
                   textAnchor="middle"
+                  dominantBaseline="central"
                   fill="#FFFFFF"
-                  fontSize="11"
+                  fontSize={district.fontSize || 10.5}
                   fontWeight="600"
-                  fontFamily="Inter, sans-serif"
+                  fontFamily="Inter, -apple-system, BlinkMacSystemFont, sans-serif"
                   opacity="0"
-                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
+                  style={{
+                    textShadow: "0 1px 3px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9)",
+                    letterSpacing: "-0.01em",
+                  }}
                 >
-                  {district.name.length > 12 ? (
+                  {district.name === "Seraikela Kharsawan" ? (
                     <>
-                      <tspan x={x + BOX_WIDTH / 2} dy="-4">
-                        {district.name.split(" ")[0]}
-                      </tspan>
-                      <tspan x={x + BOX_WIDTH / 2} dy="12">
-                        {district.name.split(" ").slice(1).join(" ")}
-                      </tspan>
+                      <tspan x={cx} dy="-5">Seraikela</tspan>
+                      <tspan x={cx} dy="10">Kharsawan</tspan>
+                    </>
+                  ) : district.name === "East Singhbhum" ? (
+                    <>
+                      <tspan x={cx} dy="-5">East</tspan>
+                      <tspan x={cx} dy="10">Singhbhum</tspan>
+                    </>
+                  ) : district.name === "West Singhbhum" ? (
+                    <>
+                      <tspan x={cx} dy="-5">West</tspan>
+                      <tspan x={cx} dy="10">Singhbhum</tspan>
                     </>
                   ) : (
                     district.name
                   )}
-                </text>
-
-                <text
-                  className="district-label"
-                  x={x + BOX_WIDTH / 2}
-                  y={y + 52}
-                  textAnchor="middle"
-                  fill="#FFFFFF"
-                  fontSize="9.5"
-                  fontWeight="500"
-                  fontFamily="Inter, sans-serif"
-                  opacity="0"
-                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
-                >
-                  {stat.count} issues
                 </text>
               </g>
             );
@@ -419,19 +426,21 @@ export default function JharkhandMap({
         {/* Hover Tooltip */}
         {tooltip.visible && tooltip.district && (
           <div
-            className="absolute z-20 pointer-events-none bg-navy text-white text-xs p-2.5 rounded shadow border border-gold/50"
+            className="absolute z-20 pointer-events-none bg-navy text-white text-xs p-2.5 rounded-sm shadow-md border border-gold/50"
             style={{
-              left: `${tooltip.x + 12}px`,
-              top: `${tooltip.y + 12}px`,
+              left: `${tooltip.x + 14}px`,
+              top: `${tooltip.y + 14}px`,
               transform: "translate(0, 0)",
             }}
           >
             <div className="font-serif font-bold text-gold text-sm">
               {tooltip.district.name}
             </div>
-            <div className="text-slate-300 text-[11px] mb-1">
-              Division: {tooltip.district.division}
-            </div>
+            {tooltip.district.division && (
+              <div className="text-slate-300 text-[11px] mb-1">
+                Division: {tooltip.district.division}
+              </div>
+            )}
             <div className="border-t border-slate-600 pt-1 mt-1 flex justify-between gap-4">
               <span>Logged Issues:</span>
               <span className="font-semibold text-white">{tooltip.count}</span>
@@ -444,9 +453,13 @@ export default function JharkhandMap({
         )}
       </div>
 
-      <div className="w-full text-left mt-2">
-        <p className="text-[11px] text-slate-500 italic">
-          * Note: Schematic block representation for state monitoring and issue routing; not a survey-accurate boundary map.
+      {/* Map Data Attribution & Note */}
+      <div className="w-full text-left mt-2 flex flex-col sm:flex-row justify-between text-[11px] text-slate-500">
+        <p>
+          * Official district boundaries rendered from Survey/Census spatial data (CC BY 4.0).
+        </p>
+        <p className="italic">
+          Click any district for public grievance records & HEI projects
         </p>
       </div>
     </div>
