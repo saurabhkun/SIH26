@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CivicResolve - SIH 2026 (PS: 26043)
 
-## Getting Started
+## 🚀 The Pitch
+CivicResolve is a unified digital ecosystem designed to bridge the gap between citizens, higher education institutions (HEIs), industry/CSR, and the government. By leveraging community-reported data and matching it with institutional expertise and industry funding, CivicResolve accelerates the resolution of local challenges and transforms them into actionable innovation projects. 
 
-First, run the development server:
+Instead of issues getting lost in bureaucracy, CivicResolve empowers universities to tackle real-world problems with real-world funding, all under the transparent oversight of the government.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🎯 Problem Statement (PS: 26043)
+The project mandates a robust "notification and communication system" connecting citizens, colleges, industry, and government throughout the project lifecycle. 
+
+The goal is to create a seamless pipeline where a citizen's issue can be adopted by a college, funded by an industry partner, and overseen by the government, with complete transparency at every step. This prototype demonstrates this core workflow, including role-specific dashboards, sandbox payments, map-based analytics, and a comprehensive notification system.
+
+## 🏗️ Folder Structure
+
+```text
+SIH/
+├── app/                  # Next.js App Router pages and API routes
+│   ├── api/              # Backend API routes (auth, issues, gov, pledges, proposals, etc.)
+│   ├── dashboard/        # Role-specific dashboards (college, gov, industry)
+│   ├── district/         # District-level view for public
+│   ├── login/            # Netflix-style role selection & authentication
+│   ├── report/           # Public issue reporting wizard
+│   └── track/            # Citizen issue tracking
+├── components/           # Reusable React components (UI, Shells, Maps, NotificationBell)
+├── lib/                  # Core logic, database models, constants, and utils
+│   ├── auth/             # Session management
+│   ├── data/             # Static data (districts, domains, etc.)
+│   └── models/           # Mongoose schemas (User, Issue, College, Proposal, Notification, etc.)
+├── scripts/              # Database seeding scripts
+└── public/               # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ How to Run Locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js (v18+)
+- MongoDB (Optional: The app will automatically spin up an in-memory MongoDB instance if a local daemon is not running).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Install Dependencies
+```bash
+npm install
+```
 
-## Learn More
+### 2. Environment Variables
+Ensure you have a `.env.local` file in the root directory. 
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/civicresolve
+```
+*(If you do not have MongoDB running locally, the application will fallback to `mongodb-memory-server` automatically).*
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Seed the Database
+Populate the database with test accounts, colleges, and sample data.
+```bash
+npm run seed
+```
+**Test Credentials Created:**
+- 🏛️ **Government**: `officer@jharkhand.gov.in` (Pass: `Gov@1234`)
+- 🎓 **College**: `rnd.director@bitmesra.ac.in` (Pass: `College@1234`)
+- 🏭 **Industry**: `csr.head@tatasteel.com` (Pass: `Industry@1234`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Start the Development Server
+```bash
+npm run dev
+```
+Navigate to [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🌟 Key Features Built
+- **Role-Based Portals**: Distinct Netflix-style login gateway for Government, Universities, and Industry partners.
+- **Smart Issue Marketplace**: Colleges are matched with citizen-reported issues based on their declared domain capabilities.
+- **Industry Funding & Escrow**: Mock integration with Razorpay Sandbox for CSR funding pledges. Milestone-based fund release.
+- **Government Analytics**: Recharts-powered dashboard showing resolution rates, capital distribution, proposal funnels, and geographic issue density.
+- **Unified Notification System**: Fire-and-forget notification bell across all portals tracking key lifecycle transitions.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Built for Smart India Hackathon (SIH) 2026*
