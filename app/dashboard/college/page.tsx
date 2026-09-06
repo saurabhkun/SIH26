@@ -198,6 +198,7 @@ export default function CollegeDashboardPage() {
 
   useEffect(() => {
     loadDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Open Claim Modal
