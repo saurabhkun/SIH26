@@ -1,5 +1,9 @@
 # CivicResolve - SIH 2026 (PS: 26043)
 
+> 🌐 **Live Demo:** [https://civic-ressolve.vercel.app/](https://civic-ressolve.vercel.app/)
+
+---
+
 ## 🚀 The Pitch
 CivicResolve is a unified digital ecosystem designed to bridge the gap between citizens, higher education institutions (HEIs), industry/CSR, and the government. By leveraging community-reported data and matching it with institutional expertise and industry funding, CivicResolve accelerates the resolution of local challenges and transforms them into actionable innovation projects. 
 
