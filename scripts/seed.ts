@@ -2,6 +2,7 @@ import { connectDB } from "../lib/mongodb";
 import College from "../lib/models/College";
 import Issue from "../lib/models/Issue";
 import User from "../lib/models/User";
+import Notification from "../lib/models/Notification";
 import mongoose from "mongoose";
 
 async function runSeed() {
@@ -39,6 +40,7 @@ async function runSeed() {
     await College.deleteMany({});
     await Issue.deleteMany({});
     await User.deleteMany({});
+    await Notification.deleteMany({});
     console.log("[OK] Existing records cleared.\n");
 
     // 1. Seed 3 Sample Colleges across tiers in Jharkhand
@@ -318,6 +320,74 @@ async function runSeed() {
     insertedUsers.forEach((u, idx) => {
       console.log(`   ${idx + 1}. [Role: ${u.role.toUpperCase()}] ${u.name} <${u.email}> (Pass: ${u.passwordHash})`);
     });
+
+    // 4. Seed Multi-Role Operational Notifications
+    console.log("\nStep 5: Inserting operational state notifications across roles...");
+    const sampleNotifications = [
+      {
+        recipientRole: "GOV",
+        recipientId: "gov_admin_nodal",
+        title: "⚡ Circuit Breaker Disaster Alert",
+        message: "Damodar River chemical discharge detected near Bokaro Thermal. Emergency fast-track triggered.",
+        type: "CIRCUIT_BREAKER_DISASTER",
+        priority: "CRITICAL",
+        actionUrl: "/dashboard/gov/triage",
+        read: false,
+      },
+      {
+        recipientRole: "GOV",
+        recipientId: "gov_admin_nodal",
+        title: "🏆 Human Panel Determination Required",
+        message: "BIT Mesra and NIT Jamshedpur submitted competitive bids for Fluoride Filtration. 1 Winner + 2 Runners-Up to be selected.",
+        type: "PANEL_DECISION",
+        priority: "HIGH",
+        actionUrl: "/dashboard/gov/allocations",
+        read: false,
+      },
+      {
+        recipientRole: "RO",
+        recipientId: insertedColleges[0]._id.toString(),
+        title: "🎯 Challenge Awarded: Winning RO",
+        message: "Your institution's proposal for 'Groundwater Heavy-Metal Bioremediation' was approved as Lead RO by the State Nodal Panel!",
+        type: "PANEL_DECISION",
+        priority: "HIGH",
+        actionUrl: "/dashboard/college/projects",
+        read: false,
+      },
+      {
+        recipientRole: "RO",
+        recipientId: insertedColleges[0]._id.toString(),
+        title: "🤝 L3 Subcontracting Recommendation",
+        message: "Consider delegating ground sensor calibration to Chaibasa Polytechnic (Tier L3G) for rural deployment.",
+        type: "L3_SUBCONTRACT_INVITE",
+        priority: "NORMAL",
+        actionUrl: "/dashboard/college/projects",
+        read: true,
+      },
+      {
+        recipientRole: "INDUSTRY",
+        recipientId: "all_csr_partners",
+        title: "💰 Milestone Escrow Verification Ready",
+        message: "Milestone #1 for Patamda Check-Dam IoT telemetry has achieved nodal signoff. Escrow payout ready for release.",
+        type: "MILESTONE_PAYOUT_RELEASED",
+        priority: "NORMAL",
+        actionUrl: "/dashboard/industry/escrow",
+        read: false,
+      },
+      {
+        recipientRole: "CITIZEN",
+        recipientPhone: "9876543210",
+        title: "✅ Ground Resolution In Progress",
+        message: "BIT Mesra field engineering team deployed automated water testing units in Ranchi Sadar.",
+        type: "CITIZEN_STATUS_UPDATE",
+        priority: "NORMAL",
+        actionUrl: "/track",
+        read: false,
+      },
+    ];
+
+    const insertedNotifications = await Notification.insertMany(sampleNotifications);
+    console.log(`[OK] Inserted ${insertedNotifications.length} operational notifications.`);
 
     console.log("\n==================================================================");
     console.log(" [SUCCESS] Database schemas, users, and connectDB() fully verified!");
