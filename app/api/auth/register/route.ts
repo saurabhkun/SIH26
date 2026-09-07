@@ -74,20 +74,17 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     if (role === "college") {
-      if (!institutionName || !district || !tier) {
+      if (!institutionName || !district) {
         return NextResponse.json(
-          { success: false, error: "Institution Name, District, and Academic Tier (L1/L2/L3R/L3G) are required." },
+          { success: false, error: "Institution Name and District are required." },
           { status: 400 }
         );
       }
 
       const validTiers: CollegeTier[] = ["L1", "L2", "L3R", "L3G"];
-      if (!validTiers.includes(tier as CollegeTier)) {
-        return NextResponse.json(
-          { success: false, error: "Invalid tier selected. Must be L1, L2, L3R, or L3G." },
-          { status: 400 }
-        );
-      }
+      const resolvedTier: CollegeTier = validTiers.includes(tier as CollegeTier)
+        ? (tier as CollegeTier)
+        : "L2";
 
       // Generate a clean college code
       const codeBase = institutionName
@@ -107,7 +104,7 @@ export async function POST(request: NextRequest) {
         name: institutionName.trim(),
         code,
         email: normalizedEmail,
-        tier: tier as CollegeTier,
+        tier: resolvedTier,
         district: district.trim(),
         facilities: equipmentList.map((eq: string) => ({
           name: eq,

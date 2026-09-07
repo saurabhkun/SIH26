@@ -102,15 +102,14 @@ export default function Home() {
 
       {/* Modal / Embedded Citizen Submission Wizard */}
       {isWizardOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="relative w-full max-w-3xl my-8">
-            <CitizenSubmissionWizard
-              onCancel={() => setIsWizardOpen(false)}
-              onSuccess={() => {
-                // Keep open on confirmation screen
-              }}
-            />
-          </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm overflow-hidden">
+          <CitizenSubmissionWizard
+            onClose={() => setIsWizardOpen(false)}
+            onCancel={() => setIsWizardOpen(false)}
+            onSuccess={() => {
+              // Keep open on confirmation screen
+            }}
+          />
         </div>
       )}
 

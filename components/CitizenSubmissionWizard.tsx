@@ -33,6 +33,7 @@ import { classifyIssueDescription } from "@/lib/classify";
 interface CitizenSubmissionWizardProps {
   onSuccess?: (trackingCode: string, district: string) => void;
   onCancel?: () => void;
+  onClose?: () => void;
   defaultDistrict?: string;
 }
 
@@ -87,8 +88,11 @@ declare global {
 export default function CitizenSubmissionWizard({
   onSuccess,
   onCancel,
+  onClose,
   defaultDistrict = "Ranchi",
 }: CitizenSubmissionWizardProps) {
+  const handleClose = onClose || onCancel;
+
   // Step state (1 = Challenge Selection & Description, 2 = Spatiotemporal, 3 = Identity & Verification, 4 = Success)
   const [step, setStep] = useState<number>(1);
 
@@ -383,72 +387,73 @@ export default function CitizenSubmissionWizard({
   };
 
   return (
-    <div className="bg-white border border-slate-300 p-4 sm:p-7 max-w-4xl mx-auto rounded-sm shadow-sm">
-      {/* Wizard Header */}
-      <div className="border-b border-slate-200 pb-4 mb-6">
-        <div className="flex justify-between items-start sm:items-center">
-          <div>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-navy bg-gold/15 px-2.5 py-0.5 border border-gold/40 inline-block mb-1.5">
-              Government of Jharkhand &bull; Public Grievance & Innovation Portal
-            </span>
-            <h2 className="text-xl sm:text-2xl font-serif font-bold text-navy">
-              Report a Grassroots Challenge / Grievance
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Tap a category, speak or type your issue, and submit with zero bureaucratic hassle.
-            </p>
-          </div>
-          {onCancel && (
-            <button
-              onClick={onCancel}
-              className="text-slate-400 hover:text-slate-700 p-1"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+    <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      {/* Pinned Header */}
+      <div className="sticky top-0 z-20 flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200 shrink-0">
+        <div>
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            Government of Jharkhand • Grievance Portal
+          </span>
+          <h2 className="text-xl font-bold text-[#001B2E]">
+            Report a Grassroots Challenge / Grievance
+          </h2>
         </div>
+        {handleClose && (
+          <button
+            type="button"
+            onClick={handleClose}
+            className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+            aria-label="Close modal"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        )}
+      </div>
 
-        {/* Step Indicator */}
-        {step < 4 && (
-          <div className="grid grid-cols-3 gap-2 text-xs mt-4 pt-3 border-t border-slate-200">
+      {/* Step Indicator */}
+      {step < 4 && (
+        <div className="px-6 py-2.5 bg-slate-50 border-b border-slate-200 shrink-0">
+          <div className="grid grid-cols-3 gap-2 text-xs">
             <div
               className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 1
-                  ? "border-navy text-navy font-bold"
+                  ? "border-[#001B2E] text-[#001B2E] font-bold"
                   : step > 1
                   ? "border-emerald-700 text-emerald-800"
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-navy/10 text-navy inline-flex items-center justify-center text-[10px] font-bold">1</span>
-              <span>1. Choose Problem & Voice / Text</span>
+              <span className="w-4 h-4 rounded-full bg-[#001B2E]/10 text-[#001B2E] inline-flex items-center justify-center text-[10px] font-bold">1</span>
+              <span className="truncate">1. Problem &amp; Voice / Text</span>
             </div>
             <div
               className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 2
-                  ? "border-navy text-navy font-bold"
+                  ? "border-[#001B2E] text-[#001B2E] font-bold"
                   : step > 2
                   ? "border-emerald-700 text-emerald-800"
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-navy/10 text-navy inline-flex items-center justify-center text-[10px] font-bold">2</span>
-              <span>2. District & Duration</span>
+              <span className="w-4 h-4 rounded-full bg-[#001B2E]/10 text-[#001B2E] inline-flex items-center justify-center text-[10px] font-bold">2</span>
+              <span className="truncate">2. District &amp; Duration</span>
             </div>
             <div
               className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 3
-                  ? "border-navy text-navy font-bold"
+                  ? "border-[#001B2E] text-[#001B2E] font-bold"
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-navy/10 text-navy inline-flex items-center justify-center text-[10px] font-bold">3</span>
-              <span>3. Verification & Submit</span>
+              <span className="w-4 h-4 rounded-full bg-[#001B2E]/10 text-[#001B2E] inline-flex items-center justify-center text-[10px] font-bold">3</span>
+              <span className="truncate">3. Verification &amp; Submit</span>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Scrollable Body */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
       {/* STEP 1: Visual Problem Cards & Dual-Mode Description */}
       {step === 1 && (
@@ -1117,6 +1122,7 @@ export default function CitizenSubmissionWizard({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

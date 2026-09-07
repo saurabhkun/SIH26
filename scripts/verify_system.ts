@@ -89,7 +89,7 @@ async function runSystemVerification() {
 
   // Claim 6: HMAC-SHA256 Session Token Security & Tamper Resistance
   const testPayload = {
-    userId: "usr_mock_gov_01",
+    id: "usr_mock_gov_01",
     email: "officer@jharkhand.gov.in",
     role: "gov" as const,
     name: "Dr. Alok Verma",

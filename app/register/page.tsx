@@ -38,7 +38,6 @@ export default function RegisterPage() {
   // College form state
   const [institutionName, setInstitutionName] = useState("");
   const [district, setDistrict] = useState(JHARKHAND_DISTRICTS[0].name);
-  const [tier, setTier] = useState<"L1" | "L2" | "L3R" | "L3G">("L2");
   const [facultyLeadName, setFacultyLeadName] = useState("");
   const [labEquipmentInput, setLabEquipmentInput] = useState("");
   const [labEquipmentTags, setLabEquipmentTags] = useState<string[]>([
@@ -90,7 +89,6 @@ export default function RegisterPage() {
         password,
         institutionName: role === "college" ? institutionName.trim() : undefined,
         district: role === "college" ? district : undefined,
-        tier: role === "college" ? tier : undefined,
         facultyLeadName: role === "college" ? facultyLeadName.trim() : undefined,
         labEquipment: role === "college" ? labEquipmentTags : undefined,
         companyName: role === "industry" ? companyName.trim() : undefined,
@@ -260,22 +258,6 @@ export default function RegisterPage() {
                         ))}
                       </select>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
-                      Academic Tier *
-                    </label>
-                    <select
-                      value={tier}
-                      onChange={(e) => setTier(e.target.value as "L1" | "L2" | "L3R" | "L3G")}
-                      className="w-full px-3 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B] bg-white font-medium"
-                    >
-                      <option value="L1">Tier L1 — Premier Research (IIT, NIT, BIT)</option>
-                      <option value="L2">Tier L2 — State Technical Universities / Eng. Colleges</option>
-                      <option value="L3R">Tier L3R — Regional Colleges (Lab &amp; Field Testing)</option>
-                      <option value="L3G">Tier L3G — Local Polytechnic &amp; Ground Logistics</option>
-                    </select>
                   </div>
 
                   <div>

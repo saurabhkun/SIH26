@@ -67,7 +67,7 @@ const CollegeSchema = new Schema<ICollege>(
     tier: {
       type: String,
       enum: ["L1", "L2", "L3R", "L3G"],
-      required: true,
+      default: "L2",
       index: true,
     },
     district: { type: String, required: true, trim: true, index: true },
