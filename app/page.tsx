@@ -49,6 +49,12 @@ export default function Home() {
               Report an Issue
             </button>
             <Link
+              href="/register"
+              className="inline-flex items-center px-3.5 py-1.5 bg-[#FFEFD3] text-[#001B2E] text-xs font-semibold border border-[#FFC49B] hover:bg-[#FFC49B]/30 transition-colors"
+            >
+              Register
+            </Link>
+            <Link
               href="/login"
               className="inline-flex items-center px-4 py-1.5 bg-slate-100 text-navy text-xs font-semibold border border-slate-300 hover:bg-slate-200"
             >

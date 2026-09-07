@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   LogOut,
   Landmark,
@@ -43,6 +43,7 @@ export interface NavItem {
   href: string;
   iconName: IconName;
   active?: boolean;
+  onClick?: () => void;
 }
 
 interface DashboardShellProps {
@@ -116,15 +117,17 @@ export default function DashboardShell({
     }
   };
 
+  const pathname = usePathname();
+
   return (
     <div className="min-h-screen bg-bg text-ink flex flex-col">
       {/* Top Government Strip */}
-      <div className="bg-navy text-white text-xs py-1.5 px-4 sm:px-8 border-b border-gold/40 flex justify-between items-center">
+      <div className="bg-[#001B2E] text-white text-xs py-1.5 px-4 sm:px-8 border-b border-[#FFC49B]/40 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <span className="font-semibold tracking-wider uppercase text-[11px]">
             Government of Jharkhand
           </span>
-          <span className="text-gold">|</span>
+          <span className="text-[#FFC49B]">|</span>
           <span className="text-slate-300">
             Higher & Technical Education Department
           </span>
@@ -138,12 +141,12 @@ export default function DashboardShell({
       <header className="bg-white border-b border-slate-300 py-3 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-navy text-gold rounded-xs border border-gold/40">
+            <div className="p-2 bg-[#001B2E] text-[#FFC49B] rounded-xs border border-[#FFC49B]/40">
               <RoleIcon className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <Link href="/" className="font-serif font-bold text-navy text-lg leading-tight hover:underline">
+                <Link href="/" className="font-serif font-bold text-[#001B2E] text-lg leading-tight hover:underline">
                   CivicResolve
                 </Link>
                 <span className="text-slate-300">/</span>
@@ -167,7 +170,7 @@ export default function DashboardShell({
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-medium border border-slate-300 hover:bg-slate-200"
+              className="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-medium border border-slate-300 hover:bg-slate-200 transition-colors"
             >
               <LogOut className="w-3.5 h-3.5 mr-1 text-slate-500" />
               {isLoggingOut ? "Signing Out..." : "Sign Out"}
@@ -185,27 +188,39 @@ export default function DashboardShell({
               Navigation Menu
             </div>
             {navItems.map((item, idx) => {
+              const isCurrent =
+                item.active !== undefined
+                  ? item.active
+                  : pathname === item.href ||
+                    (item.href !== "/dashboard/gov" &&
+                      item.href !== "/dashboard/college" &&
+                      item.href !== "/dashboard/industry" &&
+                      item.href.length > 2 &&
+                      pathname.startsWith(item.href));
+
               return (
-                <div
+                <Link
                   key={idx}
+                  href={item.href}
+                  onClick={item.onClick}
                   className={`flex items-center justify-between px-3 py-2 text-xs font-medium border transition-colors cursor-pointer ${
-                    item.active
-                      ? "bg-navy text-gold border-gold/40 font-semibold"
-                      : "text-slate-700 border-transparent hover:bg-slate-100"
+                    isCurrent
+                      ? "bg-[#001B2E] text-[#FFEFD3] border-l-4 border-[#FFC49B] font-semibold shadow-xs"
+                      : "text-slate-700 border-l-4 border-transparent hover:bg-slate-100 hover:text-[#001B2E]"
                   }`}
                 >
                   <div className="flex items-center space-x-2">
                     {renderNavIcon(item.iconName)}
                     <span>{item.label}</span>
                   </div>
-                  {item.active && <ChevronRight className="w-3.5 h-3.5 text-gold" />}
-                </div>
+                  {isCurrent && <ChevronRight className="w-3.5 h-3.5 text-[#FFC49B]" />}
+                </Link>
               );
             })}
           </div>
 
           <div className="mt-4 p-3 bg-white border border-slate-300 text-xs text-slate-600">
-            <div className="flex items-center space-x-1.5 font-semibold text-navy mb-1">
+            <div className="flex items-center space-x-1.5 font-semibold text-[#001B2E] mb-1">
               <ShieldCheck className="w-4 h-4 text-emerald-700" />
               <span>Session Authenticated</span>
             </div>

@@ -939,10 +939,10 @@ function AnalyticsDashboard() {
 /* ────────────────────────────────────────
    Main Gov Dashboard Page
    ──────────────────────────────────────── */
-type TabId = "analytics" | "review" | "allocate" | "colleges";
+export type TabId = "analytics" | "review" | "allocate" | "colleges";
 
-export default function GovDashboardClient() {
-  const [activeTab, setActiveTab] = useState<TabId>("analytics");
+export default function GovDashboardClient({ initialTab = "analytics" }: { initialTab?: TabId }) {
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
     { id: "analytics", label: "Analytics Dashboard", icon: <CheckCircle size={14} /> },

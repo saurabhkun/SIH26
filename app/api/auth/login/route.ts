@@ -90,8 +90,19 @@ export async function POST(request: NextRequest) {
         };
       }
     } else {
-      // Validate password (plain or hashed)
-      if (user.passwordHash !== password) {
+      // Validate password (supports bcrypt hash and plaintext demo passwords)
+      let isMatch = user.passwordHash === password;
+      if (!isMatch) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const bcrypt = require("bcryptjs");
+          isMatch = bcrypt.compareSync(password, user.passwordHash);
+        } catch {
+          isMatch = false;
+        }
+      }
+
+      if (!isMatch) {
         return NextResponse.json(
           { success: false, error: "Invalid email or password credentials." },
           { status: 401 }

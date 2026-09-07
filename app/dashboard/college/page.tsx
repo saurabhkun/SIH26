@@ -107,8 +107,12 @@ interface CollegeProfile {
   remainingClaims: number;
 }
 
-export default function CollegeDashboardPage() {
-  const [activeTab, setActiveTab] = useState<"marketplace" | "tracker" | "profile">("marketplace");
+export default function CollegeDashboardPage({
+  initialTab = "marketplace",
+}: {
+  initialTab?: "marketplace" | "tracker" | "profile";
+}) {
+  const [activeTab, setActiveTab] = useState<"marketplace" | "tracker" | "profile">(initialTab);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<CollegeProfile | null>(null);
   const [marketplaceIssues, setMarketplaceIssues] = useState<IssueItem[]>([]);
@@ -372,21 +376,24 @@ export default function CollegeDashboardPage() {
   const navItems: NavItem[] = [
     {
       label: "Challenge Marketplace",
-      href: "#marketplace",
+      href: "/dashboard/college/marketplace",
       iconName: "search",
       active: activeTab === "marketplace",
+      onClick: () => setActiveTab("marketplace"),
     },
     {
       label: "Project Tracker",
-      href: "#tracker",
+      href: "/dashboard/college/projects",
       iconName: "todo",
       active: activeTab === "tracker",
+      onClick: () => setActiveTab("tracker"),
     },
     {
       label: "Institutional Profile",
-      href: "#profile",
+      href: "/dashboard/college/profile",
       iconName: "code",
       active: activeTab === "profile",
+      onClick: () => setActiveTab("profile"),
     },
   ];
 

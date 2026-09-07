@@ -1,11 +1,11 @@
 import React from "react";
 import { getCurrentUser } from "@/lib/auth/session";
 import DashboardShell, { NavItem } from "@/components/DashboardShell";
-import GovDashboardClient from "./GovDashboardClient";
+import GovDashboardClient from "../GovDashboardClient";
 
 export const dynamic = "force-dynamic";
 
-export default function GovDashboardPage() {
+export default function GovReportsPage() {
   const user = getCurrentUser();
 
   const navItems: NavItem[] = [
@@ -26,7 +26,7 @@ export default function GovDashboardPage() {
       organizationOrCollege="Dept. of Higher & Technical Education, Jharkhand"
       navItems={navItems}
     >
-      <GovDashboardClient />
+      <GovDashboardClient initialTab="colleges" />
     </DashboardShell>
   );
 }

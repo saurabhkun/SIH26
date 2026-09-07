@@ -196,9 +196,14 @@ export default function JharkhandMap({
   };
 
   const handleMouseEnter = (
-    e: React.MouseEvent<SVGPathElement | SVGTextElement>,
+    e: React.MouseEvent<SVGPathElement | SVGGElement>,
     district: DistrictGeoPath
   ) => {
+    // Dynamic SVG stacking: move hovered element to the end of parent group so it renders on top
+    if (e.currentTarget && e.currentTarget.parentNode) {
+      e.currentTarget.parentNode.appendChild(e.currentTarget);
+    }
+
     setHoveredDistrict(district.name);
     const stat = activeData[district.name] || { count: 0, density: 0 };
     if (!containerRef.current) return;
@@ -215,19 +220,6 @@ export default function JharkhandMap({
       x,
       y,
     });
-
-    const group = svgRef.current?.querySelector(`#geo-district-${district.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`);
-    if (group) {
-      const fillEl = group.querySelector<SVGPathElement>(".district-fill-path");
-      if (fillEl) {
-        animate(fillEl, {
-          opacity: 1,
-          scale: 1.015,
-          duration: 150,
-          ease: "outQuad",
-        });
-      }
-    }
   };
 
   const handleMouseMove = (e: React.MouseEvent<SVGPathElement | SVGTextElement>) => {
@@ -316,6 +308,23 @@ export default function JharkhandMap({
           className="w-full h-auto block select-none max-h-[520px]"
           aria-label="Choropleth Map of Jharkhand Districts"
         >
+          <defs>
+            <style>{`
+              .district-fill-path, .district-path {
+                transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1), stroke 180ms ease, opacity 180ms ease;
+                transform-box: fill-box;
+                transform-origin: center center;
+                will-change: transform;
+                cursor: pointer;
+              }
+              .district-fill-path:hover, .district-geo-group:hover .district-fill-path {
+                transform: scale(1.025);
+                stroke: #001B2E;
+                stroke-width: 2px;
+                filter: drop-shadow(0 4px 12px rgba(0, 27, 46, 0.25));
+              }
+            `}</style>
+          </defs>
           {/* Base Layer */}
           <g>
             {geoConfig.districts.map((district) => (

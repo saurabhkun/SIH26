@@ -311,6 +311,17 @@ export default function LoginPage() {
               {isLoading ? "Validating Credentials..." : `Access ${activeRoleConfig.title}`}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
+
+            {selectedRole !== "gov" && (
+              <div className="pt-2 text-center border-t border-slate-200 mt-4">
+                <p className="text-xs text-slate-600">
+                  New institution or CSR partner?{" "}
+                  <Link href="/register" className="font-bold text-[#001B2E] underline hover:text-[#294C60]">
+                    Register Account &rarr;
+                  </Link>
+                </p>
+              </div>
+            )}
           </form>
         </div>
       </main>

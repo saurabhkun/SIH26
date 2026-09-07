@@ -89,8 +89,12 @@ interface PledgeItem {
   createdAt: string;
 }
 
-export default function IndustryDashboardPage() {
-  const [activeTab, setActiveTab] = useState<"curated" | "portfolio" | "releases">("curated");
+export default function IndustryDashboardPage({
+  initialTab = "curated",
+}: {
+  initialTab?: "curated" | "portfolio" | "releases";
+}) {
+  const [activeTab, setActiveTab] = useState<"curated" | "portfolio" | "releases">(initialTab);
   const [loading, setLoading] = useState(true);
   const [proposals, setProposals] = useState<ProposalItem[]>([]);
   const [myPledges, setMyPledges] = useState<PledgeItem[]>([]);
@@ -302,21 +306,24 @@ export default function IndustryDashboardPage() {
   const navItems: NavItem[] = [
     {
       label: "Curated Innovation Feed",
-      href: "#curated",
+      href: "/dashboard/industry/feed",
       iconName: "search",
       active: activeTab === "curated",
+      onClick: () => setActiveTab("curated"),
     },
     {
       label: "My CSR Portfolio",
-      href: "#portfolio",
+      href: "/dashboard/industry/portfolio",
       iconName: "coins",
       active: activeTab === "portfolio",
+      onClick: () => setActiveTab("portfolio"),
     },
     {
       label: "Milestone Fund Releases",
-      href: "#releases",
+      href: "/dashboard/industry/escrow",
       iconName: "award",
       active: activeTab === "releases",
+      onClick: () => setActiveTab("releases"),
     },
   ];
 
