@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import {
   ProjectMilestone,
@@ -101,34 +102,86 @@ const ProposalSchema = new Schema<IProposal>(
     issueId: {
       type: Schema.Types.ObjectId,
       ref: "Issue",
-      required: true,
       index: true,
+      default: function (this: any) {
+        return this.issue || null;
+      },
     },
     collegeId: {
       type: Schema.Types.ObjectId,
       ref: "College",
-      required: true,
       index: true,
+      default: function (this: any) {
+        return this.college || null;
+      },
     },
     issue: {
       type: Schema.Types.ObjectId,
       ref: "Issue",
+      default: function (this: any) {
+        return this.issueId || null;
+      },
     },
     college: {
       type: Schema.Types.ObjectId,
       ref: "College",
+      default: function (this: any) {
+        return this.collegeId || null;
+      },
     },
     title: { type: String, required: true, trim: true },
-    methodologySummary: { type: String, required: true, trim: true },
-    technicalScope: { type: String, trim: true },
-    estimatedCost: { type: Number, required: true, min: 0 },
-    budgetRequested: { type: Number, default: 0 },
+    methodologySummary: {
+      type: String,
+      trim: true,
+      default: function (this: any) {
+        return this.technicalScope || "";
+      },
+    },
+    technicalScope: {
+      type: String,
+      trim: true,
+      default: function (this: any) {
+        return this.methodologySummary || "";
+      },
+    },
+    estimatedCost: {
+      type: Number,
+      min: 0,
+      default: function (this: any) {
+        return this.budgetRequested || 150000;
+      },
+    },
+    budgetRequested: {
+      type: Number,
+      min: 0,
+      default: function (this: any) {
+        return this.estimatedCost || 150000;
+      },
+    },
 
     facultyLead: {
-      name: { type: String, required: true, trim: true },
-      email: { type: String, required: true, trim: true, lowercase: true },
-      specialization: { type: String, required: true, trim: true },
-      designation: { type: String, default: "Principal Investigator / Professor" },
+      name: {
+        type: String,
+        trim: true,
+        default: function (this: any) {
+          return this.facultyMentor || "Principal Investigator";
+        },
+      },
+      email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        default: "faculty.lead@institution.ac.in",
+      },
+      specialization: {
+        type: String,
+        trim: true,
+        default: "Societal Innovation & Technology",
+      },
+      designation: {
+        type: String,
+        default: "Principal Investigator / Professor",
+      },
     },
     studentTeamSize: { type: Number, default: 4 },
     utilizedLabs: [{ type: String }],
@@ -190,24 +243,40 @@ const ProposalSchema = new Schema<IProposal>(
 );
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Synchronize virtual / alias fields before save
-ProposalSchema.pre("save", function (this: any) {
-  if (this.issueId && !this.issue) this.issue = this.issueId;
-  if (this.issue && !this.issueId) this.issueId = this.issue;
-  if (this.collegeId && !this.college) this.college = this.collegeId;
-  if (this.college && !this.collegeId) this.collegeId = this.college;
-  if (this.methodologySummary && !this.technicalScope) this.technicalScope = this.methodologySummary;
-  if (this.technicalScope && !this.methodologySummary) this.methodologySummary = this.technicalScope;
-  if (this.estimatedCost && !this.budgetRequested) this.budgetRequested = this.estimatedCost;
-  if (this.budgetRequested && !this.estimatedCost) this.estimatedCost = this.budgetRequested;
-  if (this.facultyMentor && (!this.facultyLead || !this.facultyLead.name)) {
-    this.facultyLead = {
-      name: this.facultyMentor,
+// Synchronize virtual / alias fields before validate and save
+const syncFields = function (doc: any) {
+  if (doc.issueId && !doc.issue) doc.issue = doc.issueId;
+  if (doc.issue && !doc.issueId) doc.issueId = doc.issue;
+  if (doc.collegeId && !doc.college) doc.college = doc.collegeId;
+  if (doc.college && !doc.collegeId) doc.collegeId = doc.college;
+  if (doc.methodologySummary && !doc.technicalScope) doc.technicalScope = doc.methodologySummary;
+  if (doc.technicalScope && !doc.methodologySummary) doc.methodologySummary = doc.technicalScope;
+  if (doc.estimatedCost !== undefined && doc.budgetRequested === undefined) doc.budgetRequested = doc.estimatedCost;
+  if (doc.budgetRequested !== undefined && doc.estimatedCost === undefined) doc.estimatedCost = doc.budgetRequested;
+  if (!doc.facultyLead || !doc.facultyLead.name) {
+    doc.facultyLead = {
+      name: doc.facultyMentor || "Principal Investigator",
       email: "mentor@institution.ac.in",
-      specialization: "Principal Investigator",
-      designation: "Professor & Lead",
+      specialization: "Applied Research & Innovation",
+      designation: "Principal Investigator / Professor",
     };
+  } else {
+    if (!doc.facultyLead.email) doc.facultyLead.email = "mentor@institution.ac.in";
+    if (!doc.facultyLead.specialization) doc.facultyLead.specialization = "Applied Research & Innovation";
+    if (!doc.facultyLead.designation) doc.facultyLead.designation = "Principal Investigator / Professor";
+    if (!doc.facultyLead.name && doc.facultyMentor) doc.facultyLead.name = doc.facultyMentor;
   }
+  if (!doc.facultyMentor && doc.facultyLead?.name) {
+    doc.facultyMentor = doc.facultyLead.name;
+  }
+};
+
+ProposalSchema.pre("validate", function (this: any) {
+  syncFields(this);
+});
+
+ProposalSchema.pre("save", function (this: any) {
+  syncFields(this);
 });
 
 // Indexes

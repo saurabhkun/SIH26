@@ -247,12 +247,23 @@ export async function POST(request: NextRequest) {
 
     // 5. Create Proposal doc
     const newProposal = await Proposal.create({
+      issueId: issue._id,
       issue: issue._id,
+      collegeId: college._id,
       college: college._id,
       title: title.trim(),
+      methodologySummary: technicalScope.trim(),
       technicalScope: technicalScope.trim(),
+      estimatedCost: Number(budgetRequested) || 150000,
       budgetRequested: Number(budgetRequested) || 150000,
+      facultyLead: {
+        name: facultyMentor.trim(),
+        email: college.email || "rnd.director@institution.ac.in",
+        specialization: (college.capabilities && college.capabilities[0]) || "Applied Research & Innovation",
+        designation: "Principal Investigator / Professor",
+      },
       facultyMentor: facultyMentor.trim(),
+      studentTeamSize: formattedTeam.length || 4,
       team: formattedTeam,
       milestones: formattedMilestones,
       status: "Submitted",
