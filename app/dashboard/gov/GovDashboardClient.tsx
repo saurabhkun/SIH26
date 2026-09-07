@@ -18,6 +18,8 @@ import {
 } from "recharts";
 import { CheckCircle, AlertTriangle, Building2, ShieldCheck, RefreshCw } from "lucide-react";
 import dynamic from "next/dynamic";
+import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
+import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
 
 const JharkhandMap = dynamic(() => import("@/components/JharkhandMap"), { ssr: false });
 
@@ -109,6 +111,11 @@ function ReviewQueue() {
     district: string;
     status: string;
     description: string;
+    citizenName?: string;
+    address?: string;
+    mediaUrls?: string[];
+    attachments?: { url: string; type: "photo" | "video" | "document" }[];
+    audioUrl?: string;
     similarIssueIds?: SimilarIssue[];
   }
 
@@ -308,14 +315,81 @@ function ReviewQueue() {
                 marginBottom: 12,
               }}
             >
-              <p style={{ margin: "0 0 4px", fontWeight: 700, color: "#1a2e4a" }}>{selected.title}</p>
-              <p style={{ margin: "0 0 6px", color: "#374151", lineHeight: 1.5, fontSize: 12 }}>
-                {selected.description || "No description provided."}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  gap: 8,
+                  marginBottom: 6,
+                }}
+              >
+                <p style={{ margin: 0, fontWeight: 700, color: "#1a2e4a", fontSize: 13 }}>
+                  {selected.title}
+                </p>
+                <VoiceAudioPlayer
+                  textToRead={selected.description || selected.title}
+                  audioUrl={selected.audioUrl}
+                />
+              </div>
+              <p
+                style={{
+                  margin: "0 0 8px",
+                  color: "#374151",
+                  lineHeight: 1.5,
+                  fontSize: 12,
+                  fontStyle: "italic",
+                }}
+              >
+                &ldquo;{selected.description || "No description provided."}&rdquo;
               </p>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontSize: 11 }}>
-                <span style={{ color: "#64748b" }}>Domain: <b>{selected.domain}</b></span>
-                <span style={{ color: "#64748b" }}>District: <b>{selected.district}</b></span>
-                <span style={{ color: "#64748b" }}>Status: <b>{selected.status}</b></span>
+
+              <div style={{ margin: "8px 0" }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: "#64748b",
+                    textTransform: "uppercase",
+                    display: "block",
+                    marginBottom: 4,
+                  }}
+                >
+                  Citizen Photo Evidence
+                </span>
+                <EvidenceMediaViewer
+                  mediaUrls={
+                    selected.mediaUrls && selected.mediaUrls.length > 0
+                      ? selected.mediaUrls
+                      : selected.attachments?.map((a) => a.url) || []
+                  }
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  flexWrap: "wrap",
+                  fontSize: 11,
+                  borderTop: "1px solid #f1f5f9",
+                  paddingTop: 6,
+                }}
+              >
+                <span style={{ color: "#64748b" }}>
+                  Domain: <b>{selected.domain}</b>
+                </span>
+                <span style={{ color: "#64748b" }}>
+                  District: <b>{selected.district}</b>
+                </span>
+                <span style={{ color: "#64748b" }}>
+                  Status: <b>{selected.status}</b>
+                </span>
+                {selected.citizenName && (
+                  <span style={{ color: "#64748b" }}>
+                    Citizen: <b>{selected.citizenName}</b>
+                  </span>
+                )}
               </div>
             </div>
 

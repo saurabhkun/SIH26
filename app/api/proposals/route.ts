@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     const proposals = await Proposal.find(query)
-      .populate("issue", "title trackingCode district domain severityScore status citizenName")
+      .populate("issue", "title description trackingCode district domain severityScore status citizenName address mediaUrls attachments")
       .populate("college", "name district tier capabilities")
       .sort({ createdAt: -1 })
       .lean();

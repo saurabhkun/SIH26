@@ -18,8 +18,14 @@ import {
   Sliders,
   Layers,
   CheckSquare,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Camera,
 } from "lucide-react";
 import { ISSUE_DOMAINS, IssueDomain } from "@/lib/constants/domains";
+import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
+import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
 
 interface IssueItem {
   _id: string;
@@ -33,6 +39,9 @@ interface IssueItem {
   facingSince?: string;
   citizenName: string;
   status: string;
+  mediaUrls?: string[];
+  attachments?: { url: string; type: "photo" | "video" | "document" }[];
+  audioUrl?: string;
   isCapabilityMatch: boolean;
   matchingFacilityName?: string;
   isClaimedByThisCollege: boolean;
@@ -119,6 +128,12 @@ export default function CollegeDashboardPage({
   const [myProposals, setMyProposals] = useState<ProposalItem[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [expandedMarketplaceIssueIds, setExpandedMarketplaceIssueIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpandMarketplaceIssue = (id: string) => {
+    setExpandedMarketplaceIssueIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   // Proposal modal state
   const [claimModalIssue, setClaimModalIssue] = useState<IssueItem | null>(null);
@@ -544,105 +559,176 @@ export default function CollegeDashboardPage({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {filteredIssues.map((issue) => (
-                  <div
-                    key={issue._id}
-                    className={`bg-white rounded-xl border transition-all p-5 flex flex-col justify-between ${
-                      issue.isCapabilityMatch
-                        ? "border-[#C9A227] shadow-md ring-1 ring-[#C9A227]/30"
-                        : "border-slate-200 hover:border-slate-300 shadow-sm"
-                    }`}
-                  >
-                    <div>
-                      {/* Match Badge & Meta Header */}
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div className="flex flex-wrap gap-1.5 items-center">
-                          <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                            {issue.trackingCode}
-                          </span>
-                          <span className="text-[11px] font-semibold text-[#1A365D] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                            {issue.domain}
-                          </span>
-                          <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
-                            📍 {issue.district}
-                          </span>
+                {filteredIssues.map((issue) => {
+                  const mediaList =
+                    issue.mediaUrls && issue.mediaUrls.length > 0
+                      ? issue.mediaUrls
+                      : issue.attachments?.map((a) => a.url) || [];
+
+                  return (
+                    <div
+                      key={issue._id}
+                      className={`bg-white rounded-xl border transition-all p-5 flex flex-col justify-between ${
+                        issue.isCapabilityMatch
+                          ? "border-[#C9A227] shadow-md ring-1 ring-[#C9A227]/30"
+                          : "border-slate-200 hover:border-slate-300 shadow-sm"
+                      }`}
+                    >
+                      <div>
+                        {/* Match Badge & Meta Header with Voice Audio Player */}
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                              {issue.trackingCode}
+                            </span>
+                            <span className="text-[11px] font-semibold text-[#1A365D] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                              {issue.domain}
+                            </span>
+                            <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                              📍 {issue.district}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <VoiceAudioPlayer
+                              textToRead={issue.description || issue.title}
+                              audioUrl={issue.audioUrl}
+                            />
+                            <div className="flex items-center space-x-1 px-2 py-0.5 bg-red-50 text-red-700 rounded border border-red-200 text-xs font-bold flex-shrink-0">
+                              <span>Sev: {issue.severityScore}/5</span>
+                            </div>
+                          </div>
                         </div>
 
-                        {/* Severity Score Indicator */}
-                        <div className="flex items-center space-x-1 px-2 py-0.5 bg-red-50 text-red-700 rounded border border-red-200 text-xs font-bold flex-shrink-0">
-                          <span>Sev: {issue.severityScore}/5</span>
-                        </div>
-                      </div>
+                        {/* Capability Match Highlight Banner */}
+                        {issue.isCapabilityMatch && (
+                          <div className="mb-3 px-3 py-1.5 bg-[#FFF9E6] border border-[#E6C65A] rounded-md flex items-center justify-between text-xs text-[#8A6700]">
+                            <span className="flex items-center font-bold">
+                              <Sparkles className="w-3.5 h-3.5 mr-1.5 text-[#C9A227]" />
+                              AI Capability Match
+                            </span>
+                            <span className="text-[11px] text-slate-600">
+                              {issue.matchingFacilityName || "Declared R&D Strength"}
+                            </span>
+                          </div>
+                        )}
 
-                      {/* Capability Match Highlight Banner */}
-                      {issue.isCapabilityMatch && (
-                        <div className="mb-3 px-3 py-1.5 bg-[#FFF9E6] border border-[#E6C65A] rounded-md flex items-center justify-between text-xs text-[#8A6700]">
-                          <span className="flex items-center font-bold">
-                            <Sparkles className="w-3.5 h-3.5 mr-1.5 text-[#C9A227]" />
-                            AI Capability Match
-                          </span>
-                          <span className="text-[11px] text-slate-600">
-                            {issue.matchingFacilityName || "Declared R&D Strength"}
-                          </span>
-                        </div>
-                      )}
+                        {/* Challenge Title */}
+                        <h3 className="font-serif font-bold text-base text-slate-900 leading-snug mb-2">
+                          {issue.title}
+                        </h3>
 
-                      {/* Challenge Title */}
-                      <h3 className="font-serif font-bold text-base text-slate-900 leading-snug mb-2">
-                        {issue.title}
-                      </h3>
-
-                      {/* Problem Description */}
-                      <p className="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed">
-                        {issue.description}
-                      </p>
-
-                      {/* Citizen / Context Footer */}
-                      <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-500 flex justify-between items-center mb-4">
-                        <span>Reported by: <strong>{issue.citizenName}</strong></span>
-                        <span className="capitalize">
-                          Status:{" "}
-                          <strong
-                            className={
-                              issue.status === "Proposal_Submitted"
-                                ? "text-blue-700"
-                                : "text-amber-700"
-                            }
+                        {/* Ground Sourced Problem & Evidence Collapsible Drawer */}
+                        <div className="mb-3.5 bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => toggleExpandMarketplaceIssue(issue._id)}
+                            className="w-full px-3.5 py-2 flex items-center justify-between text-left hover:bg-slate-100 transition cursor-pointer"
                           >
-                            {issue.status.replace(/_/g, " ")}
-                          </strong>
-                        </span>
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-3.5 h-3.5 text-[#1A365D]" />
+                              <span className="text-xs font-bold text-slate-800">
+                                Ground Sourced Problem &amp; Evidence
+                              </span>
+                              {mediaList.length > 0 && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-[#FFEFD3] text-[#001B2E] px-1.5 py-0.5 rounded border border-[#FFC49B]/50">
+                                  <Camera className="w-2.5 h-2.5" /> {mediaList.length} Photos
+                                </span>
+                              )}
+                            </div>
+                            {expandedMarketplaceIssueIds[issue._id] ? (
+                              <ChevronUp className="w-4 h-4 text-slate-500" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-slate-500" />
+                            )}
+                          </button>
+
+                          {expandedMarketplaceIssueIds[issue._id] && (
+                            <div className="px-3.5 pb-3.5 pt-1 border-t border-slate-200/60 space-y-2.5 bg-white/50">
+                              <div>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                  Citizen Grievance Statement
+                                </p>
+                                <p className="text-xs text-slate-700 italic bg-white p-2.5 rounded border border-slate-200 leading-relaxed">
+                                  &ldquo;
+                                  {issue.description ||
+                                    "Grassroots civic issue reported by local resident."}
+                                  &rdquo;
+                                </p>
+                                {issue.citizenName && (
+                                  <p className="text-[11px] text-slate-500 mt-1">
+                                    Reported by: <strong className="text-slate-700">{issue.citizenName}</strong>
+                                    {issue.address ? ` • ${issue.address}` : ""}
+                                  </p>
+                                )}
+                              </div>
+
+                              <div>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                  Field Evidence Photos
+                                </p>
+                                <EvidenceMediaViewer mediaUrls={mediaList} />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Problem Description Preview (if drawer collapsed) */}
+                        {!expandedMarketplaceIssueIds[issue._id] && (
+                          <p className="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">
+                            {issue.description}
+                          </p>
+                        )}
+
+                        {/* Citizen / Context Footer */}
+                        <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-500 flex justify-between items-center mb-4">
+                          <span>
+                            Reported by: <strong>{issue.citizenName}</strong>
+                          </span>
+                          <span className="capitalize">
+                            Status:{" "}
+                            <strong
+                              className={
+                                issue.status === "Proposal_Submitted"
+                                  ? "text-blue-700"
+                                  : "text-amber-700"
+                              }
+                            >
+                              {issue.status.replace(/_/g, " ")}
+                            </strong>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Action Area */}
+                      <div className="pt-2">
+                        {issue.isClaimedByThisCollege ? (
+                          <div className="w-full py-2 px-3 bg-blue-50 border border-blue-200 rounded-md text-center text-xs font-semibold text-blue-800 flex items-center justify-center space-x-1.5">
+                            <CheckCircle className="w-4 h-4 text-blue-600" />
+                            <span>Proposal Submitted by BIT Mesra</span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleOpenClaim(issue)}
+                            disabled={profile?.isAtCap}
+                            className={`w-full py-2.5 px-4 rounded-md text-xs font-bold flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+                              profile?.isAtCap
+                                ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                                : "bg-[#1A365D] hover:bg-[#132845] text-white shadow-sm"
+                            }`}
+                          >
+                            <Send className="w-3.5 h-3.5 text-[#C9A227]" />
+                            <span>
+                              {profile?.isAtCap
+                                ? "Claim Locked (Allocation Cap Reached)"
+                                : "Claim Challenge & Submit Proposal"}
+                            </span>
+                          </button>
+                        )}
                       </div>
                     </div>
-
-                    {/* Action Area */}
-                    <div className="pt-2">
-                      {issue.isClaimedByThisCollege ? (
-                        <div className="w-full py-2 px-3 bg-blue-50 border border-blue-200 rounded-md text-center text-xs font-semibold text-blue-800 flex items-center justify-center space-x-1.5">
-                          <CheckCircle className="w-4 h-4 text-blue-600" />
-                          <span>Proposal Submitted by BIT Mesra</span>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => handleOpenClaim(issue)}
-                          disabled={profile?.isAtCap}
-                          className={`w-full py-2.5 px-4 rounded-md text-xs font-bold flex items-center justify-center space-x-2 transition-all ${
-                            profile?.isAtCap
-                              ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
-                              : "bg-[#1A365D] hover:bg-[#132845] text-white shadow-sm"
-                          }`}
-                        >
-                          <Send className="w-3.5 h-3.5 text-[#C9A227]" />
-                          <span>
-                            {profile?.isAtCap
-                              ? "Claim Locked (Allocation Cap Reached)"
-                              : "Claim Challenge & Submit Proposal"}
-                          </span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1084,6 +1170,39 @@ export default function CollegeDashboardPage({
                     {formFeedback.msg}
                   </div>
                 )}
+
+                {/* Citizen Problem Statement & Media Evidence Box */}
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-[#1A365D]" />
+                      <span className="text-xs font-bold text-slate-900">
+                        Original Citizen Grievance &amp; Field Evidence
+                      </span>
+                    </div>
+                    <VoiceAudioPlayer
+                      textToRead={claimModalIssue.description || claimModalIssue.title}
+                      audioUrl={claimModalIssue.audioUrl}
+                    />
+                  </div>
+
+                  <p className="text-xs text-slate-700 italic bg-white p-3 rounded-lg border border-slate-200 leading-relaxed">
+                    &ldquo;{claimModalIssue.description}&rdquo;
+                  </p>
+
+                  <div className="pt-1">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                      Citizen Field Photo Evidence
+                    </span>
+                    <EvidenceMediaViewer
+                      mediaUrls={
+                        claimModalIssue.mediaUrls && claimModalIssue.mediaUrls.length > 0
+                          ? claimModalIssue.mediaUrls
+                          : claimModalIssue.attachments?.map((a) => a.url) || []
+                      }
+                    />
+                  </div>
+                </div>
 
                 {/* Proposal Title */}
                 <div>

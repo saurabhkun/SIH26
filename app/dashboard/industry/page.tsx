@@ -15,8 +15,14 @@ import {
   RefreshCw,
   AlertCircle,
   ShieldCheck,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Camera,
 } from "lucide-react";
 import { ISSUE_DOMAINS } from "@/lib/constants/domains";
+import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
+import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
 
 interface Milestone {
   title: string;
@@ -38,11 +44,16 @@ interface ProposalItem {
   issue?: {
     _id: string;
     title: string;
+    description?: string;
     trackingCode: string;
     district: string;
     domain: string;
     severityScore: number;
     citizenName: string;
+    address?: string;
+    mediaUrls?: string[];
+    attachments?: { url: string; type: "photo" | "video" | "document" }[];
+    audioUrl?: string;
   };
   college?: {
     _id: string;
@@ -100,6 +111,12 @@ export default function IndustryDashboardPage({
   const [myPledges, setMyPledges] = useState<PledgeItem[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [expandedIssueIds, setExpandedIssueIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpandIssue = (id: string) => {
+    setExpandedIssueIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   // Pledge modal state
   const [pledgeModalProposal, setPledgeModalProposal] = useState<ProposalItem | null>(null);
@@ -457,82 +474,160 @@ export default function IndustryDashboardPage({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredProposals.map((prop) => (
-                  <div
-                    key={prop._id}
-                    className="bg-white rounded-xl border border-slate-200 hover:border-slate-300 shadow-sm p-5 flex flex-col justify-between transition-all"
-                  >
-                    <div>
-                      {/* Meta header */}
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div className="flex flex-wrap gap-1.5 items-center">
-                          <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                            {prop.issue?.trackingCode || "CR-JH-2026"}
-                          </span>
-                          <span className="text-[11px] font-semibold text-[#1A365D] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                            {prop.issue?.domain || "Civic Innovation"}
-                          </span>
-                          <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
-                            📍 {prop.issue?.district || "Jharkhand"}
-                          </span>
+                {filteredProposals.map((prop) => {
+                  const mediaList =
+                    prop.issue?.mediaUrls && prop.issue.mediaUrls.length > 0
+                      ? prop.issue.mediaUrls
+                      : prop.issue?.attachments?.map((a) => a.url) || [];
+
+                  return (
+                    <div
+                      key={prop._id}
+                      className="bg-white rounded-xl border border-slate-200 hover:border-slate-300 shadow-sm p-5 flex flex-col justify-between transition-all"
+                    >
+                      <div>
+                        {/* Meta header with Voice Audio Player on right */}
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                              {prop.issue?.trackingCode || "CR-JH-2026"}
+                            </span>
+                            <span className="text-[11px] font-semibold text-[#1A365D] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                              {prop.issue?.domain || "Civic Innovation"}
+                            </span>
+                            <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                              📍 {prop.issue?.district || "Jharkhand"}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <VoiceAudioPlayer
+                              textToRead={
+                                prop.issue?.description || prop.issue?.title || prop.technicalScope
+                              }
+                              audioUrl={prop.issue?.audioUrl}
+                            />
+                            <span className="text-xs font-bold px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded shrink-0">
+                              ₹{prop.budgetRequested.toLocaleString("en-IN")} Required
+                            </span>
+                          </div>
                         </div>
 
-                        <span className="text-xs font-bold px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded">
-                          ₹{prop.budgetRequested.toLocaleString("en-IN")} Required
-                        </span>
-                      </div>
+                        {/* Title & Institution */}
+                        <h3 className="font-serif font-bold text-base text-slate-900 leading-snug mb-1.5">
+                          {prop.title}
+                        </h3>
+                        <p className="text-xs font-semibold text-[#1A365D] mb-3 flex items-center">
+                          <Building className="w-3.5 h-3.5 mr-1 text-[#C9A227]" />
+                          {prop.college?.name || "Higher Education Institution"} ({prop.college?.tier || "L1"})
+                        </p>
 
-                      {/* Title & Institution */}
-                      <h3 className="font-serif font-bold text-base text-slate-900 leading-snug mb-1.5">
-                        {prop.title}
-                      </h3>
-                      <p className="text-xs font-semibold text-[#1A365D] mb-3 flex items-center">
-                        <Building className="w-3.5 h-3.5 mr-1 text-[#C9A227]" />
-                        {prop.college?.name || "Higher Education Institution"} ({prop.college?.tier || "L1"})
-                      </p>
-
-                      {/* Technical Scope */}
-                      <p className="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        {prop.technicalScope}
-                      </p>
-
-                      {/* Milestones Preview */}
-                      <div className="mb-4">
-                        <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
-                          Deliverable Milestones ({prop.milestones?.length || 0})
-                        </h5>
-                        <div className="space-y-1.5">
-                          {prop.milestones?.slice(0, 3).map((m, idx) => (
-                            <div
-                              key={idx}
-                              className="text-[11px] flex justify-between items-center text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded"
-                            >
-                              <span className="truncate max-w-[200px]">{m.title}</span>
-                              <span className="font-mono font-bold text-slate-800">
-                                ₹{m.fundingReleaseAmount.toLocaleString("en-IN")}
+                        {/* Ground Sourced Problem & Evidence Drawer */}
+                        <div className="mb-3.5 bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => toggleExpandIssue(prop._id)}
+                            className="w-full px-3.5 py-2 flex items-center justify-between text-left hover:bg-slate-100 transition cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-3.5 h-3.5 text-[#1A365D]" />
+                              <span className="text-xs font-bold text-slate-800">
+                                Ground Sourced Problem &amp; Evidence
                               </span>
+                              {mediaList.length > 0 && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-[#FFEFD3] text-[#001B2E] px-1.5 py-0.5 rounded border border-[#FFC49B]/50">
+                                  <Camera className="w-2.5 h-2.5" /> {mediaList.length} Photos
+                                </span>
+                              )}
                             </div>
-                          ))}
+                            {expandedIssueIds[prop._id] ? (
+                              <ChevronUp className="w-4 h-4 text-slate-500" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-slate-500" />
+                            )}
+                          </button>
+
+                          {expandedIssueIds[prop._id] && (
+                            <div className="px-3.5 pb-3.5 pt-1 border-t border-slate-200/60 space-y-2.5 bg-white/50">
+                              <div>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                  Citizen Grievance Statement
+                                </p>
+                                <p className="text-xs text-slate-700 italic bg-white p-2.5 rounded border border-slate-200 leading-relaxed">
+                                  &ldquo;
+                                  {prop.issue?.description ||
+                                    prop.issue?.title ||
+                                    "Grassroots civic issue reported by local resident."}
+                                  &rdquo;
+                                </p>
+                                {prop.issue?.citizenName && (
+                                  <p className="text-[11px] text-slate-500 mt-1">
+                                    Reported by: <strong className="text-slate-700">{prop.issue.citizenName}</strong>
+                                    {prop.issue?.address ? ` • ${prop.issue.address}` : ""}
+                                  </p>
+                                )}
+                              </div>
+
+                              <div>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                  Ground Photo Evidence
+                                </p>
+                                <EvidenceMediaViewer mediaUrls={mediaList} />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Technical Scope */}
+                        <div className="mb-4">
+                          <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Academic R&amp;D Solution Plan
+                          </h5>
+                          <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            {prop.technicalScope}
+                          </p>
+                        </div>
+
+                        {/* Milestones Preview */}
+                        <div className="mb-4">
+                          <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                            Deliverable Milestones ({prop.milestones?.length || 0})
+                          </h5>
+                          <div className="space-y-1.5">
+                            {prop.milestones?.slice(0, 3).map((m, idx) => (
+                              <div
+                                key={idx}
+                                className="text-[11px] flex justify-between items-center text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded"
+                              >
+                                <span className="truncate max-w-[200px]">{m.title}</span>
+                                <span className="font-mono font-bold text-slate-800">
+                                  ₹{m.fundingReleaseAmount.toLocaleString("en-IN")}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Action Area */}
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                      <div className="text-xs text-slate-500">
-                        <span>Mentor: <strong>{prop.facultyMentor}</strong></span>
+                      {/* Action Area */}
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                        <div className="text-xs text-slate-500">
+                          <span>
+                            Mentor: <strong>{prop.facultyMentor}</strong>
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => handleOpenPledge(prop)}
+                          className="py-2 px-4 bg-[#1A365D] hover:bg-[#132845] text-white rounded-md text-xs font-bold shadow-sm flex items-center space-x-1.5 transition-all cursor-pointer"
+                        >
+                          <Coins className="w-3.5 h-3.5 text-[#C9A227]" />
+                          <span>Pledge CSR Funding</span>
+                        </button>
                       </div>
-
-                      <button
-                        onClick={() => handleOpenPledge(prop)}
-                        className="py-2 px-4 bg-[#1A365D] hover:bg-[#132845] text-white rounded-md text-xs font-bold shadow-sm flex items-center space-x-1.5 transition-all"
-                      >
-                        <Coins className="w-3.5 h-3.5 text-[#C9A227]" />
-                        <span>Pledge CSR Funding</span>
-                      </button>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

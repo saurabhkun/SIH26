@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     };
 
     const proposals = await Proposal.find(query)
-      .populate("issue", "title trackingCode district domain severityScore citizenName address")
+      .populate("issue", "title description trackingCode district domain severityScore citizenName address mediaUrls attachments")
       .populate("college", "name district tier capabilities facilities")
       .sort({ createdAt: -1 })
       .lean();

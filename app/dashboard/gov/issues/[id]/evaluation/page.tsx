@@ -7,6 +7,8 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import HumanPanelDecisionMatrix, { ProposalCardData } from "@/components/panels/HumanPanelDecisionMatrix";
 import ContingencyEscalationLadder from "@/components/panels/ContingencyEscalationLadder";
+import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
+import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
 
 export default function GovProposalEvaluationPage() {
   const params = useParams();
@@ -61,7 +63,7 @@ export default function GovProposalEvaluationPage() {
           }));
           setProposals(mapped);
         } else {
-          // Fallback mock proposals for immediate demo
+          // Fallback realistic proposal cards for demonstration
           setProposals([
             {
               id: "prop_demo_1",
@@ -139,34 +141,56 @@ export default function GovProposalEvaluationPage() {
           ...payload,
         }),
       });
+
       const data = await res.json();
-      if (data.success) {
-        setSuccessBanner(
-          "Decision bindingly confirmed! Winner has been awarded lead custody, and 2 designated runners-up have been logged in the contingency cascade."
-        );
+      if (res.ok && data.success) {
+        setSuccessBanner(data.message || "Stage 2 Human Determination finalized successfully!");
         setTimeout(() => {
           router.push("/dashboard/gov");
-        }, 2200);
+        }, 3000);
       } else {
-        alert(data.error || "Failed to confirm determination");
+        alert(data.error || "Failed to record panel determination.");
       }
-    } catch (e: any) {
-      alert("Error finalizing evaluation: " + e.message);
+    } catch (err: any) {
+      alert("Network failure: " + err?.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-bg text-ink p-4 sm:p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#FFF9F2] text-slate-900 pb-20">
+      {/* Top Header */}
+      <header className="bg-[#001B2E] text-white border-b border-[#294C60] px-6 py-4 sticky top-0 z-20 shadow-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-mono tracking-wider uppercase font-bold text-[#FFC49B]">
+              Government of Jharkhand &bull; Nodal Officer Determination Desk
+            </span>
+            <h1 className="text-xl font-serif font-bold text-[#FFEFD3] leading-tight">
+              Bidding Window Stage 2: Multi-Criteria Panel Review
+            </h1>
+          </div>
+          <div className="text-right">
+            <span className="text-xs text-slate-300 font-mono">
+              Challenge ID: <strong>{issue?.trackingCode || issueId}</strong>
+            </span>
+            <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 justify-end">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              State High-Level Evaluation Committee
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <Link
             href="/dashboard/gov"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy hover:underline"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#294C60] hover:text-[#001B2E] transition"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-4 h-4" />
             <span>Back to Government Nodal Dashboard</span>
           </Link>
           <span className="text-xs text-slate-500 font-medium">
@@ -189,6 +213,51 @@ export default function GovProposalEvaluationPage() {
           hasSweeteners={issue?.sweeteners?.priorityFunding}
           isNodalOfficer={true}
         />
+
+        {/* Citizen Sourced Problem Statement & Photo Evidence */}
+        <div className="bg-white border border-slate-300 p-5 rounded-sm shadow-xs space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+            <div>
+              <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 border border-amber-200">
+                {issue?.trackingCode || "CR-JH-2026"} &bull; {issue?.domain || "Civic Challenge"} &bull; {issue?.district || "Jharkhand"}
+              </span>
+              <h2 className="text-base font-serif font-bold text-slate-900 mt-1">
+                {issue?.title || "Regional S&T Innovation Challenge"}
+              </h2>
+            </div>
+            <VoiceAudioPlayer
+              textToRead={issue?.description || issue?.title}
+              audioUrl={issue?.audioUrl}
+            />
+          </div>
+
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              Verbatim Citizen Grievance Statement
+            </p>
+            <p className="text-xs text-slate-700 italic bg-slate-50 p-3 border border-slate-200 leading-relaxed rounded-xs">
+              &ldquo;{issue?.description || "Heavy toxic run-off and sediment accumulation affecting municipal drinking water reservoirs."}&rdquo;
+            </p>
+            {issue?.citizenName && (
+              <p className="text-[11px] text-slate-500 mt-1">
+                Reported by: <strong className="text-slate-700">{issue.citizenName}</strong> {issue?.address ? `• ${issue.address}` : ""}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              Citizen Photo Evidence
+            </p>
+            <EvidenceMediaViewer
+              mediaUrls={
+                issue?.mediaUrls && issue.mediaUrls.length > 0
+                  ? issue.mediaUrls
+                  : issue?.attachments?.map((a: any) => a.url) || []
+              }
+            />
+          </div>
+        </div>
 
         {/* Human Panel Shortlist Review & Award Matrix */}
         {isLoading ? (
