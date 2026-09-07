@@ -4,6 +4,7 @@ import Issue, { IssueDomain } from "@/lib/models/Issue";
 import College from "@/lib/models/College";
 import Proposal from "@/lib/models/Proposal";
 import { getCurrentUser } from "@/lib/auth/session";
+import { syncReportsToIssues } from "@/lib/utils/reportsAdapter";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
+    await syncReportsToIssues();
 
     const { searchParams } = new URL(request.url);
     const domainFilter = searchParams.get("domain");

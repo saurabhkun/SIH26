@@ -5,6 +5,7 @@ import Proposal from "@/lib/models/Proposal";
 import IndustryPledge from "@/lib/models/IndustryPledge";
 import { getCurrentUser } from "@/lib/auth/session";
 import { JHARKHAND_DISTRICTS } from "@/lib/constants/districts";
+import { syncReportsToIssues } from "@/lib/utils/reportsAdapter";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export async function GET() {
   }
 
   await dbConnect();
+  await syncReportsToIssues();
 
   // 1. Issues by domain
   const issuesByDomain = await Issue.aggregate([

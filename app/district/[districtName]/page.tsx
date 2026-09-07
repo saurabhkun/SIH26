@@ -5,6 +5,7 @@ import College from "@/lib/models/College";
 import Proposal from "@/lib/models/Proposal";
 import IndustryPledge from "@/lib/models/IndustryPledge";
 import { JHARKHAND_DISTRICTS } from "@/lib/data/districts";
+import { syncReportsToIssues } from "@/lib/utils/reportsAdapter";
 import DistrictDashboardView from "@/components/DistrictDashboardView";
 
 export const dynamic = "force-dynamic";
@@ -55,6 +56,7 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
 
   try {
     await connectDB();
+    await syncReportsToIssues();
 
     const districtQuery = {
       district: { $regex: new RegExp(`^${targetName}$`, "i") },

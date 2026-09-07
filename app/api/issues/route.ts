@@ -6,6 +6,8 @@ import { createNotification } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 
+import { getAllUnifiedIssues, syncIssueToReport } from "@/lib/utils/reportsAdapter";
+
 /**
  * GET /api/issues?district=X&status=Y&domain=Z
  */
@@ -18,26 +20,20 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const domain = searchParams.get("domain");
 
-    const query: Record<string, unknown> = {};
+    let issues = await getAllUnifiedIssues();
 
     if (district && district !== "all") {
-      // Case-insensitive district match
-      query.district = { $regex: new RegExp(`^${district}$`, "i") };
+      const dLower = district.toLowerCase();
+      issues = issues.filter((i) => (i.district || "").toLowerCase() === dLower);
     }
 
     if (status && status !== "all") {
-      query.status = status;
+      issues = issues.filter((i) => i.status === status);
     }
 
     if (domain && domain !== "all") {
-      query.domain = domain;
+      issues = issues.filter((i) => i.domain === domain);
     }
-
-    const issues = await Issue.find(query)
-      .populate("assignedColleges", "name tier district")
-      .populate("similarIssueIds", "trackingCode title status")
-      .sort({ createdAt: -1 })
-      .lean();
 
     return NextResponse.json({
       success: true,
@@ -172,6 +168,8 @@ export async function POST(request: NextRequest) {
       assignedColleges: [],
       submissionIndexForMobile,
     });
+
+    await syncIssueToReport(newIssue);
 
     // 7. Fire citizen notification
     await createNotification({

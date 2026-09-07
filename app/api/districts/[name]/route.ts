@@ -5,6 +5,7 @@ import College from "@/lib/models/College";
 import Proposal from "@/lib/models/Proposal";
 import IndustryPledge from "@/lib/models/IndustryPledge";
 import { JHARKHAND_DISTRICTS } from "@/lib/data/districts";
+import { syncReportsToIssues } from "@/lib/utils/reportsAdapter";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ export async function GET(
 ) {
   try {
     await connectDB();
+    await syncReportsToIssues();
 
     const decodedName = decodeURIComponent(params.name);
 

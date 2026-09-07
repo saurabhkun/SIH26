@@ -1,9 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  Upload,
+  Droplets,
+  Sprout,
+  Pickaxe,
+  HeartPulse,
+  GraduationCap,
+  Trees,
+  Baby,
+  Tractor,
+  Mic,
+  MicOff,
+  Plus,
+  Languages,
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
@@ -16,6 +27,7 @@ import {
 } from "lucide-react";
 import { JHARKHAND_DISTRICTS } from "@/lib/data/districts";
 import { ISSUE_DOMAINS, IssueDomain, FACING_SINCE_OPTIONS, FacingSince } from "@/lib/constants/domains";
+import { VISUAL_CHALLENGES, VisualChallengeOption } from "@/lib/constants/challenges";
 import { classifyIssueDescription } from "@/lib/classify";
 
 interface CitizenSubmissionWizardProps {
@@ -30,25 +42,76 @@ interface MockFile {
   type: "photo" | "document" | "video";
 }
 
+// Global declaration for Web Speech Recognition API
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence?: number;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  length: number;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onstart: (event: Event) => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: Event) => void;
+  onend: (event: Event) => void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognitionInstance;
+    webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
+  }
+}
+
 export default function CitizenSubmissionWizard({
   onSuccess,
   onCancel,
   defaultDistrict = "Ranchi",
 }: CitizenSubmissionWizardProps) {
-  // Step state (1 = Description & Evidence, 2 = Spatiotemporal, 3 = Identity & Verification, 4 = Success)
+  // Step state (1 = Challenge Selection & Description, 2 = Spatiotemporal, 3 = Identity & Verification, 4 = Success)
   const [step, setStep] = useState<number>(1);
+
+  // Selected Visual Challenge Option
+  const [selectedChallengeId, setSelectedChallengeId] = useState<string>("water-contamination");
 
   // Step 1 Form State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState<MockFile[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<IssueDomain>("Water Resources");
-  const [selectedSeverity, setSelectedSeverity] = useState<number>(3);
+  const [selectedSeverity, setSelectedSeverity] = useState<number>(4);
   const [aiSuggestedDomain, setAiSuggestedDomain] = useState<IssueDomain>("Water Resources");
   const [aiSuggestedSeverity, setAiSuggestedSeverity] = useState<number>(3);
   const [aiTags, setAiTags] = useState<string[]>([]);
   const [isAiOverridden, setIsAiOverridden] = useState(false);
   const [aiConfidence, setAiConfidence] = useState<number>(0);
+
+  // Speech to Text States
+  const [isListening, setIsListening] = useState(false);
+  const [speechLang, setSpeechLang] = useState<"hi-IN" | "en-IN">("hi-IN");
+  const [interimTranscript, setInterimTranscript] = useState("");
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   // Step 2 Form State
   const [district, setDistrict] = useState<string>(defaultDistrict);
@@ -75,7 +138,87 @@ export default function CitizenSubmissionWizard({
   } | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Run AI classification as citizen types description
+  // File input ref for the embedded "+" button
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const toggleListening = () => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice speech-to-text is not supported on your browser. Please type directly into the description box or use Google Chrome / Microsoft Edge.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      setInterimTranscript("");
+      return;
+    }
+
+    // Save baseline text before recording starts
+    const baseText = description;
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = speechLang;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let spokenText = "";
+        let currentInterim = "";
+
+        for (let i = 0; i < event.results.length; ++i) {
+          const item = event.results[i];
+          const transcript = item[0]?.transcript || "";
+          spokenText += transcript + " ";
+          if (!item.isFinal) {
+            currentInterim += transcript + " ";
+          }
+        }
+
+        const trimmedSpoken = spokenText.trim();
+        if (trimmedSpoken) {
+          const combined = baseText ? `${baseText.trim()} ${trimmedSpoken}` : trimmedSpoken;
+          setDescription(combined);
+
+          if (!title) {
+            const firstWords = trimmedSpoken.split(" ").slice(0, 7).join(" ");
+            if (firstWords.length > 4) {
+              setTitle(firstWords);
+            }
+          }
+        }
+
+        setInterimTranscript(currentInterim.trim());
+      };
+
+      recognition.onerror = (err) => {
+        console.warn("Speech recognition notice:", err);
+        setIsListening(false);
+        setInterimTranscript("");
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        setInterimTranscript("");
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.error("Speech Recognition Error:", err);
+      setIsListening(false);
+    }
+  };
+
+  // Run AI classification as citizen types or speaks description
   useEffect(() => {
     if (description.length >= 10) {
       const res = classifyIssueDescription(description, title);
@@ -91,7 +234,18 @@ export default function CitizenSubmissionWizard({
     }
   }, [description, title, isAiOverridden]);
 
-  // Handle Mock File Upload
+  // Handle Visual Challenge Card Selection
+  const handleSelectChallenge = (option: VisualChallengeOption) => {
+    setSelectedChallengeId(option.id);
+    setSelectedDomain(option.domain);
+    setSelectedSeverity(option.defaultSeverity);
+
+    if (!title) {
+      setTitle(option.exampleTitle);
+    }
+  };
+
+  // Handle File Upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles: MockFile[] = Array.from(e.target.files).map((f) => {
@@ -145,7 +299,7 @@ export default function CitizenSubmissionWizard({
 
     try {
       const payload = {
-        title: title.trim(),
+        title: title.trim() || VISUAL_CHALLENGES.find((c) => c.id === selectedChallengeId)?.title || "Grassroots Civic Issue",
         description: description.trim(),
         domain: selectedDomain,
         severityScore: selectedSeverity,
@@ -203,18 +357,46 @@ export default function CitizenSubmissionWizard({
     }
   };
 
+  // Icon renderer for the 8 challenge categories
+  const renderChallengeIcon = (iconName: string, color: string) => {
+    const props = { className: "w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0", style: { color } };
+    switch (iconName) {
+      case "droplets":
+        return <Droplets {...props} />;
+      case "sprout":
+        return <Sprout {...props} />;
+      case "pickaxe":
+        return <Pickaxe {...props} />;
+      case "heart-pulse":
+        return <HeartPulse {...props} />;
+      case "graduation-cap":
+        return <GraduationCap {...props} />;
+      case "trees":
+        return <Trees {...props} />;
+      case "baby":
+        return <Baby {...props} />;
+      case "tractor":
+        return <Tractor {...props} />;
+      default:
+        return <Droplets {...props} />;
+    }
+  };
+
   return (
-    <div className="bg-white border border-slate-300 p-6 max-w-3xl mx-auto rounded-xs">
+    <div className="bg-white border border-slate-300 p-4 sm:p-7 max-w-4xl mx-auto rounded-sm shadow-sm">
       {/* Wizard Header */}
       <div className="border-b border-slate-200 pb-4 mb-6">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-start sm:items-center">
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-navy bg-gold/15 px-2 py-0.5 border border-gold/40 inline-block mb-1">
-              Government of Jharkhand &bull; Citizen Grievance Sourcing
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-navy bg-gold/15 px-2.5 py-0.5 border border-gold/40 inline-block mb-1.5">
+              Government of Jharkhand &bull; Public Grievance & Innovation Portal
             </span>
             <h2 className="text-xl sm:text-2xl font-serif font-bold text-navy">
-              Report a Grassroots Civic Challenge
+              Report a Grassroots Challenge / Grievance
             </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Tap a category, speak or type your issue, and submit with zero bureaucratic hassle.
+            </p>
           </div>
           {onCancel && (
             <button
@@ -231,7 +413,7 @@ export default function CitizenSubmissionWizard({
         {step < 4 && (
           <div className="grid grid-cols-3 gap-2 text-xs mt-4 pt-3 border-t border-slate-200">
             <div
-              className={`py-1.5 px-2 border-b-2 font-medium ${
+              className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 1
                   ? "border-navy text-navy font-bold"
                   : step > 1
@@ -239,10 +421,11 @@ export default function CitizenSubmissionWizard({
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              1. Evidence & Description
+              <span className="w-4 h-4 rounded-full bg-navy/10 text-navy inline-flex items-center justify-center text-[10px] font-bold">1</span>
+              <span>1. Choose Problem & Voice / Text</span>
             </div>
             <div
-              className={`py-1.5 px-2 border-b-2 font-medium ${
+              className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 2
                   ? "border-navy text-navy font-bold"
                   : step > 2
@@ -250,73 +433,289 @@ export default function CitizenSubmissionWizard({
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              2. District & Duration
+              <span className="w-4 h-4 rounded-full bg-navy/10 text-navy inline-flex items-center justify-center text-[10px] font-bold">2</span>
+              <span>2. District & Duration</span>
             </div>
             <div
-              className={`py-1.5 px-2 border-b-2 font-medium ${
+              className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 3
                   ? "border-navy text-navy font-bold"
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              3. Identity & Verification
+              <span className="w-4 h-4 rounded-full bg-navy/10 text-navy inline-flex items-center justify-center text-[10px] font-bold">3</span>
+              <span>3. Verification & Submit</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* STEP 1: Evidence & Description */}
+      {/* STEP 1: Visual Problem Cards & Dual-Mode Description */}
       {step === 1 && (
-        <div className="space-y-5">
-          {/* Issue Title */}
+        <div className="space-y-6">
+          {/* SECTION A: 8 1-Tap Visual Problem Categories */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <label className="text-xs font-bold text-navy uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Step 1: Select Main Problem Category</span>
+                  <span className="text-red-600">*</span>
+                </label>
+                <p className="text-[11px] text-slate-500">
+                  Choose the icon that best matches the issue in your village or ward.
+                </p>
+              </div>
+              <span className="text-[10.5px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-xs border border-slate-200 hidden sm:inline-block">
+                1-Tap Accessible Selection
+              </span>
+            </div>
+
+            {/* 8 Visual Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+              {VISUAL_CHALLENGES.map((option) => {
+                const isSelected = selectedChallengeId === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => handleSelectChallenge(option)}
+                    className={`text-left p-3 border transition-all duration-150 flex flex-col justify-between rounded-xs relative group ${
+                      isSelected
+                        ? "bg-navy/5 border-navy ring-1 ring-navy shadow-sm"
+                        : "bg-white border-slate-200 hover:border-slate-400 hover:bg-slate-50/70"
+                    }`}
+                  >
+                    {/* Active Checkmark Badge */}
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-4 h-4 bg-navy text-gold rounded-full flex items-center justify-center shadow-xs">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      </div>
+                    )}
+
+                    <div>
+                      <div className="flex items-center space-x-2.5 mb-1.5">
+                        <div
+                          className="p-2 rounded-xs flex items-center justify-center"
+                          style={{ backgroundColor: option.bgLight, border: `1px solid ${option.borderColor}55` }}
+                        >
+                          {renderChallengeIcon(option.iconName, option.color)}
+                        </div>
+                        <span
+                          className="text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-xs"
+                          style={{
+                            backgroundColor: `${option.color}15`,
+                            color: option.color,
+                            border: `1px solid ${option.color}33`,
+                          }}
+                        >
+                          {option.badge}
+                        </span>
+                      </div>
+
+                      <div className="font-bold text-xs text-navy leading-snug line-clamp-2">
+                        {option.title}
+                      </div>
+                      <div className="text-[11px] font-medium text-slate-500 mt-0.5">
+                        {option.hindiTitle}
+                      </div>
+                    </div>
+
+                    <div className="text-[10.5px] text-slate-600 mt-2 line-clamp-2 leading-relaxed border-t border-slate-100 pt-1.5">
+                      {option.description}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SECTION B: Issue Title (Pre-seeded or Custom) */}
           <div>
             <label className="block text-xs font-semibold text-slate-800 mb-1">
-              Challenge Title <span className="text-red-600">*</span>
+              Issue Headline / Summary <span className="text-red-600">*</span>
             </label>
             <input
               type="text"
               placeholder="e.g. High Fluoride in Handpumps of Bhandra Panchayat"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy"
+              className="w-full px-3 py-2 text-sm border border-slate-300 focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy rounded-xs"
               required
             />
           </div>
 
-          {/* Problem Narrative Textarea */}
+          {/* SECTION C: Modern Dual-Mode Description Box (Type or Speak) */}
           <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-semibold text-slate-800">
-                Detailed Problem Narrative <span className="text-red-600">*</span>
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="text-xs font-bold text-navy uppercase tracking-wider flex items-center gap-1.5">
+                <span>Step 2: Describe the Issue (Type or Speak 🎙️)</span>
+                <span className="text-red-600">*</span>
               </label>
-              <span
-                className={`text-[11px] ${
-                  description.length < 20 ? "text-amber-700" : "text-slate-500"
-                }`}
-              >
-                {description.length}/20 min chars
-              </span>
+              <div className="flex items-center gap-2">
+                {/* Language Switcher for Speech */}
+                <div className="flex items-center space-x-1 text-[11px] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-xs">
+                  <Languages className="w-3 h-3 text-slate-500" />
+                  <span className="text-slate-500">Language:</span>
+                  <button
+                    type="button"
+                    onClick={() => setSpeechLang("hi-IN")}
+                    className={`font-semibold px-1 rounded-xs transition-colors ${
+                      speechLang === "hi-IN" ? "text-navy bg-white shadow-xs" : "text-slate-500 hover:text-navy"
+                    }`}
+                  >
+                    हिन्दी
+                  </button>
+                  <span className="text-slate-300">|</span>
+                  <button
+                    type="button"
+                    onClick={() => setSpeechLang("en-IN")}
+                    className={`font-semibold px-1 rounded-xs transition-colors ${
+                      speechLang === "en-IN" ? "text-navy bg-white shadow-xs" : "text-slate-500 hover:text-navy"
+                    }`}
+                  >
+                    English
+                  </button>
+                </div>
+
+                <span
+                  className={`text-[11px] font-medium ${
+                    description.length < 15 ? "text-amber-700" : "text-emerald-700 font-semibold"
+                  }`}
+                >
+                  {description.length} chars
+                </span>
+              </div>
             </div>
-            <textarea
-              rows={4}
-              placeholder="Describe the problem, affected community size, duration, and attempts made to resolve it..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy"
-              required
-            />
+
+            {/* AI / Chat Unified Input Container */}
+            <div className={`border rounded-xs transition-all duration-150 bg-white ${
+              isListening
+                ? "border-red-500 ring-2 ring-red-100 shadow-md"
+                : "border-slate-300 focus-within:border-navy focus-within:ring-1 focus-within:ring-navy"
+            }`}>
+              {/* Text Area */}
+              <textarea
+                rows={4}
+                placeholder="Describe the problem, affected families, location, or tap the mic 🎙️ below to speak in Hindi or English..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full p-3 text-sm focus:outline-none resize-y border-none bg-transparent placeholder-slate-400 text-slate-900"
+                required
+              />
+
+              {/* Interim Real-Time Speech Display Banner */}
+              {isListening && (
+                <div className="px-3 py-2 bg-red-50/80 border-t border-red-200 flex items-center justify-between text-xs text-red-900 animate-pulse">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping" />
+                    <span className="font-semibold">
+                      Listening ({speechLang === "hi-IN" ? "बोलिए - हिन्दी" : "Speaking - English"})...
+                    </span>
+                    {interimTranscript && (
+                      <span className="italic text-slate-700 text-xs truncate max-w-xs sm:max-w-md">
+                        &ldquo;{interimTranscript}&rdquo;
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-red-700 font-medium">Tap mic to stop</span>
+                </div>
+              )}
+
+              {/* Chat-Style Bottom Action Bar inside the box */}
+              <div className="flex items-center justify-between px-3 py-2 bg-slate-50/80 border-t border-slate-200">
+                {/* Left: [+] Attachment Trigger & Shortcuts */}
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center space-x-1 text-xs text-navy font-semibold hover:text-navyLight bg-white border border-slate-300 px-2.5 py-1 rounded-xs hover:bg-slate-50 transition-colors"
+                    title="Attach Photo or Document"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-navy" />
+                    <span>Attach Evidence</span>
+                    {files.length > 0 && (
+                      <span className="ml-1 px-1.5 py-0.2 bg-navy text-gold text-[10px] font-bold rounded-full">
+                        {files.length}
+                      </span>
+                    )}
+                  </button>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*,.pdf,.doc,.docx"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+
+                  <span className="text-[11px] text-slate-400 hidden sm:inline-block">
+                    Photos, PDFs or test reports
+                  </span>
+                </div>
+
+                {/* Right: Speech-to-Text Mic Button */}
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={toggleListening}
+                    className={`inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xs transition-all ${
+                      isListening
+                        ? "bg-red-600 text-white shadow-md hover:bg-red-700 animate-bounce"
+                        : "bg-navy text-gold border border-gold/40 hover:bg-navyLight"
+                    }`}
+                    title={isListening ? "Stop Recording" : "Speak to Type Description (Speech to Text)"}
+                  >
+                    {isListening ? (
+                      <>
+                        <MicOff className="w-3.5 h-3.5" />
+                        <span>Stop Mic</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-3.5 h-3.5 text-gold" />
+                        <span>Voice Input (बोलकर लिखें)</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Attached files preview chips */}
+            {files.length > 0 && (
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                {files.map((file, idx) => (
+                  <div
+                    key={idx}
+                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-slate-100 border border-slate-300 text-xs rounded-xs"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-navy flex-shrink-0" />
+                    <span className="font-medium text-slate-800 truncate max-w-[140px]">{file.name}</span>
+                    <span className="text-[10px] text-slate-500 uppercase">({file.size})</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(idx)}
+                      className="text-slate-400 hover:text-red-700 ml-1"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Real-Time AI Suggestion Panel */}
+          {/* Real-Time AI Suggestion & Triage Panel */}
           {description.length >= 10 && (
-            <div className="p-3.5 bg-slate-50 border border-slate-300 text-xs">
+            <div className="p-3.5 bg-slate-50 border border-slate-300 text-xs rounded-xs">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-1.5 text-navy font-semibold">
                   <Sparkles className="w-4 h-4 text-gold" />
-                  <span>Automated Technical Domain & Severity Suggestion</span>
+                  <span>AI Triage & Technical Department Suggestion</span>
                 </div>
                 {aiConfidence > 0 && (
-                  <span className="text-[10.5px] bg-white border border-slate-300 px-1.5 py-0.5 text-slate-600">
+                  <span className="text-[10.5px] bg-white border border-slate-300 px-1.5 py-0.5 text-slate-600 font-medium">
                     Confidence: {aiConfidence}%
                   </span>
                 )}
@@ -324,13 +723,16 @@ export default function CitizenSubmissionWizard({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700">
                 <div className="bg-white p-2.5 border border-slate-200">
-                  <span className="text-[11px] text-slate-500 block">Suggested Domain:</span>
+                  <span className="text-[11px] text-slate-500 block">AI Detected Department:</span>
                   <span className="font-semibold text-navy text-sm">{aiSuggestedDomain}</span>
+                  {isAiOverridden && (
+                    <span className="text-[10px] text-amber-700 block font-medium">Overridden to: {selectedDomain}</span>
+                  )}
                 </div>
                 <div className="bg-white p-2.5 border border-slate-200">
-                  <span className="text-[11px] text-slate-500 block">Suggested Severity:</span>
+                  <span className="text-[11px] text-slate-500 block">AI Assessed Severity:</span>
                   <span className="font-semibold text-navy text-sm">
-                    Level {aiSuggestedSeverity}/5
+                    Level {isAiOverridden ? selectedSeverity : aiSuggestedSeverity}/5 &bull; {selectedSeverity >= 4 ? "High Priority" : "Standard Review"}
                   </span>
                 </div>
               </div>
@@ -344,14 +746,14 @@ export default function CitizenSubmissionWizard({
                     onChange={(e) => setIsAiOverridden(e.target.checked)}
                     className="mr-2 text-navy focus:ring-navy"
                   />
-                  <span>Edit or manually override suggested domain / severity</span>
+                  <span>Manually override department or severity</span>
                 </label>
 
                 {isAiOverridden && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pt-2 border-t border-slate-200">
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-700 mb-1">
-                        Select Correct Domain:
+                        Select Department:
                       </label>
                       <select
                         value={selectedDomain}
@@ -393,61 +795,16 @@ export default function CitizenSubmissionWizard({
             </div>
           )}
 
-          {/* Multi-File Upload Input */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-800 mb-1">
-              Upload Supporting Evidence (Photos, Water Quality Tests, Documents)
-            </label>
-            <div className="border-2 border-dashed border-slate-300 p-4 text-center bg-slate-50/50 hover:bg-slate-50">
-              <Upload className="w-6 h-6 mx-auto text-slate-400 mb-1" />
-              <label className="cursor-pointer text-xs font-semibold text-navy hover:underline block">
-                Click to attach files
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*,.pdf,.doc,.docx"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                PNG, JPG, PDF up to 10MB per document
-              </p>
-            </div>
-
-            {/* Attached files list */}
-            {files.length > 0 && (
-              <div className="mt-3 space-y-1.5">
-                {files.map((file, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between px-3 py-1.5 bg-slate-100 border border-slate-200 text-xs"
-                  >
-                    <div className="flex items-center space-x-2 truncate">
-                      <FileText className="w-3.5 h-3.5 text-navy flex-shrink-0" />
-                      <span className="truncate font-medium">{file.name}</span>
-                      <span className="text-[10px] text-slate-500 uppercase">({file.type})</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFile(idx)}
-                      className="text-slate-400 hover:text-red-700 ml-2"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* Next Button */}
           <div className="flex justify-end pt-4 border-t border-slate-200">
             <button
               type="button"
-              disabled={!title.trim() || description.trim().length < 20}
-              onClick={() => setStep(2)}
-              className="inline-flex items-center px-5 py-2 bg-navy text-gold text-xs font-semibold border border-gold/40 hover:bg-navyLight disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!title.trim() || description.trim().length < 10}
+              onClick={() => {
+                if (isListening) toggleListening();
+                setStep(2);
+              }}
+              className="inline-flex items-center px-6 py-2.5 bg-navy text-gold text-xs font-bold border border-gold/40 hover:bg-navyLight disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors"
             >
               Next: District & Location
               <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
@@ -507,7 +864,7 @@ export default function CitizenSubmissionWizard({
             </div>
           </div>
 
-          {/* Duration Pill Selector (Buttons, not dropdown) */}
+          {/* Duration Pill Selector */}
           <div>
             <label className="block text-xs font-semibold text-slate-800 mb-1.5">
               How long has this challenge been affecting your community? <span className="text-red-600">*</span>

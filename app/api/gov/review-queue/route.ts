@@ -4,9 +4,11 @@ import Issue from "@/lib/models/Issue";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createNotification } from "@/lib/notifications";
 
+import { syncReportsToIssues } from "@/lib/utils/reportsAdapter";
+
 export const dynamic = "force-dynamic";
 
-// GET /api/gov/review-queue  → issues with status Under_Review or with similarIssueIds
+// GET /api/gov/review-queue  → issues with status Under_Review, Reported, or with similarIssueIds
 export async function GET() {
   const user = getCurrentUser();
   if (!user || user.role !== "gov") {
@@ -14,10 +16,11 @@ export async function GET() {
   }
 
   await dbConnect();
+  await syncReportsToIssues();
 
   const issues = await Issue.find({
     $or: [
-      { status: "Under_Review" },
+      { status: { $in: ["Under_Review", "Reported"] } },
       { similarIssueIds: { $exists: true, $not: { $size: 0 } } },
     ],
   })

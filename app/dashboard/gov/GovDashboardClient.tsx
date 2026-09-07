@@ -839,8 +839,9 @@ function AnalyticsDashboard() {
           >
             Issue Density by District
           </p>
-          <div style={{ height: 280 }}>
+          <div className="w-full flex justify-center py-2">
             <JharkhandMap
+              compact={true}
               districtData={Object.fromEntries(
                 data.issuesByDistrict
                   .filter((d) => d.issues > 0)

@@ -1,4 +1,12 @@
+import dns from "dns";
 import mongoose from "mongoose";
+
+// Ensure reliable DNS resolution for MongoDB Atlas SRV connection strings on Windows
+try {
+  dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+} catch {
+  // Ignore in restricted environments
+}
 
 interface MongooseCache {
   conn: typeof mongoose | null;

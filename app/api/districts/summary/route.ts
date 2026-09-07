@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import Issue from "@/lib/models/Issue";
 import College from "@/lib/models/College";
 import IndustryPledge from "@/lib/models/IndustryPledge";
 import { JHARKHAND_DISTRICTS } from "@/lib/data/districts";
+import { getAllUnifiedIssues } from "@/lib/utils/reportsAdapter";
 
 export const dynamic = "force-dynamic";
 
@@ -33,35 +33,34 @@ export async function GET() {
   try {
     await connectDB();
 
-    // 1. Group issues by district
-    const issueAgg: DistrictIssueAgg[] = await Issue.aggregate([
-      {
-        $group: {
-          _id: "$district",
-          totalIssues: { $sum: 1 },
-          resolvedCount: {
-            $sum: { $cond: [{ $eq: ["$status", "Resolved"] }, 1, 0] },
-          },
-          underReviewCount: {
-            $sum: { $cond: [{ $eq: ["$status", "Under_Review"] }, 1, 0] },
-          },
-          assignedCount: {
-            $sum: {
-              $cond: [
-                {
-                  $in: [
-                    "$status",
-                    ["Assigned_HEI", "Proposal_Submitted", "Under_Prototyping", "Industry_Funded"],
-                  ],
-                },
-                1,
-                0,
-              ],
-            },
-          },
-        },
-      },
-    ]);
+    // 1. Gather all unified issues from both issues and reports collections
+    const allUnifiedIssues = await getAllUnifiedIssues();
+
+    // Map aggregates to a fast lookup
+    const issueStatsMap: Record<string, DistrictIssueAgg> = {};
+    let maxIssues = 1;
+
+    for (const item of allUnifiedIssues) {
+      const dName = item.district || "Ranchi";
+      if (!issueStatsMap[dName]) {
+        issueStatsMap[dName] = {
+          _id: dName,
+          totalIssues: 0,
+          resolvedCount: 0,
+          underReviewCount: 0,
+          assignedCount: 0,
+        };
+      }
+      issueStatsMap[dName].totalIssues += 1;
+      if (item.status === "Resolved") issueStatsMap[dName].resolvedCount += 1;
+      if (item.status === "Under_Review") issueStatsMap[dName].underReviewCount += 1;
+      if (["Assigned_HEI", "Proposal_Submitted", "Under_Prototyping", "Industry_Funded"].includes(item.status)) {
+        issueStatsMap[dName].assignedCount += 1;
+      }
+      if (issueStatsMap[dName].totalIssues > maxIssues) {
+        maxIssues = issueStatsMap[dName].totalIssues;
+      }
+    }
 
     // 2. Group colleges by district
     const collegeAgg: DistrictCollegeAgg[] = await College.aggregate([
@@ -97,17 +96,6 @@ export async function GET() {
           (fundsByDistrict[issueDistrict] || 0) + (pledge.amountPledged || 0);
       }
     }
-
-    // Map aggregates to a fast lookup
-    const issueStatsMap: Record<string, DistrictIssueAgg> = {};
-    let maxIssues = 1;
-
-    issueAgg.forEach((item) => {
-      issueStatsMap[item._id] = item;
-      if (item.totalIssues > maxIssues) {
-        maxIssues = item.totalIssues;
-      }
-    });
 
     const collegeStatsMap: Record<string, number> = {};
     collegeAgg.forEach((item) => {
