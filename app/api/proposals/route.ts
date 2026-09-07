@@ -195,35 +195,50 @@ export async function POST(request: NextRequest) {
         ];
 
     const formattedMilestones: IMilestone[] = Array.isArray(milestones) && milestones.length > 0
-      ? milestones.map((m: { title: string; description: string; dueDate?: string; fundingReleaseAmount?: number }, idx: number) => ({
-          title: m.title?.trim() || `Milestone ${idx + 1}`,
-          description: m.description?.trim() || "Deliverable execution and testing",
-          dueDate: m.dueDate ? new Date(m.dueDate) : new Date(Date.now() + (idx + 1) * 30 * 24 * 60 * 60 * 1000),
-          status: "Pending" as const,
-          fundingReleaseAmount: Number(m.fundingReleaseAmount) || Math.round((Number(budgetRequested) || 150000) / (milestones.length || 3)),
-          fundingReleased: false,
-        }))
+      ? milestones.map((m: { title: string; description: string; dueDate?: string; fundingReleaseAmount?: number; payoutPercentage?: number }, idx: number) => {
+          const target = m.dueDate || new Date(Date.now() + (idx + 1) * 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+          return {
+            id: `m-${idx + 1}`,
+            title: m.title?.trim() || `Milestone ${idx + 1}`,
+            description: m.description?.trim() || "Deliverable execution and testing",
+            targetDate: target,
+            dueDate: new Date(target),
+            payoutPercentage: m.payoutPercentage || Math.round(100 / (milestones.length || 3)),
+            status: "Pending" as const,
+            fundingReleaseAmount: Number(m.fundingReleaseAmount) || Math.round((Number(budgetRequested) || 150000) / (milestones.length || 3)),
+            fundingReleased: false,
+          };
+        })
       : [
           {
+            id: "m-1",
             title: "Phase 1: Field Assessment & Sensor Prototyping",
             description: "Site visits, water sampling, and baseline laboratory calibration",
+            targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
             dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            payoutPercentage: 40,
             status: "Pending" as const,
             fundingReleaseAmount: Math.round((Number(budgetRequested) || 150000) * 0.4),
             fundingReleased: false,
           },
           {
+            id: "m-2",
             title: "Phase 2: Deployment & Pilot Community Testing",
             description: "Install modular filtration unit and continuous telemetry",
+            targetDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
             dueDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+            payoutPercentage: 40,
             status: "Pending" as const,
             fundingReleaseAmount: Math.round((Number(budgetRequested) || 150000) * 0.4),
             fundingReleased: false,
           },
           {
+            id: "m-3",
             title: "Phase 3: Final Handover & Nodal Certification",
             description: "Government inspection report and user manual handover to panchayat",
+            targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
             dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+            payoutPercentage: 20,
             status: "Pending" as const,
             fundingReleaseAmount: Math.round((Number(budgetRequested) || 150000) * 0.2),
             fundingReleased: false,

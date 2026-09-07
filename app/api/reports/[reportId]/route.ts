@@ -68,14 +68,15 @@ export async function PATCH(
 
     await issue.save();
 
-    if (data.status) {
-      await createNotification({
-        recipientType: "citizen",
-        recipientId: issue.citizenMobile,
-        message: `Your issue "${issue.title}" status has been updated to ${issue.status.replace(/_/g, " ")}.`,
-        relatedIssue: issue._id,
-      });
-    }
+      const recipientPhone = issue.citizenMobile || issue.citizenPhone;
+      if (recipientPhone) {
+        await createNotification({
+          recipientType: "citizen",
+          recipientId: recipientPhone,
+          message: `Your issue "${issue.title}" status has been updated to ${issue.status.replace(/_/g, " ")}.`,
+          relatedIssue: issue._id,
+        });
+      }
 
     return NextResponse.json(mapToFlutterReport(issue));
   } catch (error: any) {

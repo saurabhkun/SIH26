@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const orderAmount = Number(amount) || pledge.amountPledged;
+    const orderAmount = Number(amount) || pledge.amountPledged || pledge.pledgedAmount || 50000;
     const amountInPaise = Math.round(orderAmount * 100);
 
     // Generate authenticated Razorpay Sandbox Test Order ID

@@ -1,11 +1,20 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
+import {
+  IssueStatus,
+  UrgencyTrack,
+  EscalationStage,
+  CollegeTier,
+  SweetenersConfig,
+  DirectNominationInfo,
+  L3SubcontractDetail,
+  RunnerUpRef,
+} from "@/types/civic";
 import {
   ISSUE_DOMAINS,
   IssueDomain,
   FACING_SINCE_OPTIONS,
   FacingSince,
   ISSUE_STATUSES,
-  IssueStatus,
 } from "../constants/domains";
 
 export { ISSUE_DOMAINS, FACING_SINCE_OPTIONS, ISSUE_STATUSES };
@@ -18,29 +27,56 @@ export interface IAttachment {
 }
 
 export interface IIssue extends Document {
+  trackingCode: string;
   title: string;
   description: string;
-  attachments: IAttachment[];
-  domain: IssueDomain;
-  severityScore: number;
-  aiTags: string[];
+  domain: string;
   district: string;
+  block?: string;
   pincode?: string;
   address?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
   location?: {
     lat: number;
     lng: number;
   };
-  facingSince: FacingSince;
+  attachments: IAttachment[];
+  mediaUrls?: string[];
+  severityScore: number;
+  aiTags: string[];
+  facingSince?: string;
   citizenName: string;
-  citizenMobile: string;
+  citizenPhone: string;
+  citizenMobile?: string;
   mobileVerified: boolean;
-  trackingCode: string;
   dedupFingerprint?: string;
-  duplicateOf?: mongoose.Types.ObjectId | null;
-  similarIssueIds: mongoose.Types.ObjectId[];
-  status: IssueStatus;
-  assignedColleges: mongoose.Types.ObjectId[];
+  duplicateOf?: Types.ObjectId | null;
+  similarIssueIds?: Types.ObjectId[];
+
+  // Triage & Circuit-Breaker Engine
+  urgencyTrack: UrgencyTrack;
+  triageRationale?: string;
+  disasterNotifiedAt?: Date;
+  assignedNodalOfficer?: string;
+
+  // Workflow & Contingency Escalation Ladder
+  status: string;
+  escalationStage: EscalationStage;
+  targetTiers: CollegeTier[];
+  biddingDeadline: Date;
+  sweeteners: SweetenersConfig;
+  directNomination: DirectNominationInfo;
+
+  // Assigned Entity & Subcontracting
+  assignedLeadCollege?: Types.ObjectId;
+  assignedColleges: Types.ObjectId[];
+  subContractedL3?: L3SubcontractDetail;
+  winningProposal?: Types.ObjectId;
+  backupRunnersUp: RunnerUpRef[];
+
   reviewedBy?: string;
   submissionIndexForMobile: number;
   createdAt: Date;
@@ -56,67 +92,139 @@ const AttachmentSchema = new Schema<IAttachment>(
   { _id: false }
 );
 
+const DirectNominationSchema = new Schema<DirectNominationInfo>(
+  {
+    collegeId: { type: Schema.Types.ObjectId, ref: "College" },
+    collegeName: { type: String },
+    nominatedAt: { type: Date },
+    status: {
+      type: String,
+      enum: ["NONE", "PENDING_RO_CONSENT", "ACCEPTED", "DECLINED"],
+      default: "NONE",
+    },
+    rejectionReason: { type: String },
+  },
+  { _id: false }
+);
+
+const SubContractedL3Schema = new Schema<L3SubcontractDetail>(
+  {
+    collegeId: { type: Schema.Types.ObjectId, ref: "College", required: true },
+    collegeName: { type: String },
+    type: { type: String, enum: ["L3R", "L3G"], required: true },
+    scopeOfWork: [{ type: String }],
+    agreedStipend: { type: Number, default: 0 },
+    distanceKm: { type: Number },
+    status: {
+      type: String,
+      enum: ["PENDING", "ACCEPTED", "IN_PROGRESS", "COMPLETED"],
+      default: "PENDING",
+    },
+  },
+  { _id: false }
+);
+
+const RunnerUpSchema = new Schema<RunnerUpRef>(
+  {
+    proposalId: { type: Schema.Types.ObjectId, ref: "Proposal", required: true },
+    collegeId: { type: Schema.Types.ObjectId, ref: "College" },
+    collegeName: { type: String },
+    rank: { type: Number, enum: [1, 2], required: true },
+  },
+  { _id: false }
+);
+
 const IssueSchema = new Schema<IIssue>(
   {
-    title: { type: String, required: true, trim: true },
-    description: { type: String, required: true, trim: true },
-    attachments: { type: [AttachmentSchema], default: [] },
-    domain: {
-      type: String,
-      enum: ISSUE_DOMAINS,
-      required: true,
-    },
-    severityScore: {
-      type: Number,
-      min: 1,
-      max: 5,
-      default: 3,
-    },
-    aiTags: { type: [String], default: [] },
-    district: { type: String, required: true, trim: true },
-    pincode: { type: String, trim: true },
-    address: { type: String, trim: true },
-    location: {
-      lat: { type: Number },
-      lng: { type: Number },
-    },
-    facingSince: {
-      type: String,
-      enum: FACING_SINCE_OPTIONS,
-      required: true,
-    },
-    citizenName: { type: String, required: true, trim: true },
-    citizenMobile: { type: String, required: true, trim: true },
-    mobileVerified: { type: Boolean, default: false },
     trackingCode: {
       type: String,
       required: true,
       unique: true,
       trim: true,
+      index: true,
     },
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
+    domain: { type: String, required: true, trim: true, index: true },
+    district: { type: String, required: true, trim: true, index: true },
+    block: { type: String, trim: true },
+    pincode: { type: String, trim: true },
+    address: { type: String, trim: true },
+    coordinates: {
+      lat: { type: Number },
+      lng: { type: Number },
+    },
+    location: {
+      lat: { type: Number },
+      lng: { type: Number },
+    },
+    attachments: { type: [AttachmentSchema], default: [] },
+    mediaUrls: [{ type: String }],
+    severityScore: { type: Number, min: 1, max: 100, default: 45 },
+    aiTags: { type: [String], default: [] },
+    facingSince: { type: String, default: "1_to_3_months" },
+    citizenName: { type: String, required: true, trim: true },
+    citizenPhone: { type: String, default: "9876543210", trim: true },
+    citizenMobile: { type: String, trim: true },
+    mobileVerified: { type: Boolean, default: false },
     dedupFingerprint: { type: String, index: true },
-    duplicateOf: {
-      type: Schema.Types.ObjectId,
-      ref: "Issue",
-      default: null,
+    duplicateOf: { type: Schema.Types.ObjectId, ref: "Issue", default: null },
+    similarIssueIds: [{ type: Schema.Types.ObjectId, ref: "Issue" }],
+
+    // Triage & Circuit Breaker
+    urgencyTrack: {
+      type: String,
+      enum: [
+        "DISASTER_FAST_TRACK",
+        "TRADITIONAL_GOVT_GRIEVANCE",
+        "RO_INNOVATION_PIPELINE",
+      ],
+      default: "RO_INNOVATION_PIPELINE",
+      index: true,
     },
-    similarIssueIds: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Issue",
-      },
-    ],
+    triageRationale: { type: String },
+    disasterNotifiedAt: { type: Date },
+    assignedNodalOfficer: { type: String },
+
+    // Workflow & Escalation Engine
     status: {
       type: String,
-      enum: ISSUE_STATUSES,
-      default: "Reported",
+      default: "OPEN_FOR_BIDDING",
+      index: true,
     },
-    assignedColleges: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "College",
-      },
-    ],
+    escalationStage: {
+      type: Number,
+      enum: [1, 2, 3, 4, 5],
+      default: 1,
+      index: true,
+    },
+    targetTiers: {
+      type: [String],
+      enum: ["L1", "L2", "L3R", "L3G"],
+      default: ["L1"],
+    },
+    biddingDeadline: {
+      type: Date,
+      default: () => new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+      index: true,
+    },
+    sweeteners: {
+      priorityFunding: { type: Boolean, default: false },
+      stateBonusPoints: { type: Number, default: 0 },
+      fastTrackApproval: { type: Boolean, default: false },
+    },
+    directNomination: {
+      type: DirectNominationSchema,
+      default: () => ({ status: "NONE" }),
+    },
+
+    // Assigned Entity & Subcontracting
+    assignedLeadCollege: { type: Schema.Types.ObjectId, ref: "College" },
+    assignedColleges: [{ type: Schema.Types.ObjectId, ref: "College" }],
+    subContractedL3: { type: SubContractedL3Schema },
+    winningProposal: { type: Schema.Types.ObjectId, ref: "Proposal" },
+    backupRunnersUp: { type: [RunnerUpSchema], default: [] },
+
     reviewedBy: { type: String },
     submissionIndexForMobile: { type: Number, default: 1 },
   },
@@ -125,10 +233,10 @@ const IssueSchema = new Schema<IIssue>(
   }
 );
 
-// Compound and single field indexes
+// High-speed compound indexes for query execution
 IssueSchema.index({ district: 1, status: 1 });
-IssueSchema.index({ domain: 1 });
-IssueSchema.index({ citizenMobile: 1 });
+IssueSchema.index({ escalationStage: 1, biddingDeadline: 1 });
+IssueSchema.index({ urgencyTrack: 1, createdAt: -1 });
 
 const Issue: Model<IIssue> =
   mongoose.models.Issue || mongoose.model<IIssue>("Issue", IssueSchema);

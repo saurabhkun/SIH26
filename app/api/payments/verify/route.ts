@@ -67,13 +67,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const finalAmt = pledge.amountPledged || pledge.pledgedAmount || 0;
+
     return NextResponse.json({
       success: true,
-      message: `CSR Funding of ₹${pledge.amountPledged.toLocaleString("en-IN")} successfully verified & locked in Sandbox mode!`,
+      message: `CSR Funding of ₹${finalAmt.toLocaleString("en-IN")} successfully verified & locked in Sandbox mode!`,
       data: {
         pledgeId: pledge._id,
         status: pledge.status,
-        amountPledged: pledge.amountPledged,
+        amountPledged: finalAmt,
         razorpayPaymentId: pledge.razorpayPaymentId,
         razorpayOrderId: pledge.razorpayOrderId,
       },

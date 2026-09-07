@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     // Fire notifications
     await createNotification({
       recipientType: "citizen",
-      recipientId: newIssue.citizenMobile,
+      recipientId: newIssue.citizenMobile || newIssue.citizenPhone || "citizen",
       message: `Your issue "${newIssue.title}" has been registered via Phone App with tracking code ${trackingCode}.`,
       relatedIssue: newIssue._id,
     });

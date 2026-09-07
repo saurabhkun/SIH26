@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Issue, { IssueDomain } from "@/lib/models/Issue";
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const collegeCapabilities: IssueDomain[] = college?.capabilities || [];
+    const collegeCapabilities: IssueDomain[] = (college?.capabilities || []) as IssueDomain[];
 
     // 2. Query issues with status Assigned_HEI or Reported (or all non-resolved for testing)
     const query: Record<string, unknown> = {
@@ -98,12 +99,12 @@ export async function GET(request: NextRequest) {
 
     // 4. Annotate each issue with capability match and claim status
     const annotatedIssues = issues.map((issue) => {
-      const isMatch = collegeCapabilities.includes(issue.domain);
+      const isMatch = collegeCapabilities.includes(issue.domain as IssueDomain);
       const existingProposal = proposalMap.get(issue._id.toString());
       const isClaimedByThisCollege = !!existingProposal;
 
       // Find matching facility if any
-      const matchingFacility = college?.facilities?.find((f: { relatedDomains: IssueDomain[] }) =>
+      const matchingFacility = (college?.facilities as any[])?.find((f: any) =>
         f.relatedDomains?.includes(issue.domain)
       );
 

@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
 
     const pledgeMap = new Map<string, typeof pledges[0][]>();
     pledges.forEach((p) => {
-      const propId = p.proposal.toString();
+      const propId = (p.proposalId || p.proposal)?.toString();
+      if (!propId) return;
       const existing = pledgeMap.get(propId) || [];
       existing.push(p);
       pledgeMap.set(propId, existing);

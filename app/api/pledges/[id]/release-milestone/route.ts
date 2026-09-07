@@ -54,12 +54,13 @@ export async function POST(
 
     const targetMilestone = proposal.milestones[idx];
 
-    // Check if milestone was completed by the college
-    if (targetMilestone.status !== "Completed") {
+    // Check if milestone was completed/verified by the college/panel
+    const mStatus = String(targetMilestone.status);
+    if (mStatus !== "Completed" && mStatus !== "VERIFIED") {
       return NextResponse.json(
         {
           success: false,
-          error: "Funds cannot be released yet: Milestone must first be marked 'Completed' by the college research team.",
+          error: "Funds cannot be released yet: Milestone must first be marked 'Completed' or 'VERIFIED'.",
         },
         { status: 400 }
       );

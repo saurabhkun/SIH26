@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Schema, Document, Model } from "mongoose";
-import { ISSUE_DOMAINS, IssueDomain, COLLEGE_TIERS, CollegeTier } from "../constants/domains";
+import { CollegeTier } from "@/types/civic";
 
-export { COLLEGE_TIERS };
 export type { CollegeTier };
+export const COLLEGE_TIERS: CollegeTier[] = ["L1", "L2", "L3R", "L3G"];
 
 export interface IFacility {
   name: string;
   description?: string;
-  relatedDomains: IssueDomain[];
+  equipment?: string[];
+  certification?: string;
+  relatedDomains?: string[];
 }
 
 export interface IFaculty {
@@ -19,12 +22,19 @@ export interface IFaculty {
 
 export interface ICollege extends Document {
   name: string;
-  district: string;
-  tier: CollegeTier;
-  capabilities: IssueDomain[];
-  facilities: IFacility[];
-  faculty: IFaculty[];
+  code: string;
   email: string;
+  tier: CollegeTier;
+  district: string;
+  facilities: string[] | IFacility[];
+  researchSpecializations: string[];
+  capabilities: string[];
+  faculty: IFaculty[];
+  activeFacultyCount: number;
+  availableStudentWorkforce: number;
+  completedProjectsCount: number;
+  avgMilestoneOnTimeRate: number;
+  reputationScore: number;
   contactPerson?: string;
   contactPhone?: string;
   maxConcurrentClaims: number;
@@ -32,15 +42,6 @@ export interface ICollege extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
-const FacilitySchema = new Schema<IFacility>(
-  {
-    name: { type: String, required: true, trim: true },
-    description: { type: String, trim: true },
-    relatedDomains: [{ type: String, enum: ISSUE_DOMAINS }],
-  },
-  { _id: false }
-);
 
 const FacultySchema = new Schema<IFaculty>(
   {
@@ -55,20 +56,7 @@ const FacultySchema = new Schema<IFaculty>(
 const CollegeSchema = new Schema<ICollege>(
   {
     name: { type: String, required: true, trim: true },
-    district: { type: String, required: true, trim: true },
-    tier: {
-      type: String,
-      enum: COLLEGE_TIERS,
-      required: true,
-    },
-    capabilities: [
-      {
-        type: String,
-        enum: ISSUE_DOMAINS,
-      },
-    ],
-    facilities: { type: [FacilitySchema], default: [] },
-    faculty: { type: [FacultySchema], default: [] },
+    code: { type: String, required: true, unique: true, trim: true },
     email: {
       type: String,
       required: true,
@@ -76,19 +64,36 @@ const CollegeSchema = new Schema<ICollege>(
       lowercase: true,
       trim: true,
     },
+    tier: {
+      type: String,
+      enum: ["L1", "L2", "L3R", "L3G"],
+      required: true,
+      index: true,
+    },
+    district: { type: String, required: true, trim: true, index: true },
+    facilities: { type: [Schema.Types.Mixed as any], default: [] },
+    researchSpecializations: [{ type: String }],
+    capabilities: [{ type: String }],
+    faculty: { type: [FacultySchema], default: [] },
+    activeFacultyCount: { type: Number, default: 25 },
+    availableStudentWorkforce: { type: Number, default: 120 },
+    completedProjectsCount: { type: Number, default: 0 },
+    avgMilestoneOnTimeRate: { type: Number, default: 95.0 },
+    reputationScore: { type: Number, default: 4.8 },
     contactPerson: { type: String, trim: true },
     contactPhone: { type: String, trim: true },
-    maxConcurrentClaims: { type: Number, default: 3, min: 1 },
-    verified: { type: Boolean, default: false },
+    maxConcurrentClaims: { type: Number, default: 4, min: 1 },
+    verified: { type: Boolean, default: true },
   },
   {
     timestamps: true,
   }
 );
 
-// Indexes
-CollegeSchema.index({ district: 1, tier: 1 });
-CollegeSchema.index({ capabilities: 1 });
+// High performance compound indexes
+CollegeSchema.index({ tier: 1, district: 1 });
+CollegeSchema.index({ capabilities: 1, tier: 1 });
+CollegeSchema.index({ reputationScore: -1 });
 
 const College: Model<ICollege> =
   mongoose.models.College || mongoose.model<ICollege>("College", CollegeSchema);

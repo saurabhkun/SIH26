@@ -106,9 +106,11 @@ export async function POST(request: NextRequest) {
       mentorshipNotes: mentorshipNotes?.trim() || "",
     });
 
+    const formattedAmount = (newPledge.amountPledged ?? newPledge.pledgedAmount ?? Number(amountPledged)).toLocaleString("en-IN");
+
     return NextResponse.json({
       success: true,
-      message: `CSR funding pledge of ₹${newPledge.amountPledged.toLocaleString("en-IN")} initiated for '${proposal.title}'.`,
+      message: `CSR funding pledge of ₹${formattedAmount} initiated for '${proposal.title}'.`,
       data: newPledge,
     });
   } catch (error: unknown) {
