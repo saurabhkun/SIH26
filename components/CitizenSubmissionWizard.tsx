@@ -28,6 +28,7 @@ import {
 import { JHARKHAND_DISTRICTS } from "@/lib/data/districts";
 import { ISSUE_DOMAINS, IssueDomain, FACING_SINCE_OPTIONS, FacingSince } from "@/lib/constants/domains";
 import { VISUAL_CHALLENGES, VisualChallengeOption } from "@/lib/constants/challenges";
+import { getContextualMediaUrl } from "@/lib/constants/civicMedia";
 import { classifyIssueDescription } from "@/lib/classify";
 
 interface CitizenSubmissionWizardProps {
@@ -314,8 +315,8 @@ export default function CitizenSubmissionWizard({
         citizenName: citizenName.trim(),
         citizenMobile: citizenMobile.trim(),
         aiTags,
-        attachments: files.map((f) => ({
-          url: `https://storage.civicresolve.gov.in/uploads/${encodeURIComponent(f.name)}`,
+        attachments: files.map((f, idx) => ({
+          url: getContextualMediaUrl(selectedDomain, idx),
           type: f.type,
           filename: f.name,
         })),

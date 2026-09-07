@@ -154,9 +154,14 @@ async function runSeed() {
         description: "Severe fluoride contamination (>2.5 mg/L) detected in 14 community handpumps across 3 panchayats, causing dental and skeletal fluorosis among schoolchildren.",
         attachments: [
           {
-            url: "https://example.gov.in/reports/fluoride-test-lohardaga.pdf",
-            type: "document" as const,
-            filename: "water_quality_test_report_bhandra.pdf",
+            url: "https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&w=800&q=80",
+            type: "photo" as const,
+            filename: "water_fluoride_turbidity_sample_1.jpg",
+          },
+          {
+            url: "https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=800&q=80",
+            type: "photo" as const,
+            filename: "handpump_borewell_head_bhandra.jpg",
           },
         ],
         domain: "Water Resources" as const,
@@ -182,7 +187,13 @@ async function runSeed() {
       {
         title: "High Spoilage in Post-Harvest Lac Processing & Storage",
         description: "Tribal lac farmers in Khunti suffer up to 35% produce loss due to lack of solar dehumidification storage units and moisture-control storage bags during the monsoon flush.",
-        attachments: [],
+        attachments: [
+          {
+            url: "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80",
+            type: "photo" as const,
+            filename: "tribal_lac_processing_khunti.jpg",
+          },
+        ],
         domain: "Rural Livelihoods" as const,
         severityScore: 4,
         aiTags: ["lac-cultivation", "post-harvest-loss", "solar-drying", "tribal-livelihoods"],
@@ -206,7 +217,13 @@ async function runSeed() {
       {
         title: "Coal Dust Fugitive Emissions and Respiratory Risk in Slag Yards",
         description: "Heavy PM10/PM2.5 particulate dispersion affecting residential colonies adjoining coal washery transport corridor without automated mist canon suppression.",
-        attachments: [],
+        attachments: [
+          {
+            url: "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?auto=format&fit=crop&w=800&q=80",
+            type: "photo" as const,
+            filename: "coal_dust_haze_jharia.jpg",
+          },
+        ],
         domain: "Environment" as const,
         severityScore: 4,
         aiTags: ["air-pollution", "coal-dust", "particulate-matter", "respiratory-health"],
@@ -230,7 +247,13 @@ async function runSeed() {
       {
         title: "Cold-Chain Breakdown in Remote Primary Health Centre (PHC)",
         description: "Intermittent grid supply causes vaccine storage refrigerator failures at Sarath PHC. Requires a ruggedized hybrid solar-battery backup with real-time temperature telemetry.",
-        attachments: [],
+        attachments: [
+          {
+            url: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80",
+            type: "photo" as const,
+            filename: "phc_vaccine_cold_storage_sarath.jpg",
+          },
+        ],
         domain: "Healthcare" as const,
         severityScore: 5,
         aiTags: ["cold-chain", "vaccine-storage", "solar-backup", "iot-telemetry"],
@@ -254,7 +277,13 @@ async function runSeed() {
       {
         title: "Soil Erosion and Silt Choking of Irrigation Canals in Patamda",
         description: "Heavy silt runoff during torrential rains blocks check-dam channels, depriving 200+ hectares of paddy fields from perennial canal irrigation.",
-        attachments: [],
+        attachments: [
+          {
+            url: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80",
+            type: "photo" as const,
+            filename: "patamda_canal_siltation.jpg",
+          },
+        ],
         domain: "Agriculture" as const,
         severityScore: 3,
         aiTags: ["soil-erosion", "check-dam", "siltation", "canal-irrigation"],

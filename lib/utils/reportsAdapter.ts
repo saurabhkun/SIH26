@@ -2,6 +2,7 @@
 import mongoose from "mongoose";
 import Issue from "@/lib/models/Issue";
 import { IssueDomain, IssueStatus } from "@/lib/constants/domains";
+import { sanitizeMediaUrl, getContextualMediaUrl } from "@/lib/constants/civicMedia";
 
 export interface PhoneAppReport {
   _id: string;
@@ -101,9 +102,24 @@ export function normalizeReportToIssue(doc: any): any {
   const status: IssueStatus = statusMap[doc.status?.toLowerCase()] || (doc.status as IssueStatus) || "Reported";
   const priorityScore = doc.priority === "critical" || doc.priority === "high" ? 4 : doc.priority === "medium" ? 3 : 2;
 
-  const attachments = Array.isArray(doc.image_urls)
-    ? doc.image_urls.map((url: string) => ({ url, type: "photo", filename: "phone_upload.jpg" }))
-    : doc.attachments || [];
+  const attachments = Array.isArray(doc.image_urls) && doc.image_urls.length > 0
+    ? doc.image_urls.map((url: string, idx: number) => ({
+        url: sanitizeMediaUrl(url, domain, idx),
+        type: "photo",
+        filename: "field_evidence.jpg",
+      }))
+    : Array.isArray(doc.attachments) && doc.attachments.length > 0
+    ? doc.attachments.map((a: any, idx: number) => ({
+        ...a,
+        url: sanitizeMediaUrl(a.url, domain, idx),
+      }))
+    : [
+        {
+          url: getContextualMediaUrl(domain, 0),
+          type: "photo",
+          filename: "field_evidence.jpg",
+        },
+      ];
 
   return {
     _id: doc._id || new mongoose.Types.ObjectId(idStr),
@@ -152,9 +168,14 @@ export function mapToFlutterReport(issue: any): PhoneAppReport {
       ? "medium"
       : "low";
 
-  const images = Array.isArray(issue.image_urls)
+  const domain = issue.domain || "Urban Development";
+  const rawImages = Array.isArray(issue.image_urls) && issue.image_urls.length > 0
     ? issue.image_urls
     : issue.attachments?.map((a: any) => a.url) || [];
+
+  const images = rawImages.length > 0
+    ? rawImages.map((u: string, idx: number) => sanitizeMediaUrl(u, domain, idx))
+    : [getContextualMediaUrl(domain, 0)];
 
   return {
     _id: idStr,

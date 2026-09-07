@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import Issue, { ISSUE_DOMAINS, FACING_SINCE_OPTIONS } from "@/lib/models/Issue";
 import { generateDedupFingerprint, formatTrackingCode } from "@/lib/utils/dedup";
 import { createNotification } from "@/lib/notifications";
+import { sanitizeMediaUrl, getContextualMediaUrl } from "@/lib/constants/civicMedia";
 
 export const dynamic = "force-dynamic";
 
@@ -144,11 +145,28 @@ export async function POST(request: NextRequest) {
 
     const submissionIndexForMobile = recentSubmissionsCount + 1;
 
-    // 6. Save Issue Document
+    // 6. Sanitize & Prepare Attachments
+    const rawAttachments = Array.isArray(attachments) ? attachments : [];
+    const sanitizedAttachments =
+      rawAttachments.length > 0
+        ? rawAttachments.map((att: { url: string; type?: string; filename?: string }, idx: number) => ({
+            url: sanitizeMediaUrl(att.url, domain, idx),
+            type: (att.type === "video" || att.type === "document" ? att.type : "photo") as "photo" | "video" | "document",
+            filename: att.filename || `field_evidence_${idx + 1}.jpg`,
+          }))
+        : [
+            {
+              url: getContextualMediaUrl(domain, 0),
+              type: "photo" as const,
+              filename: "field_evidence.jpg",
+            },
+          ];
+
+    // 7. Save Issue Document
     const newIssue = await Issue.create({
       title: title.trim(),
       description: description.trim(),
-      attachments,
+      attachments: sanitizedAttachments,
       domain,
       severityScore: Math.min(5, Math.max(1, Number(severityScore) || 3)),
       aiTags,

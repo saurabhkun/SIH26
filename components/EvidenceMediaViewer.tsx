@@ -2,17 +2,28 @@
 
 import React, { useState } from "react";
 import { Image as ImageIcon, ExternalLink, X } from "lucide-react";
+import { sanitizeMediaUrl } from "@/lib/constants/civicMedia";
 
 interface MediaProps {
   mediaUrls?: string[];
+  domain?: string;
   className?: string;
 }
 
-export const EvidenceMediaViewer: React.FC<MediaProps> = ({ mediaUrls = [], className = "" }) => {
+const FALLBACK_EVIDENCE_IMAGE =
+  "https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&w=800&q=80";
+
+export const EvidenceMediaViewer: React.FC<MediaProps> = ({
+  mediaUrls = [],
+  domain,
+  className = "",
+}) => {
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
-  // Filter out any empty/null strings
-  const validUrls = (mediaUrls || []).filter((u): u is string => typeof u === "string" && u.trim().length > 0);
+  // Filter and sanitize URLs
+  const validUrls = (mediaUrls || [])
+    .filter((u): u is string => typeof u === "string" && u.trim().length > 0)
+    .map((u, idx) => sanitizeMediaUrl(u, domain, idx));
 
   if (validUrls.length === 0) {
     return (
@@ -38,9 +49,7 @@ export const EvidenceMediaViewer: React.FC<MediaProps> = ({ mediaUrls = [], clas
               alt={`Evidence ${idx + 1}`}
               className="w-full h-full object-cover group-hover:scale-105 transition duration-200"
               onError={(e) => {
-                // Fallback placeholder if broken URL
-                e.currentTarget.src =
-                  "https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=300&q=80";
+                e.currentTarget.src = FALLBACK_EVIDENCE_IMAGE;
               }}
             />
             <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
@@ -74,8 +83,7 @@ export const EvidenceMediaViewer: React.FC<MediaProps> = ({ mediaUrls = [], clas
                 alt="Enlarged Ground Evidence"
                 className="max-h-[75vh] w-auto max-w-full object-contain rounded-lg"
                 onError={(e) => {
-                  e.currentTarget.src =
-                    "https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=1200&q=80";
+                  e.currentTarget.src = FALLBACK_EVIDENCE_IMAGE;
                 }}
               />
               <div className="w-full pt-2 px-2 flex items-center justify-between text-xs text-slate-500">
