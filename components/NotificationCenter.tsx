@@ -159,7 +159,7 @@ export default function NotificationCenter({ compact = false }: NotificationCent
       case "RUNNER_UP_PROMOTED":
         return (
           <div className="w-8 h-8 rounded-full bg-[#FFEFD3] flex items-center justify-center flex-shrink-0 text-[#001B2E] border border-[#FFC49B]">
-            <Award className="w-4 h-4 text-[#C9A227]" />
+            <Award className="w-4 h-4 text-[#001B2E]" />
           </div>
         );
       case "MILESTONE_PAYOUT_RELEASED":

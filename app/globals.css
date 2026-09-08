@@ -3,11 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --navy: #0A2540;
-  --navy-light: #0F3460;
-  --gold: #C9A227;
-  --bg: #F7F5F0;
-  --ink: #1A1A1A;
+  --brand-prussian: #001B2E;
+  --brand-charcoal: #294C60;
+  --brand-slate: #ADB6C4;
+  --brand-papaya: #FFEFD3;
+  --brand-peach: #FFC49B;
+
+  --navy: #001B2E;
+  --navy-light: #294C60;
+  --gold: #FFC49B;
+  --bg: #FFEFD3;
+  --ink: #001B2E;
 }
 
 body {
@@ -18,4 +24,23 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-source-serif-4), Georgia, serif;
+}
+
+/* Custom theme scrollbars & utility styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFEFD3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ADB6C4;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #294C60;
 }

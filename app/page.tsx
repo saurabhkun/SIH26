@@ -12,30 +12,30 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-bg text-ink flex flex-col">
       {/* Top Government Identifier Bar */}
-      <div className="bg-navy text-white text-xs py-1.5 px-4 sm:px-8 border-b border-gold/40 flex justify-between items-center">
+      <div className="bg-brand-prussian text-white text-xs py-1.5 px-4 sm:px-8 border-b border-brand-peach/40 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <span className="font-semibold tracking-wider uppercase text-[11px]">
             Government of Jharkhand
           </span>
-          <span className="text-gold">|</span>
-          <span className="text-slate-300">
+          <span className="text-brand-peach">|</span>
+          <span className="text-brand-slate">
             Higher & Technical Education Department
           </span>
         </div>
-        <div className="text-slate-300 text-[11px] hidden md:block">
+        <div className="text-brand-slate text-[11px] hidden md:block">
           Smart India Hackathon 2026 &bull; PS ID: 26043
         </div>
       </div>
 
       {/* Main Navbar */}
-      <header className="bg-white border-b border-slate-300 py-3.5 px-4 sm:px-8">
+      <header className="bg-white border-b border-brand-slate/40 py-3.5 px-4 sm:px-8 shadow-xs">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
             <Link href="/" className="group block">
-              <span className="text-2xl sm:text-3xl font-serif font-bold text-navy tracking-tight block leading-tight">
+              <span className="text-2xl sm:text-3xl font-serif font-bold text-brand-prussian tracking-tight block leading-tight">
                 CivicResolve
               </span>
-              <span className="text-[11px] sm:text-xs text-slate-600 block mt-0.5 tracking-normal">
+              <span className="text-[11px] sm:text-xs text-brand-charcoal block mt-0.5 tracking-normal">
                 Government of Jharkhand &middot; Department of Higher & Technical Education
               </span>
             </Link>
@@ -43,20 +43,20 @@ export default function Home() {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setIsWizardOpen(true)}
-              className="inline-flex items-center px-3.5 py-1.5 bg-navy text-gold text-xs font-semibold border border-gold/60 hover:bg-navyLight"
+              className="inline-flex items-center px-3.5 py-1.5 bg-brand-prussian text-brand-peach text-xs font-semibold border border-brand-peach/60 hover:bg-brand-charcoal transition-colors rounded-xs"
             >
-              <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-gold" />
+              <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-brand-peach" />
               Report an Issue
             </button>
             <Link
               href="/register"
-              className="inline-flex items-center px-3.5 py-1.5 bg-[#FFEFD3] text-[#001B2E] text-xs font-semibold border border-[#FFC49B] hover:bg-[#FFC49B]/30 transition-colors"
+              className="inline-flex items-center px-3.5 py-1.5 bg-brand-papaya text-brand-prussian text-xs font-semibold border border-brand-peach hover:bg-brand-peach/40 transition-colors rounded-xs"
             >
               Register
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center px-4 py-1.5 bg-slate-100 text-navy text-xs font-semibold border border-slate-300 hover:bg-slate-200"
+              className="inline-flex items-center px-4 py-1.5 bg-slate-100 text-brand-prussian text-xs font-semibold border border-brand-slate/50 hover:bg-brand-papaya transition-colors rounded-xs"
             >
               Login
             </Link>

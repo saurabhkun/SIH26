@@ -40,8 +40,8 @@ function StatCard({
   return (
     <div
       style={{
-        border: `1px solid ${accent ? "#c9a84c" : "#dde2ea"}`,
-        borderTop: `3px solid ${accent ? "#c9a84c" : "#1a2e4a"}`,
+        border: `1px solid ${accent ? "#FFC49B" : "#ADB6C4"}`,
+        borderTop: `3px solid ${accent ? "#FFC49B" : "#001B2E"}`,
         background: "#fff",
         padding: "16px 20px",
         minWidth: 150,
@@ -52,13 +52,13 @@ function StatCard({
           fontSize: 28,
           fontWeight: 800,
           fontFamily: "Georgia, serif",
-          color: accent ? "#c9a84c" : "#1a2e4a",
+          color: accent ? "#294C60" : "#001B2E",
           lineHeight: 1,
         }}
       >
         {value}
       </div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: "#374151", marginTop: 4 }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#294C60", marginTop: 4 }}>{label}</div>
       {sub && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{sub}</div>}
     </div>
   );
@@ -71,8 +71,8 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
         fontFamily: "Georgia, serif",
         fontSize: 16,
         fontWeight: 700,
-        color: "#1a2e4a",
-        borderBottom: "2px solid #c9a84c",
+        color: "#001B2E",
+        borderBottom: "2px solid #FFC49B",
         paddingBottom: 6,
         marginBottom: 16,
       }}
