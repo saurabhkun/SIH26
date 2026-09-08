@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -16,7 +16,25 @@ import {
   Funnel,
   Cell,
 } from "recharts";
-import { CheckCircle, AlertTriangle, Building2, ShieldCheck, RefreshCw } from "lucide-react";
+import {
+  CheckCircle,
+  AlertTriangle,
+  Building2,
+  ShieldCheck,
+  RefreshCw,
+  Search,
+  Check,
+  ChevronsUpDown,
+  ShieldAlert,
+  GraduationCap,
+  AlertCircle,
+  FileText,
+  CheckCircle2,
+  Info,
+  Zap,
+  ArrowRight,
+  X,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
 import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
@@ -505,115 +523,741 @@ function ReviewQueue() {
 }
 
 /* ────────────────────────────────────────
-   Allocation Override Component
+   Allocation Override Component (Searchable Comboboxes & Administrative Metadata)
    ──────────────────────────────────────── */
-function AllocationOverride() {
-  const [issueId, setIssueId] = useState("");
-  const [collegeId, setCollegeId] = useState("");
-  const [msg, setMsg] = useState("");
-  const [loading, setLoading] = useState(false);
+interface OverrideIssueOption {
+  _id: string;
+  trackingCode: string;
+  title: string;
+  domain: string;
+  district: string;
+  status: string;
+  severityScore?: number;
+  escalationStage?: number;
+  urgencyTrack?: string;
+}
 
-  const handleSubmit = async () => {
-    if (!issueId.trim() || !collegeId.trim()) {
-      setMsg("Both Issue ID and College ID are required.");
+interface OverrideCollegeOption {
+  _id: string;
+  name: string;
+  code?: string;
+  tier?: string;
+  district: string;
+  verified?: boolean;
+  capabilities?: string[];
+  facilities?: Array<{ name: string; equipment?: string[] } | string>;
+  researchSpecializations?: string[];
+  reputationScore?: number;
+}
+
+const OVERRIDE_JUSTIFICATION_OPTIONS = [
+  {
+    id: "Stage 4: Escalation Direct Nomination",
+    title: "Stage 4: Escalation Direct Nomination",
+    description: "Standard open-bidding window expired with 0 qualifying proposals. Activating mandatory direct allocation ladder to prevent grievance abandonment.",
+    badge: "Escalation Policy",
+    icon: Zap,
+  },
+  {
+    id: "Disaster / Public Safety Immediate Directive",
+    title: "Disaster / Public Safety Immediate Directive",
+    description: "Urgent public health, toxic contamination, structural collapse, or environmental emergency requiring immediate institutional mobilization.",
+    badge: "Circuit-Breaker Emergency",
+    icon: ShieldAlert,
+  },
+  {
+    id: "Nodal Discretionary Assignment",
+    title: "Nodal Discretionary Assignment",
+    description: "Departmental directive assigning the issue based on verified specialized laboratory facilities, patent expertise, or district proximity.",
+    badge: "Discretionary Mandate",
+    icon: Building2,
+  },
+];
+
+function AllocationOverride() {
+  const [issues, setIssues] = useState<OverrideIssueOption[]>([]);
+  const [colleges, setColleges] = useState<OverrideCollegeOption[]>([]);
+  const [loadingData, setLoadingData] = useState<boolean>(true);
+
+  // Form selections
+  const [selectedIssue, setSelectedIssue] = useState<OverrideIssueOption | null>(null);
+  const [selectedCollege, setSelectedCollege] = useState<OverrideCollegeOption | null>(null);
+  const [reason, setReason] = useState<string>("Stage 4: Escalation Direct Nomination");
+  const [remarks, setRemarks] = useState<string>("");
+
+  // Search filter query state
+  const [issueSearch, setIssueSearch] = useState<string>("");
+  const [collegeSearch, setCollegeSearch] = useState<string>("");
+  const [isIssueOpen, setIsIssueOpen] = useState<boolean>(false);
+  const [isCollegeOpen, setIsCollegeOpen] = useState<boolean>(false);
+
+  // Submission & feedback state
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+    details?: { trackingCode: string; collegeName: string; reason: string };
+  } | null>(null);
+
+  const issueDropdownRef = useRef<HTMLDivElement>(null);
+  const collegeDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load data from endpoint
+  const fetchData = useCallback(async () => {
+    try {
+      setLoadingData(true);
+      const res = await fetch("/api/gov/override-allocation");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setIssues(data.issues || []);
+          setColleges(data.colleges || []);
+          return;
+        }
+      }
+
+      // Fallback endpoints
+      const [issuesRes, collegesRes] = await Promise.all([
+        fetch("/api/issues?status=all"),
+        fetch("/api/colleges"),
+      ]);
+      const iData = await issuesRes.json();
+      const cData = await collegesRes.json();
+      setIssues(iData.data || []);
+      setColleges(cData.colleges || []);
+    } catch (err) {
+      console.warn("Failed to fetch override allocation metadata:", err);
+    } finally {
+      setLoadingData(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Click outside to close dropdowns
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (issueDropdownRef.current && !issueDropdownRef.current.contains(e.target as Node)) {
+        setIsIssueOpen(false);
+      }
+      if (collegeDropdownRef.current && !collegeDropdownRef.current.contains(e.target as Node)) {
+        setIsCollegeOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Filtered issues list
+  const filteredIssues = issues.filter((i) => {
+    if (!issueSearch.trim()) return true;
+    const q = issueSearch.toLowerCase();
+    return (
+      i.trackingCode?.toLowerCase().includes(q) ||
+      i.title?.toLowerCase().includes(q) ||
+      i.district?.toLowerCase().includes(q) ||
+      i.domain?.toLowerCase().includes(q)
+    );
+  });
+
+  // Filtered colleges list
+  const filteredColleges = colleges.filter((c) => {
+    if (!collegeSearch.trim()) return true;
+    const q = collegeSearch.toLowerCase();
+    const facilityText = (c.facilities || [])
+      .map((f) => (typeof f === "string" ? f : f.name))
+      .join(" ")
+      .toLowerCase();
+    const capText = (c.capabilities || []).join(" ").toLowerCase();
+    return (
+      c.name?.toLowerCase().includes(q) ||
+      c.code?.toLowerCase().includes(q) ||
+      c.district?.toLowerCase().includes(q) ||
+      facilityText.includes(q) ||
+      capText.includes(q)
+    );
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedIssue) {
+      setFeedback({ type: "error", message: "Please select a target civic challenge from the dropdown." });
       return;
     }
-    setLoading(true);
-    setMsg("");
+    if (!selectedCollege) {
+      setFeedback({ type: "error", message: "Please select an accredited academic institution." });
+      return;
+    }
+    if (!reason.trim()) {
+      setFeedback({ type: "error", message: "Please select an administrative override justification." });
+      return;
+    }
+
+    setSubmitting(true);
+    setFeedback(null);
+
     try {
-      const res = await fetch("/api/gov/allocate", {
+      const res = await fetch("/api/gov/override-allocation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ issueId: issueId.trim(), collegeId: collegeId.trim() }),
+        body: JSON.stringify({
+          issueId: selectedIssue._id,
+          collegeId: selectedCollege._id,
+          reason,
+          remarks: remarks.trim(),
+        }),
       });
-      const d = await res.json();
-      if (res.ok) {
-        setMsg(`✓ Issue assigned to "${d.college}" (${d.issueStatus}).`);
-        setIssueId("");
-        setCollegeId("");
-      } else {
-        setMsg(`Error: ${d.error}`);
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to execute institutional override allocation.");
       }
+
+      setFeedback({
+        type: "success",
+        message: data.message || `Successfully allocated ${selectedIssue.trackingCode} to ${selectedCollege.name}.`,
+        details: {
+          trackingCode: selectedIssue.trackingCode,
+          collegeName: selectedCollege.name,
+          reason,
+        },
+      });
+
+      // Reset form
+      setSelectedIssue(null);
+      setSelectedCollege(null);
+      setRemarks("");
+      setIssueSearch("");
+      setCollegeSearch("");
+
+      // Refetch
+      fetchData();
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setFeedback({ type: "error", message: errorMsg });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <SectionTitle>Institutional Allocation Override</SectionTitle>
-      <p style={{ fontSize: 12, color: "#64748b", marginBottom: 12 }}>
-        Manually assign a college to an issue, bypassing the marketplace claim. Enter MongoDB Object IDs.
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 10, alignItems: "end" }}>
-        <div>
-          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#374151", marginBottom: 4 }}>
-            Issue Object ID
-          </label>
-          <input
-            value={issueId}
-            onChange={(e) => setIssueId(e.target.value)}
-            placeholder="e.g. 685..."
-            style={{
-              width: "100%",
-              padding: "8px 10px",
-              fontSize: 12,
-              border: "1px solid #cbd5e1",
-              borderRadius: 5,
-              outline: "none",
-              boxSizing: "border-box",
-            }}
-          />
-        </div>
-        <div>
-          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#374151", marginBottom: 4 }}>
-            College Object ID
-          </label>
-          <input
-            value={collegeId}
-            onChange={(e) => setCollegeId(e.target.value)}
-            placeholder="e.g. 685..."
-            style={{
-              width: "100%",
-              padding: "8px 10px",
-              fontSize: 12,
-              border: "1px solid #cbd5e1",
-              borderRadius: 5,
-              outline: "none",
-              boxSizing: "border-box",
-            }}
-          />
-        </div>
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          style={{
-            padding: "8px 20px",
-            background: "#1a2e4a",
-            color: "#c9a84c",
-            border: "none",
-            borderRadius: 5,
-            cursor: "pointer",
-            fontSize: 12,
-            fontWeight: 700,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {loading ? "Saving…" : "Override & Assign"}
-        </button>
-      </div>
-      {msg && (
-        <p
-          style={{
-            marginTop: 8,
-            fontSize: 12,
-            color: msg.startsWith("✓") ? "#065f46" : "#b91c1c",
-            fontWeight: 600,
-          }}
-        >
-          {msg}
+    <div className="space-y-6">
+      <div>
+        <SectionTitle>Institutional Allocation Override</SectionTitle>
+        <p className="text-xs text-civic-textMuted -mt-2">
+          Statutory executive mechanism to bypass open marketplace bidding and directly allocate grassroots grievances to accredited HEIs under disaster directives or escalation triggers.
         </p>
+      </div>
+
+      {/* Success / Error Feedback Banner */}
+      {feedback && (
+        <div
+          className={`p-4 rounded-xl border flex items-start gap-3 transition-all ${
+            feedback.type === "success"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+              : "bg-red-50 border-red-200 text-red-900"
+          }`}
+        >
+          {feedback.type === "success" ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+          )}
+          <div className="flex-1 text-xs">
+            <div className="font-bold text-sm">
+              {feedback.type === "success" ? "Allocation Override Executed Successfully" : "Action Required"}
+            </div>
+            <p className="mt-0.5 leading-relaxed">{feedback.message}</p>
+            {feedback.details && (
+              <div className="mt-2 pt-2 border-t border-emerald-200/60 flex flex-wrap items-center gap-2 text-[11px]">
+                <span className="font-mono font-bold bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
+                  {feedback.details.trackingCode}
+                </span>
+                <span>&rarr; Assigned to</span>
+                <span className="font-bold text-emerald-950">{feedback.details.collegeName}</span>
+                <span className="text-emerald-700">({feedback.details.reason})</span>
+              </div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setFeedback(null)}
+            className="text-slate-400 hover:text-slate-700 p-1"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       )}
+
+      <form onSubmit={handleSubmit} className="bg-civic-surface border border-civic-border rounded-xl shadow-xs p-6 space-y-6">
+        {/* Step 1 & Step 2: Two Column Searchable Comboboxes */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* COMBOBOX 1: TARGET ISSUE */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold uppercase tracking-wider text-civic-textDark flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-civic-secondary" />
+                <span>1. Target Civic Grievance / Challenge</span>
+                <span className="text-rose-600">*</span>
+              </label>
+              <span className="text-[11px] text-civic-textMuted font-medium">
+                {issues.length} open issues
+              </span>
+            </div>
+
+            {/* Dropdown Combobox Container */}
+            <div ref={issueDropdownRef} className="relative">
+              <div
+                onClick={() => {
+                  setIsIssueOpen(!isIssueOpen);
+                  setIsCollegeOpen(false);
+                }}
+                className={`w-full min-h-[44px] px-3 py-2 bg-white border rounded-lg cursor-pointer flex items-center justify-between transition-all ${
+                  isIssueOpen
+                    ? "border-civic-primary ring-1 ring-civic-primary shadow-xs"
+                    : selectedIssue
+                    ? "border-civic-secondary bg-civic-accent/10"
+                    : "border-civic-border hover:border-slate-400"
+                }`}
+              >
+                {selectedIssue ? (
+                  <div className="flex items-center gap-2 truncate pr-2">
+                    <span className="font-mono font-bold text-xs bg-civic-primary text-white px-2 py-0.5 rounded shrink-0">
+                      {selectedIssue.trackingCode}
+                    </span>
+                    <span className="text-xs font-semibold text-civic-textDark truncate">
+                      {selectedIssue.title}
+                    </span>
+                    <span className="text-[11px] text-civic-textMuted shrink-0">
+                      ({selectedIssue.district})
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-slate-400">
+                    {loadingData ? "Loading open issues..." : "Select or search open grievance..."}
+                  </span>
+                )}
+                <div className="flex items-center gap-1 text-slate-400 shrink-0">
+                  {selectedIssue && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedIssue(null);
+                        setIssueSearch("");
+                      }}
+                      className="p-1 hover:text-slate-700"
+                      title="Clear selection"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <ChevronsUpDown className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Flyout Search Menu */}
+              {isIssueOpen && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 z-40 bg-white border border-civic-border rounded-xl shadow-xl overflow-hidden flex flex-col max-h-72">
+                  <div className="p-2 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                    <Search className="w-3.5 h-3.5 text-civic-textMuted shrink-0" />
+                    <input
+                      type="text"
+                      placeholder="Search by code, title, district, or domain..."
+                      value={issueSearch}
+                      onChange={(e) => setIssueSearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full text-xs bg-transparent border-none focus:outline-none text-civic-textDark placeholder-slate-400"
+                      autoFocus
+                    />
+                    {issueSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setIssueSearch("")}
+                        className="text-slate-400 hover:text-slate-700 text-xs px-1"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="overflow-y-auto divide-y divide-slate-100 flex-1">
+                    {filteredIssues.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-civic-textMuted">
+                        No matching open issues found.
+                      </div>
+                    ) : (
+                      filteredIssues.map((issue) => {
+                        const isSelected = selectedIssue?._id === issue._id;
+                        const isDisaster = issue.urgencyTrack === "DISASTER_FAST_TRACK";
+
+                        return (
+                          <div
+                            key={issue._id}
+                            onClick={() => {
+                              setSelectedIssue(issue);
+                              setIsIssueOpen(false);
+                            }}
+                            className={`p-3 text-left cursor-pointer transition-colors flex items-start justify-between gap-3 ${
+                              isSelected
+                                ? "bg-civic-accent/20"
+                                : "hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="font-mono font-bold text-[11px] bg-civic-accent/30 text-civic-primaryHover px-1.5 py-0.5 rounded border border-civic-accent">
+                                  {issue.trackingCode}
+                                </span>
+                                <span className="text-[10.5px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">
+                                  {issue.domain}
+                                </span>
+                                <span className="text-[11px] font-semibold text-civic-textDark">
+                                  {issue.district}
+                                </span>
+                                {isDisaster && (
+                                  <span className="text-[9.5px] font-bold bg-rose-100 text-rose-700 border border-rose-300 px-1.5 py-0.5 rounded uppercase">
+                                    Disaster Urgent
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs font-semibold text-civic-textDark leading-snug line-clamp-2">
+                                {issue.title}
+                              </div>
+                              <div className="mt-1 flex items-center gap-2 text-[10.5px] text-civic-textMuted">
+                                <span>Stage {issue.escalationStage || 1} • {issue.status.replace(/_/g, " ")}</span>
+                                {issue.severityScore && (
+                                  <span>• Severity {issue.severityScore}/5</span>
+                                )}
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <Check className="w-4 h-4 text-civic-primary shrink-0 mt-1" />
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Selected Issue Preview Card */}
+            {selectedIssue && (
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1 animate-fadeIn">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-civic-primary font-mono">{selectedIssue.trackingCode}</span>
+                  <span className="text-[10px] font-bold uppercase bg-civic-accent/30 text-civic-primaryHover px-2 py-0.5 rounded-full">
+                    {selectedIssue.status.replace(/_/g, " ")}
+                  </span>
+                </div>
+                <p className="font-medium text-civic-textDark leading-tight">{selectedIssue.title}</p>
+                <div className="flex items-center gap-3 text-[11px] text-civic-textMuted pt-1 border-t border-slate-200/60">
+                  <span>District: <strong className="text-civic-textDark">{selectedIssue.district}</strong></span>
+                  <span>Domain: <strong className="text-civic-textDark">{selectedIssue.domain}</strong></span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* COMBOBOX 2: TARGET INSTITUTION */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold uppercase tracking-wider text-civic-textDark flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5 text-civic-secondary" />
+                <span>2. Target Academic Institution (HEI / RO)</span>
+                <span className="text-rose-600">*</span>
+              </label>
+              <span className="text-[11px] text-civic-textMuted font-medium">
+                {colleges.length} institutions
+              </span>
+            </div>
+
+            {/* Dropdown Combobox Container */}
+            <div ref={collegeDropdownRef} className="relative">
+              <div
+                onClick={() => {
+                  setIsCollegeOpen(!isCollegeOpen);
+                  setIsIssueOpen(false);
+                }}
+                className={`w-full min-h-[44px] px-3 py-2 bg-white border rounded-lg cursor-pointer flex items-center justify-between transition-all ${
+                  isCollegeOpen
+                    ? "border-civic-primary ring-1 ring-civic-primary shadow-xs"
+                    : selectedCollege
+                    ? "border-civic-secondary bg-civic-accent/10"
+                    : "border-civic-border hover:border-slate-400"
+                }`}
+              >
+                {selectedCollege ? (
+                  <div className="flex items-center gap-2 truncate pr-2">
+                    <span className="text-xs font-bold text-civic-primary truncate">
+                      {selectedCollege.name}
+                    </span>
+                    <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded shrink-0">
+                      Tier {selectedCollege.tier || "L2"}
+                    </span>
+                    <span className="text-[11px] text-civic-textMuted shrink-0">
+                      ({selectedCollege.district})
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-slate-400">
+                    {loadingData ? "Loading institutions..." : "Select or search accredited university / college..."}
+                  </span>
+                )}
+                <div className="flex items-center gap-1 text-slate-400 shrink-0">
+                  {selectedCollege && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedCollege(null);
+                        setCollegeSearch("");
+                      }}
+                      className="p-1 hover:text-slate-700"
+                      title="Clear selection"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <ChevronsUpDown className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Flyout Search Menu */}
+              {isCollegeOpen && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 z-40 bg-white border border-civic-border rounded-xl shadow-xl overflow-hidden flex flex-col max-h-72">
+                  <div className="p-2 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                    <Search className="w-3.5 h-3.5 text-civic-textMuted shrink-0" />
+                    <input
+                      type="text"
+                      placeholder="Search institution name, district, or lab facility..."
+                      value={collegeSearch}
+                      onChange={(e) => setCollegeSearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full text-xs bg-transparent border-none focus:outline-none text-civic-textDark placeholder-slate-400"
+                      autoFocus
+                    />
+                    {collegeSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setCollegeSearch("")}
+                        className="text-slate-400 hover:text-slate-700 text-xs px-1"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="overflow-y-auto divide-y divide-slate-100 flex-1">
+                    {filteredColleges.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-civic-textMuted">
+                        No matching institutions found.
+                      </div>
+                    ) : (
+                      filteredColleges.map((college) => {
+                        const isSelected = selectedCollege?._id === college._id;
+                        const facilitiesList = (college.facilities || []).map((f) =>
+                          typeof f === "string" ? f : f.name
+                        );
+
+                        return (
+                          <div
+                            key={college._id}
+                            onClick={() => {
+                              setSelectedCollege(college);
+                              setIsCollegeOpen(false);
+                            }}
+                            className={`p-3 text-left cursor-pointer transition-colors flex items-start justify-between gap-3 ${
+                              isSelected
+                                ? "bg-civic-accent/20"
+                                : "hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="text-xs font-bold text-civic-textDark">
+                                  {college.name}
+                                </span>
+                                <span className="text-[10px] font-bold bg-civic-primary text-white px-1.5 py-0.2 rounded">
+                                  Tier {college.tier || "L2"}
+                                </span>
+                                <span className="text-[11px] text-civic-textMuted">
+                                  {college.district}
+                                </span>
+                              </div>
+
+                              {facilitiesList.length > 0 && (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {facilitiesList.slice(0, 3).map((fac, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 line-clamp-1"
+                                    >
+                                      {fac}
+                                    </span>
+                                  ))}
+                                  {facilitiesList.length > 3 && (
+                                    <span className="text-[10px] text-civic-textMuted self-center">
+                                      +{facilitiesList.length - 3} more
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            {isSelected && (
+                              <Check className="w-4 h-4 text-civic-primary shrink-0 mt-1" />
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Selected College Preview Card */}
+            {selectedCollege && (
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1 animate-fadeIn">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-civic-textDark">{selectedCollege.name}</span>
+                  <span className="text-[10.5px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full">
+                    Tier {selectedCollege.tier || "L2"} &bull; Verified
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-[11px] text-civic-textMuted pt-1 border-t border-slate-200/60">
+                  <span>District: <strong className="text-civic-textDark">{selectedCollege.district}</strong></span>
+                  {selectedCollege.reputationScore && (
+                    <span>Rating: <strong className="text-civic-textDark">{selectedCollege.reputationScore}/5.0</strong></span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Step 3: Administrative Metadata */}
+        <div className="border-t border-civic-border pt-6 space-y-4">
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-civic-textDark flex items-center gap-1.5 mb-2">
+              <ShieldAlert className="w-3.5 h-3.5 text-civic-secondary" />
+              <span>3. Override Justification &amp; Policy Trigger</span>
+              <span className="text-rose-600">*</span>
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {OVERRIDE_JUSTIFICATION_OPTIONS.map((opt) => {
+                const Icon = opt.icon;
+                const isSelected = reason === opt.id;
+
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setReason(opt.id)}
+                    className={`text-left p-3.5 border rounded-xl transition-all cursor-pointer flex flex-col justify-between ${
+                      isSelected
+                        ? "border-civic-primary ring-2 ring-civic-primary bg-civic-accent/15 shadow-xs"
+                        : "border-civic-border bg-white hover:bg-slate-50"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div
+                          className={`p-1.5 rounded-lg border ${
+                            isSelected
+                              ? "bg-civic-primary text-white border-civic-primary"
+                              : "bg-slate-100 text-civic-textMuted border-slate-200"
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            isSelected
+                              ? "bg-civic-primary text-white"
+                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                          }`}
+                        >
+                          {opt.badge}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-bold text-civic-textDark leading-tight mb-1">
+                        {opt.title}
+                      </h4>
+                      <p className="text-[11px] text-civic-textMuted leading-relaxed">
+                        {opt.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+                      <span className="text-civic-textMuted">
+                        {isSelected ? "Selected Justification" : "Click to select"}
+                      </span>
+                      <div
+                        className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                          isSelected
+                            ? "border-civic-primary bg-civic-primary"
+                            : "border-slate-300 bg-white"
+                        }`}
+                      >
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Optional Directives / Remarks */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-civic-textDark mb-1.5">
+              Nodal Officer Directives &amp; Special Instructions (Optional)
+            </label>
+            <textarea
+              rows={3}
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              placeholder="e.g. Mandatory field deployment within 14 calendar days. Fast-track prototype grant allocation authorized under Departmental Emergency Fund."
+              className="w-full px-3.5 py-2 text-xs bg-white border border-civic-border rounded-lg text-civic-textDark placeholder-slate-400 focus:outline-none focus:border-civic-primary focus:ring-1 focus:ring-civic-primary"
+            />
+          </div>
+        </div>
+
+        {/* Action & Submission Footer */}
+        <div className="border-t border-civic-border pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-civic-textMuted flex items-center gap-1.5">
+            <Info className="w-4 h-4 text-civic-secondary shrink-0" />
+            <span>
+              Executing override immediately updates issue status to <strong className="text-civic-textDark">DIRECTLY_ALLOCATED</strong> and dispatches high-priority dispatch notifications.
+            </span>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting || !selectedIssue || !selectedCollege}
+            className="w-full sm:w-auto px-7 py-2.5 bg-civic-primary hover:bg-civic-primaryHover text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+          >
+            {submitting ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <span>Executing Override...</span>
+              </>
+            ) : (
+              <>
+                <Zap className="w-3.5 h-3.5 text-civic-accent" />
+                <span>Override &amp; Assign</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
