@@ -81,9 +81,27 @@ export default function JharkhandMap({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+
   const [liveData, setLiveData] = useState<Record<string, { count: number; density: number }>>(
     propData || DEFAULT_DISTRICT_STATS
   );
+
+  // Warm up the Next.js route cache for all 24 districts in the background
+  useEffect(() => {
+    const districts = [
+      "Garhwa", "Palamu", "Chatra", "Hazaribagh", "Koderma", "Giridih",
+      "Deoghar", "Dumka", "Godda", "Sahibganj", "Pakur", "Jamtara",
+      "Dhanbad", "Bokaro", "Ramgarh", "Ranchi", "Lohardaga", "Latehar",
+      "Gumla", "Simdega", "Khunti", "West Singhbhum", "Saraikela Kharsawan", "East Singhbhum",
+      "Seraikela Kharsawan",
+    ];
+    districts.forEach((district) => {
+      router.prefetch(`/district/${encodeURIComponent(district.toLowerCase())}`);
+      router.prefetch(`/district/${encodeURIComponent(district)}`);
+    });
+  }, [router]);
 
   // Compute D3 geographic projections once (memoized)
   const geoConfig = useMemo(() => {
@@ -166,10 +184,12 @@ export default function JharkhandMap({
   }, []);
 
   const handleDistrictClick = (districtName: string) => {
+    setIsNavigating(true);
+    setSelectedDistrict(districtName);
     if (onSelectDistrict) {
       onSelectDistrict(districtName);
     } else {
-      router.push(`/district/${encodeURIComponent(districtName)}`);
+      router.push(`/district/${encodeURIComponent(districtName.toLowerCase())}`);
     }
   };
 
@@ -261,6 +281,13 @@ export default function JharkhandMap({
 
       {/* SVG Geographic Choropleth Map Container */}
       <div className="w-full relative bg-slate-100/60 border border-civic-border p-2 sm:p-3 rounded-xl overflow-hidden flex justify-center shadow-xs">
+        {/* Fast Top Loading Bar */}
+        {isNavigating && (
+          <div className="absolute top-0 left-0 right-0 h-1 z-30 overflow-hidden bg-slate-100 rounded-t-xl">
+            <div className="h-full bg-civic-primary animate-pulse w-full transition-all duration-300 origin-left" />
+          </div>
+        )}
+
         <svg
           ref={svgRef}
           viewBox={`0 0 ${geoConfig.width} ${geoConfig.height}`}
@@ -283,6 +310,17 @@ export default function JharkhandMap({
                 stroke: #274C77 !important;
                 stroke-width: 2.2px !important;
                 filter: drop-shadow(0 4px 10px rgba(39, 76, 119, 0.25));
+              }
+
+              .district-selected {
+                stroke: #FFC49B !important;
+                stroke-width: 3px !important;
+                animation: pulseGlow 1.2s infinite ease-in-out;
+              }
+
+              @keyframes pulseGlow {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
               }
 
               .district-text-label {
@@ -312,12 +350,13 @@ export default function JharkhandMap({
             {geoConfig.districts.map((district) => {
               const stat = activeData[district.name] || { count: 0, density: 0 };
               const fillColor = getDensityColor(stat.density);
+              const isSelected = selectedDistrict === district.name;
 
               return (
                 <path
                   key={`path-${district.name}`}
                   id={`geo-path-${district.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
-                  className="district-path focus:outline-none"
+                  className={`district-path focus:outline-none ${isSelected ? "district-selected" : ""}`}
                   d={district.d}
                   fill={fillColor}
                   stroke="#1E293B"
