@@ -55,7 +55,9 @@ export function runTriageCircuitBreaker(issueData: {
   }
 
   // Track B: Routine Municipal Grievance
-  const hasMunicipalKeyword = MUNICIPAL_KEYWORDS.some((kw) => text.includes(kw));
+  const hasMunicipalKeyword = MUNICIPAL_KEYWORDS.some((kw) =>
+    text.includes(kw),
+  );
   if (severity < 40 && hasMunicipalKeyword) {
     return {
       urgencyTrack: "TRADITIONAL_GOVT_GRIEVANCE",
@@ -78,7 +80,9 @@ export function runTriageCircuitBreaker(issueData: {
 /**
  * 2. Evaluate Bidding Window (Countdown check & Stage 2 -> Stage 3 Escalation)
  */
-export async function evaluateBiddingWindow(issueId: string | Types.ObjectId): Promise<{
+export async function evaluateBiddingWindow(
+  issueId: string | Types.ObjectId,
+): Promise<{
   success: boolean;
   stage: EscalationStage;
   bidsCount: number;
@@ -145,7 +149,7 @@ export async function evaluateBiddingWindow(issueId: string | Types.ObjectId): P
  */
 export async function handleDirectNomination(
   issueId: string | Types.ObjectId,
-  targetCollegeId: string | Types.ObjectId
+  targetCollegeId: string | Types.ObjectId,
 ): Promise<{ success: boolean; nominatedCollege: string; message: string }> {
   const [issue, college] = await Promise.all([
     Issue.findById(issueId),
@@ -184,7 +188,7 @@ export async function handleDirectNomination(
 export async function respondToNomination(
   issueId: string | Types.ObjectId,
   accepted: boolean,
-  reason?: string
+  reason?: string,
 ): Promise<{ success: boolean; newStatus: string; message: string }> {
   const issue = await Issue.findById(issueId);
   if (!issue || !issue.directNomination?.collegeId) {
@@ -211,7 +215,8 @@ export async function respondToNomination(
     return {
       success: true,
       newStatus: "ASSIGNED",
-      message: "Direct nomination accepted. Challenge is now officially Assigned to the lead RO.",
+      message:
+        "Direct nomination accepted. Challenge is now officially Assigned to the lead RO.",
     };
   }
 
@@ -242,7 +247,7 @@ export async function respondToNomination(
  */
 export async function handleLeadDropout(
   issueId: string | Types.ObjectId,
-  breachReason?: string
+  breachReason?: string,
 ): Promise<{
   success: boolean;
   promotedCollegeName?: string;
@@ -256,12 +261,15 @@ export async function handleLeadDropout(
   if (!issue) throw new Error("Issue not found");
 
   const formerLeadName =
-    (issue.assignedLeadCollege as unknown as ICollege)?.name || "Lead Institution";
+    (issue.assignedLeadCollege as unknown as ICollege)?.name ||
+    "Lead Institution";
 
   // Check if designated runners-up exist in custody backup queue
   if (issue.backupRunnersUp && issue.backupRunnersUp.length > 0) {
     const nextInLine = issue.backupRunnersUp[0];
-    const winningProposal = await Proposal.findById(nextInLine.proposalId).populate("collegeId");
+    const winningProposal = await Proposal.findById(
+      nextInLine.proposalId,
+    ).populate("collegeId");
 
     if (winningProposal && winningProposal.collegeId) {
       const newLeadCollege = winningProposal.collegeId as unknown as ICollege;

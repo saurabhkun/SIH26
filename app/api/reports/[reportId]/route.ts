@@ -16,9 +16,21 @@ function mapToFlutterReport(issue: any) {
     category: issue.domain.toLowerCase(),
     location: issue.address || issue.district,
     image_urls: issue.attachments?.map((a: any) => a.url) || [],
-    status: issue.status === "Reported" ? "submitted" : issue.status === "Resolved" ? "resolved" : "in_progress",
-    priority: issue.severityScore > 3 ? "high" : issue.severityScore === 3 ? "medium" : "low",
-    consolidated_reports: issue.similarIssueIds?.length ? issue.similarIssueIds.length + 1 : 1,
+    status:
+      issue.status === "Reported"
+        ? "submitted"
+        : issue.status === "Resolved"
+          ? "resolved"
+          : "in_progress",
+    priority:
+      issue.severityScore > 3
+        ? "high"
+        : issue.severityScore === 3
+          ? "medium"
+          : "low",
+    consolidated_reports: issue.similarIssueIds?.length
+      ? issue.similarIssueIds.length + 1
+      : 1,
     contact_number: issue.citizenMobile,
     coordinates: issue.location || { lat: 23.3441, lng: 85.3096 },
     admin_notes: issue.reviewedBy ? `Reviewed by ${issue.reviewedBy}` : "",
@@ -29,7 +41,7 @@ function mapToFlutterReport(issue: any) {
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { reportId: string } }
+  { params }: { params: { reportId: string } },
 ) {
   try {
     await connectDB();
@@ -58,7 +70,12 @@ export async function PATCH(
     }
 
     if (data.priority) {
-      issue.severityScore = data.priority === "high" || data.priority === "critical" ? 4 : data.priority === "medium" ? 3 : 2;
+      issue.severityScore =
+        data.priority === "high" || data.priority === "critical"
+          ? 4
+          : data.priority === "medium"
+            ? 3
+            : 2;
     }
 
     if (data.admin_notes) {
@@ -68,15 +85,15 @@ export async function PATCH(
 
     await issue.save();
 
-      const recipientPhone = issue.citizenMobile || issue.citizenPhone;
-      if (recipientPhone) {
-        await createNotification({
-          recipientType: "citizen",
-          recipientId: recipientPhone,
-          message: `Your issue "${issue.title}" status has been updated to ${issue.status.replace(/_/g, " ")}.`,
-          relatedIssue: issue._id,
-        });
-      }
+    const recipientPhone = issue.citizenMobile || issue.citizenPhone;
+    if (recipientPhone) {
+      await createNotification({
+        recipientType: "citizen",
+        recipientId: recipientPhone,
+        message: `Your issue "${issue.title}" status has been updated to ${issue.status.replace(/_/g, " ")}.`,
+        relatedIssue: issue._id,
+      });
+    }
 
     return NextResponse.json(mapToFlutterReport(issue));
   } catch (error: any) {

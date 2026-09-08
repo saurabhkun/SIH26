@@ -53,8 +53,16 @@ export async function GET() {
       }
       issueStatsMap[dName].totalIssues += 1;
       if (item.status === "Resolved") issueStatsMap[dName].resolvedCount += 1;
-      if (item.status === "Under_Review") issueStatsMap[dName].underReviewCount += 1;
-      if (["Assigned_HEI", "Proposal_Submitted", "Under_Prototyping", "Industry_Funded"].includes(item.status)) {
+      if (item.status === "Under_Review")
+        issueStatsMap[dName].underReviewCount += 1;
+      if (
+        [
+          "Assigned_HEI",
+          "Proposal_Submitted",
+          "Under_Prototyping",
+          "Industry_Funded",
+        ].includes(item.status)
+      ) {
         issueStatsMap[dName].assignedCount += 1;
       }
       if (issueStatsMap[dName].totalIssues > maxIssues) {
@@ -74,7 +82,15 @@ export async function GET() {
 
     // 3. Find funds committed per district via proposals & pledges
     const rawPledges = await IndustryPledge.find({
-      status: { $in: ["Pledged", "Payment_Processing", "Funded", "Milestone_Released", "Completed"] },
+      status: {
+        $in: [
+          "Pledged",
+          "Payment_Processing",
+          "Funded",
+          "Milestone_Released",
+          "Completed",
+        ],
+      },
     })
       .populate({
         path: "proposal",
@@ -138,7 +154,10 @@ export async function GET() {
       // Relative density calculation (clamped 10 to 100 if has issues, or 0)
       const density =
         totalIssues > 0
-          ? Math.min(100, Math.max(12, Math.round((totalIssues / maxIssues) * 100)))
+          ? Math.min(
+              100,
+              Math.max(12, Math.round((totalIssues / maxIssues) * 100)),
+            )
           : 0;
 
       const record = {
@@ -165,11 +184,14 @@ export async function GET() {
       list: summaryList,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to fetch districts summary";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to fetch districts summary";
     console.error("GET /api/districts/summary error:", error);
     return NextResponse.json(
       { success: false, error: errorMsg },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

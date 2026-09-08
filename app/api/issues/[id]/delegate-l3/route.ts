@@ -12,18 +12,28 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     await connectDB();
     const issueId = params.id;
     const body = await request.json();
-    const { collegeId, collegeName, type, scopeOfWork, agreedStipend, distanceKm } = body;
+    const {
+      collegeId,
+      collegeName,
+      type,
+      scopeOfWork,
+      agreedStipend,
+      distanceKm,
+    } = body;
 
     if (!collegeId || !type) {
       return NextResponse.json(
-        { success: false, error: "collegeId and type ('L3R' | 'L3G') are required." },
-        { status: 400 }
+        {
+          success: false,
+          error: "collegeId and type ('L3R' | 'L3G') are required.",
+        },
+        { status: 400 },
       );
     }
 
@@ -33,17 +43,23 @@ export async function POST(
     ]);
 
     if (!issue) {
-      return NextResponse.json({ success: false, error: "Issue not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Issue not found" },
+        { status: 404 },
+      );
     }
 
-    const subName = subCollege?.name || collegeName || "Regional Partner College";
+    const subName =
+      subCollege?.name || collegeName || "Regional Partner College";
 
     // Set L3 delegation
     issue.subContractedL3 = {
       collegeId: subCollege ? subCollege._id : collegeId,
       collegeName: subName,
       type,
-      scopeOfWork: scopeOfWork || ["Regional field monitoring & citizen survey"],
+      scopeOfWork: scopeOfWork || [
+        "Regional field monitoring & citizen survey",
+      ],
       agreedStipend: agreedStipend || 25000,
       distanceKm: distanceKm || 15,
       status: "PENDING",
@@ -68,8 +84,14 @@ export async function POST(
       data: issue.subContractedL3,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to delegate L3 subcontract";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to delegate L3 subcontract";
     console.error("POST /api/issues/[id]/delegate-l3 error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

@@ -86,10 +86,14 @@ export interface IIssue extends Document {
 const AttachmentSchema = new Schema<IAttachment>(
   {
     url: { type: String, required: true },
-    type: { type: String, enum: ["photo", "video", "document"], required: true },
+    type: {
+      type: String,
+      enum: ["photo", "video", "document"],
+      required: true,
+    },
     filename: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const DirectNominationSchema = new Schema<DirectNominationInfo>(
@@ -104,7 +108,7 @@ const DirectNominationSchema = new Schema<DirectNominationInfo>(
     },
     rejectionReason: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const SubContractedL3Schema = new Schema<L3SubcontractDetail>(
@@ -121,17 +125,21 @@ const SubContractedL3Schema = new Schema<L3SubcontractDetail>(
       default: "PENDING",
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const RunnerUpSchema = new Schema<RunnerUpRef>(
   {
-    proposalId: { type: Schema.Types.ObjectId, ref: "Proposal", required: true },
+    proposalId: {
+      type: Schema.Types.ObjectId,
+      ref: "Proposal",
+      required: true,
+    },
     collegeId: { type: Schema.Types.ObjectId, ref: "College" },
     collegeName: { type: String },
     rank: { type: Number, enum: [1, 2], required: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const IssueSchema = new Schema<IIssue>(
@@ -230,7 +238,7 @@ const IssueSchema = new Schema<IIssue>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // High-speed compound indexes for query execution

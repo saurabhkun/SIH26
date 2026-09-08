@@ -45,15 +45,22 @@ export async function POST(req: NextRequest) {
   const { issueId, action, duplicateOf } = body;
 
   if (!issueId || !action) {
-    return NextResponse.json({ error: "Missing issueId or action" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing issueId or action" },
+      { status: 400 },
+    );
   }
 
   const issue = await Issue.findById(issueId);
-  if (!issue) return NextResponse.json({ error: "Issue not found" }, { status: 404 });
+  if (!issue)
+    return NextResponse.json({ error: "Issue not found" }, { status: 404 });
 
   if (action === "mark_duplicate") {
     if (!duplicateOf) {
-      return NextResponse.json({ error: "duplicateOf required for mark_duplicate" }, { status: 400 });
+      return NextResponse.json(
+        { error: "duplicateOf required for mark_duplicate" },
+        { status: 400 },
+      );
     }
     issue.status = "Duplicate";
     issue.duplicateOf = duplicateOf;

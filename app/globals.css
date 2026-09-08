@@ -3,31 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --civic-primary: #274C77;
-  --civic-primary-hover: #1E3A8A;
-  --civic-secondary: #6096BA;
-  --civic-accent: #A3CEF1;
-  --civic-canvas: #E7ECEF;
-  --civic-surface: #FFFFFF;
-  --civic-border: #D1D5DB;
-  --civic-text-dark: #1E293B;
-  --civic-text-muted: #64748B;
+  --civic-primary: #274c77;
+  --civic-primary-hover: #1e3a8a;
+  --civic-secondary: #6096ba;
+  --civic-accent: #a3cef1;
+  --civic-canvas: #e7ecef;
+  --civic-surface: #ffffff;
+  --civic-border: #d1d5db;
+  --civic-text-dark: #1e293b;
+  --civic-text-muted: #64748b;
 
-  --navy: #274C77;
-  --navy-light: #1E3A8A;
-  --gold: #6096BA;
-  --bg: #E7ECEF;
-  --ink: #1E293B;
+  --navy: #274c77;
+  --navy-light: #1e3a8a;
+  --gold: #6096ba;
+  --bg: #e7ecef;
+  --ink: #1e293b;
 }
 
 body {
   background-color: var(--civic-canvas);
   color: var(--civic-text-dark);
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    var(--font-inter),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-source-serif-4), Georgia, serif;
 }
 
@@ -38,16 +49,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: #E7ECEF;
+  background: #e7ecef;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #6096BA;
+  background: #6096ba;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #274C77;
+  background: #274c77;
 }
 
 /* Hide scrollbar utility */

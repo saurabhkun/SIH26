@@ -36,7 +36,8 @@ export default function Home() {
                 CivicResolve
               </span>
               <span className="text-[11px] sm:text-xs text-civic-textMuted block mt-0.5 tracking-normal">
-                Government of Jharkhand &middot; Department of Higher &amp; Technical Education
+                Government of Jharkhand &middot; Department of Higher &amp;
+                Technical Education
               </span>
             </Link>
           </div>
@@ -76,7 +77,9 @@ export default function Home() {
               Report a civic problem in your district
             </h1>
             <p className="text-sm sm:text-base text-civic-textMuted leading-relaxed">
-              A state platform enabling citizens to log grassroots challenges across all 24 districts of Jharkhand for collaborative resolution by university research teams and industry partners.
+              A state platform enabling citizens to log grassroots challenges
+              across all 24 districts of Jharkhand for collaborative resolution
+              by university research teams and industry partners.
             </p>
           </div>
 
@@ -116,7 +119,10 @@ export default function Home() {
       {/* Schematic Map Section */}
       <section className="py-8 px-4 sm:px-8 flex-1 bg-civic-canvas">
         <div className="max-w-6xl mx-auto">
-          <div id="heatmap-section" className="border border-civic-border bg-civic-surface p-4 sm:p-6 rounded-xl shadow-xs">
+          <div
+            id="heatmap-section"
+            className="border border-civic-border bg-civic-surface p-4 sm:p-6 rounded-xl shadow-xs"
+          >
             <JharkhandMap />
           </div>
         </div>
@@ -126,7 +132,8 @@ export default function Home() {
       <footer className="bg-civic-surface border-t border-civic-border py-4 px-4 sm:px-8 text-xs text-civic-textMuted mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
-            &copy; 2026 Department of Higher &amp; Technical Education, Government of Jharkhand.
+            &copy; 2026 Department of Higher &amp; Technical Education,
+            Government of Jharkhand.
           </div>
           <div className="text-civic-textMuted">
             CivicResolve Platform &bull; Flutter Enterprise Synchronized

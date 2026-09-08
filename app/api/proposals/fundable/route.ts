@@ -23,7 +23,10 @@ export async function GET(request: NextRequest) {
     };
 
     const proposals = await Proposal.find(query)
-      .populate("issue", "title description trackingCode district domain severityScore citizenName address mediaUrls attachments")
+      .populate(
+        "issue",
+        "title description trackingCode district domain severityScore citizenName address mediaUrls attachments",
+      )
       .populate("college", "name district tier capabilities facilities")
       .sort({ createdAt: -1 })
       .lean();
@@ -33,7 +36,7 @@ export async function GET(request: NextRequest) {
       status: { $in: ["Funded", "Milestone_Released", "Completed"] },
     }).lean();
 
-    const pledgeMap = new Map<string, typeof pledges[0][]>();
+    const pledgeMap = new Map<string, (typeof pledges)[0][]>();
     pledges.forEach((p) => {
       const propId = (p.proposalId || p.proposal)?.toString();
       if (!propId) return;
@@ -45,11 +48,17 @@ export async function GET(request: NextRequest) {
     // Annotate proposals with CSR funding status
     const annotated = proposals.map((prop) => {
       const linkedPledges = pledgeMap.get(prop._id.toString()) || [];
-      const totalPledged = linkedPledges.reduce((sum, p) => sum + (p.amountPledged || 0), 0);
-      const totalReleased = linkedPledges.reduce((sum, p) => sum + (p.amountReleased || 0), 0);
+      const totalPledged = linkedPledges.reduce(
+        (sum, p) => sum + (p.amountPledged || 0),
+        0,
+      );
+      const totalReleased = linkedPledges.reduce(
+        (sum, p) => sum + (p.amountReleased || 0),
+        0,
+      );
 
       const completedUnreleasedMilestones = (prop.milestones || []).filter(
-        (m) => m.status === "Completed" && !m.fundingReleased
+        (m) => m.status === "Completed" && !m.fundingReleased,
       );
 
       return {
@@ -59,7 +68,8 @@ export async function GET(request: NextRequest) {
         totalReleased,
         isFullyFunded: totalPledged >= (prop.budgetRequested || 0),
         fundingGap: Math.max(0, (prop.budgetRequested || 0) - totalPledged),
-        completedUnreleasedMilestonesCount: completedUnreleasedMilestones.length,
+        completedUnreleasedMilestonesCount:
+          completedUnreleasedMilestones.length,
       };
     });
 
@@ -67,14 +77,16 @@ export async function GET(request: NextRequest) {
     let filtered = annotated;
     if (domainFilter && domainFilter !== "all") {
       filtered = filtered.filter(
-        (p) => (p.issue as unknown as { domain?: string })?.domain === domainFilter
+        (p) =>
+          (p.issue as unknown as { domain?: string })?.domain === domainFilter,
       );
     }
     if (districtFilter && districtFilter !== "all") {
       filtered = filtered.filter(
         (p) =>
-          (p.issue as unknown as { district?: string })?.district?.toLowerCase() ===
-          districtFilter.toLowerCase()
+          (
+            p.issue as unknown as { district?: string }
+          )?.district?.toLowerCase() === districtFilter.toLowerCase(),
       );
     }
 
@@ -84,8 +96,14 @@ export async function GET(request: NextRequest) {
       data: filtered,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to load fundable proposals";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to load fundable proposals";
     console.error("GET /api/proposals/fundable error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

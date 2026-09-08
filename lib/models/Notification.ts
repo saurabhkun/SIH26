@@ -36,7 +36,18 @@ const NotificationSchema = new Schema<INotification>(
     recipientId: { type: Schema.Types.Mixed, index: true },
     recipientRole: {
       type: String,
-      enum: ["GOV", "RO", "INDUSTRY", "CITIZEN", "ALL", "gov", "college", "industry", "citizen", "all"],
+      enum: [
+        "GOV",
+        "RO",
+        "INDUSTRY",
+        "CITIZEN",
+        "ALL",
+        "gov",
+        "college",
+        "industry",
+        "citizen",
+        "all",
+      ],
       required: true,
       index: true,
     },
@@ -73,11 +84,16 @@ const NotificationSchema = new Schema<INotification>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // High performance compound indexes
-NotificationSchema.index({ recipientRole: 1, recipientId: 1, read: 1, createdAt: -1 });
+NotificationSchema.index({
+  recipientRole: 1,
+  recipientId: 1,
+  read: 1,
+  createdAt: -1,
+});
 NotificationSchema.index({ priority: 1, read: 1, createdAt: -1 });
 
 const Notification: Model<INotification> =

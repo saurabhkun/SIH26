@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
       const domain = (formData.get("domain") as string) || "Urban Development";
 
       if (!file) {
-        return NextResponse.json({ success: false, error: "No file provided" }, { status: 400 });
+        return NextResponse.json(
+          { success: false, error: "No file provided" },
+          { status: 400 },
+        );
       }
 
       // Convert small files (< 2MB) directly to base64 Data URI for instant previews
@@ -38,7 +41,10 @@ export async function POST(request: NextRequest) {
       }
 
       // For larger files or fallback, assign contextual high-resolution CDN photo
-      const fallbackUrl = getContextualMediaUrl(domain, Math.floor(Math.random() * 3));
+      const fallbackUrl = getContextualMediaUrl(
+        domain,
+        Math.floor(Math.random() * 3),
+      );
       return NextResponse.json({
         success: true,
         url: fallbackUrl,
@@ -50,10 +56,17 @@ export async function POST(request: NextRequest) {
 
     // 2. Handle JSON payload (e.g. { filename, domain, base64 })
     const body = await request.json();
-    const { filename = "evidence.jpg", domain = "Water Resources", base64, type = "photo" } = body;
+    const {
+      filename = "evidence.jpg",
+      domain = "Water Resources",
+      base64,
+      type = "photo",
+    } = body;
 
     if (base64 && typeof base64 === "string") {
-      const dataUri = base64.startsWith("data:") ? base64 : `data:image/jpeg;base64,${base64}`;
+      const dataUri = base64.startsWith("data:")
+        ? base64
+        : `data:image/jpeg;base64,${base64}`;
       return NextResponse.json({
         success: true,
         url: dataUri,
@@ -71,8 +84,12 @@ export async function POST(request: NextRequest) {
       type,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Upload processing failed";
+    const errorMsg =
+      error instanceof Error ? error.message : "Upload processing failed";
     console.error("POST /api/upload error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

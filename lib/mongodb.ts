@@ -33,7 +33,7 @@ export async function connectDB(): Promise<typeof mongoose> {
 
   if (!MONGODB_URI) {
     throw new Error(
-      "Please define the MONGODB_URI environment variable inside .env.local"
+      "Please define the MONGODB_URI environment variable inside .env.local",
     );
   }
 
@@ -55,18 +55,24 @@ export async function connectDB(): Promise<typeof mongoose> {
         const errObj = err as { message?: string; name?: string };
         // If local 127.0.0.1 daemon is not running during local development, spin up in-memory MongoDB
         if (
-          (errObj?.message?.includes("ECONNREFUSED") || errObj?.name === "MongooseServerSelectionError") &&
-          (MONGODB_URI.includes("127.0.0.1") || MONGODB_URI.includes("localhost"))
+          (errObj?.message?.includes("ECONNREFUSED") ||
+            errObj?.name === "MongooseServerSelectionError") &&
+          (MONGODB_URI.includes("127.0.0.1") ||
+            MONGODB_URI.includes("localhost"))
         ) {
           console.warn(
-            "Local MongoDB daemon not running on port 27017. Starting embedded in-memory MongoDB instance for local prototype..."
+            "Local MongoDB daemon not running on port 27017. Starting embedded in-memory MongoDB instance for local prototype...",
           );
           const { MongoMemoryServer } = await import("mongodb-memory-server");
           if (!cached.memServer) {
             cached.memServer = await MongoMemoryServer.create();
           }
-          const memUri = (cached.memServer as { getUri: () => string }).getUri();
-          const instance = await mongoose.connect(memUri, { bufferCommands: false });
+          const memUri = (
+            cached.memServer as { getUri: () => string }
+          ).getUri();
+          const instance = await mongoose.connect(memUri, {
+            bufferCommands: false,
+          });
           return instance;
         }
         throw err;

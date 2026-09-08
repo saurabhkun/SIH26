@@ -62,7 +62,9 @@ export default function L3SubcontractorModal({
     const matchSearch =
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.district.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.facilities.some((f) => f.toLowerCase().includes(searchQuery.toLowerCase()));
+      c.facilities.some((f) =>
+        f.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
     const matchDist = c.distanceKm <= maxDistance;
     return matchTier && matchSearch && matchDist;
   });
@@ -194,7 +196,8 @@ export default function L3SubcontractorModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-1">
             {filteredCandidates.length === 0 ? (
               <div className="col-span-2 text-center py-8 text-slate-500 text-xs border border-dashed border-slate-300 rounded-xs">
-                No matching {activeTab} institutions found within {maxDistance}km.
+                No matching {activeTab} institutions found within {maxDistance}
+                km.
               </div>
             ) : (
               filteredCandidates.map((c) => {
@@ -224,7 +227,9 @@ export default function L3SubcontractorModal({
                       </div>
                       <div className="flex items-center gap-1 text-[11px] text-slate-500">
                         <Users className="w-3 h-3 text-slate-400" />
-                        <span>Workforce: {c.availableStudentWorkforce} Students</span>
+                        <span>
+                          Workforce: {c.availableStudentWorkforce} Students
+                        </span>
                       </div>
                       {c.facilities.length > 0 && (
                         <div className="text-[10.5px] text-slate-600 mt-1 line-clamp-1">
@@ -336,7 +341,11 @@ export default function L3SubcontractorModal({
             onClick={handleSubmit}
             className="px-6 py-2 bg-navy text-gold text-xs font-bold border border-gold hover:bg-navyLight disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
           >
-            <span>{isSubmitting ? "Dispatching Agreement..." : "Assign &amp; Dispatch Subcontract"}</span>
+            <span>
+              {isSubmitting
+                ? "Dispatching Agreement..."
+                : "Assign &amp; Dispatch Subcontract"}
+            </span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

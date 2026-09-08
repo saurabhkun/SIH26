@@ -133,7 +133,8 @@ export default function DashboardShell({
           </span>
         </div>
         <div className="text-slate-200 text-[11px] hidden sm:block">
-          Authenticated Portal &bull; Role: <strong className="text-civic-accent">{roleTitle}</strong>
+          Authenticated Portal &bull; Role:{" "}
+          <strong className="text-civic-accent">{roleTitle}</strong>
         </div>
       </div>
 
@@ -146,11 +147,16 @@ export default function DashboardShell({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <Link href="/" className="font-serif font-bold text-civic-textDark text-lg leading-tight hover:text-civic-primary transition-colors">
+                <Link
+                  href="/"
+                  className="font-serif font-bold text-civic-textDark text-lg leading-tight hover:text-civic-primary transition-colors"
+                >
                   CivicResolve
                 </Link>
                 <span className="text-civic-border">/</span>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-civic-accent/25 text-civic-primaryHover border border-civic-accent font-medium">{roleTitle}</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-civic-accent/25 text-civic-primaryHover border border-civic-accent font-medium">
+                  {roleTitle}
+                </span>
               </div>
               <p className="text-[11px] text-civic-textMuted">
                 {organizationOrCollege ? `${organizationOrCollege} • ` : ""}
@@ -162,7 +168,9 @@ export default function DashboardShell({
           <div className="flex items-center space-x-4">
             <div className="hidden md:block text-right text-xs">
               <div className="font-bold text-civic-textDark">{userName}</div>
-              <div className="text-civic-textMuted text-[11px]">{userEmail}</div>
+              <div className="text-civic-textMuted text-[11px]">
+                {userEmail}
+              </div>
             </div>
 
             <NotificationBell />
@@ -209,7 +217,9 @@ export default function DashboardShell({
                     {renderNavIcon(item.iconName)}
                     <span>{item.label}</span>
                   </div>
-                  {isCurrent && <ChevronRight className="w-3.5 h-3.5 text-civic-accent" />}
+                  {isCurrent && (
+                    <ChevronRight className="w-3.5 h-3.5 text-civic-accent" />
+                  )}
                 </Link>
               );
             })}
@@ -237,7 +247,8 @@ export default function DashboardShell({
       <footer className="bg-civic-surface border-t border-civic-border py-3.5 px-4 sm:px-8 text-xs text-civic-textMuted mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
-            &copy; 2026 Department of Higher &amp; Technical Education, Government of Jharkhand.
+            &copy; 2026 Department of Higher &amp; Technical Education,
+            Government of Jharkhand.
           </div>
           <div className="text-civic-textMuted">
             Unified Portal Shell &bull; Flutter Enterprise Synchronized

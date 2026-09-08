@@ -6,29 +6,43 @@ import Notification from "../lib/models/Notification";
 import mongoose from "mongoose";
 
 async function runSeed() {
-  console.log("==================================================================");
-  console.log("   CivicResolve (SIH 2026 PS 26043) - Database Verification & Seed");
-  console.log("==================================================================");
+  console.log(
+    "==================================================================",
+  );
+  console.log(
+    "   CivicResolve (SIH 2026 PS 26043) - Database Verification & Seed",
+  );
+  console.log(
+    "==================================================================",
+  );
 
   let memServer: any = null;
-  const targetUri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/civicresolve";
+  const targetUri =
+    process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/civicresolve";
   process.env.MONGODB_URI = targetUri;
 
   console.log(`Attempting connection to MongoDB at: ${targetUri}`);
 
   try {
     // Quick probe if local standalone mongod is responding
-    const probeConn = await mongoose.createConnection(targetUri, { serverSelectionTimeoutMS: 2000 }).asPromise().catch(() => null);
+    const probeConn = await mongoose
+      .createConnection(targetUri, { serverSelectionTimeoutMS: 2000 })
+      .asPromise()
+      .catch(() => null);
 
     if (probeConn) {
       await probeConn.close();
       console.log("-> Local MongoDB instance detected at 127.0.0.1:27017.");
     } else {
-      console.log("-> No active MongoDB daemon at 127.0.0.1:27017. Spinning up in-memory MongoDB instance for schema verification...");
+      console.log(
+        "-> No active MongoDB daemon at 127.0.0.1:27017. Spinning up in-memory MongoDB instance for schema verification...",
+      );
       const { MongoMemoryServer } = await import("mongodb-memory-server");
       memServer = await MongoMemoryServer.create();
       process.env.MONGODB_URI = memServer.getUri();
-      console.log(`-> In-memory MongoDB running at: ${process.env.MONGODB_URI}`);
+      console.log(
+        `-> In-memory MongoDB running at: ${process.env.MONGODB_URI}`,
+      );
     }
 
     // Call standard cached connectDB helper from lib/mongodb.ts
@@ -44,22 +58,31 @@ async function runSeed() {
     console.log("[OK] Existing records cleared.\n");
 
     // 1. Seed 3 Sample Colleges across tiers in Jharkhand
-    console.log("Step 2: Inserting 3 sample Higher Education Institutions (HEIs)...");
+    console.log(
+      "Step 2: Inserting 3 sample Higher Education Institutions (HEIs)...",
+    );
     const collegesData = [
       {
         name: "Birla Institute of Technology, Mesra",
         district: "Ranchi",
         tier: "L1" as const,
-        capabilities: ["Water Resources", "Environment", "Agriculture", "Energy"],
+        capabilities: [
+          "Water Resources",
+          "Environment",
+          "Agriculture",
+          "Energy",
+        ],
         facilities: [
           {
             name: "Environmental Engineering & Water Testing Lab",
-            description: "Advanced spectrometry and heavy metal trace detection facility.",
+            description:
+              "Advanced spectrometry and heavy metal trace detection facility.",
             relatedDomains: ["Water Resources", "Environment"],
           },
           {
             name: "Renewable Energy Research Center",
-            description: "Solar PV microgrid and biomass conversion testing setup.",
+            description:
+              "Solar PV microgrid and biomass conversion testing setup.",
             relatedDomains: ["Energy"],
           },
         ],
@@ -87,7 +110,12 @@ async function runSeed() {
         name: "National Institute of Technology Jamshedpur",
         district: "East Singhbhum",
         tier: "L1" as const,
-        capabilities: ["Urban Development", "Energy", "Sanitation", "Healthcare"],
+        capabilities: [
+          "Urban Development",
+          "Energy",
+          "Sanitation",
+          "Healthcare",
+        ],
         facilities: [
           {
             name: "Urban IoT & Automation Cell",
@@ -117,7 +145,8 @@ async function runSeed() {
         facilities: [
           {
             name: "Rural Fabrication Workshop",
-            description: "Low-cost mechanical tool machining and agricultural implement fabrication.",
+            description:
+              "Low-cost mechanical tool machining and agricultural implement fabrication.",
             relatedDomains: ["Agriculture", "Rural Livelihoods"],
           },
         ],
@@ -140,18 +169,25 @@ async function runSeed() {
     const insertedColleges = await College.insertMany(collegesData);
     console.log(`[OK] Inserted ${insertedColleges.length} colleges:`);
     insertedColleges.forEach((col, idx) => {
-      console.log(`   ${idx + 1}. [Tier ${col.tier}] ${col.name} (${col.district})`);
+      console.log(
+        `   ${idx + 1}. [Tier ${col.tier}] ${col.name} (${col.district})`,
+      );
       console.log(`      Capabilities: ${col.capabilities.join(", ")}`);
-      console.log(`      Faculty: ${col.faculty.map(f => f.name).join(", ")}`);
+      console.log(
+        `      Faculty: ${col.faculty.map((f) => f.name).join(", ")}`,
+      );
       console.log(`      ID: ${col._id}`);
     });
 
     // 2. Seed 5 Sample Issues across Jharkhand districts
-    console.log("\nStep 3: Inserting 5 sample civic issues across Jharkhand districts...");
+    console.log(
+      "\nStep 3: Inserting 5 sample civic issues across Jharkhand districts...",
+    );
     const issuesData = [
       {
         title: "Fluoride Contamination in Village Handpumps of Bhandra Block",
-        description: "Severe fluoride contamination (>2.5 mg/L) detected in 14 community handpumps across 3 panchayats, causing dental and skeletal fluorosis among schoolchildren.",
+        description:
+          "Severe fluoride contamination (>2.5 mg/L) detected in 14 community handpumps across 3 panchayats, causing dental and skeletal fluorosis among schoolchildren.",
         attachments: [
           {
             url: "https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&w=800&q=80",
@@ -166,7 +202,12 @@ async function runSeed() {
         ],
         domain: "Water Resources" as const,
         severityScore: 5,
-        aiTags: ["water-contamination", "fluoride", "groundwater-filtration", "public-health"],
+        aiTags: [
+          "water-contamination",
+          "fluoride",
+          "groundwater-filtration",
+          "public-health",
+        ],
         district: "Lohardaga",
         pincode: "835302",
         address: "Bhandra Gram Panchayat, Block Bhandra",
@@ -186,7 +227,8 @@ async function runSeed() {
       },
       {
         title: "High Spoilage in Post-Harvest Lac Processing & Storage",
-        description: "Tribal lac farmers in Khunti suffer up to 35% produce loss due to lack of solar dehumidification storage units and moisture-control storage bags during the monsoon flush.",
+        description:
+          "Tribal lac farmers in Khunti suffer up to 35% produce loss due to lack of solar dehumidification storage units and moisture-control storage bags during the monsoon flush.",
         attachments: [
           {
             url: "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80",
@@ -196,7 +238,12 @@ async function runSeed() {
         ],
         domain: "Rural Livelihoods" as const,
         severityScore: 4,
-        aiTags: ["lac-cultivation", "post-harvest-loss", "solar-drying", "tribal-livelihoods"],
+        aiTags: [
+          "lac-cultivation",
+          "post-harvest-loss",
+          "solar-drying",
+          "tribal-livelihoods",
+        ],
         district: "Khunti",
         pincode: "835210",
         address: "Murhu Market Yard, Khunti",
@@ -215,8 +262,10 @@ async function runSeed() {
         submissionIndexForMobile: 1,
       },
       {
-        title: "Coal Dust Fugitive Emissions and Respiratory Risk in Slag Yards",
-        description: "Heavy PM10/PM2.5 particulate dispersion affecting residential colonies adjoining coal washery transport corridor without automated mist canon suppression.",
+        title:
+          "Coal Dust Fugitive Emissions and Respiratory Risk in Slag Yards",
+        description:
+          "Heavy PM10/PM2.5 particulate dispersion affecting residential colonies adjoining coal washery transport corridor without automated mist canon suppression.",
         attachments: [
           {
             url: "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?auto=format&fit=crop&w=800&q=80",
@@ -226,7 +275,12 @@ async function runSeed() {
         ],
         domain: "Environment" as const,
         severityScore: 4,
-        aiTags: ["air-pollution", "coal-dust", "particulate-matter", "respiratory-health"],
+        aiTags: [
+          "air-pollution",
+          "coal-dust",
+          "particulate-matter",
+          "respiratory-health",
+        ],
         district: "Dhanbad",
         pincode: "828104",
         address: "Jharia Bypass Road, Near Colony 4",
@@ -246,7 +300,8 @@ async function runSeed() {
       },
       {
         title: "Cold-Chain Breakdown in Remote Primary Health Centre (PHC)",
-        description: "Intermittent grid supply causes vaccine storage refrigerator failures at Sarath PHC. Requires a ruggedized hybrid solar-battery backup with real-time temperature telemetry.",
+        description:
+          "Intermittent grid supply causes vaccine storage refrigerator failures at Sarath PHC. Requires a ruggedized hybrid solar-battery backup with real-time temperature telemetry.",
         attachments: [
           {
             url: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80",
@@ -256,7 +311,12 @@ async function runSeed() {
         ],
         domain: "Healthcare" as const,
         severityScore: 5,
-        aiTags: ["cold-chain", "vaccine-storage", "solar-backup", "iot-telemetry"],
+        aiTags: [
+          "cold-chain",
+          "vaccine-storage",
+          "solar-backup",
+          "iot-telemetry",
+        ],
         district: "Deoghar",
         pincode: "814149",
         address: "Primary Health Centre, Sarath",
@@ -276,7 +336,8 @@ async function runSeed() {
       },
       {
         title: "Soil Erosion and Silt Choking of Irrigation Canals in Patamda",
-        description: "Heavy silt runoff during torrential rains blocks check-dam channels, depriving 200+ hectares of paddy fields from perennial canal irrigation.",
+        description:
+          "Heavy silt runoff during torrential rains blocks check-dam channels, depriving 200+ hectares of paddy fields from perennial canal irrigation.",
         attachments: [
           {
             url: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80",
@@ -310,12 +371,18 @@ async function runSeed() {
     console.log(`[OK] Inserted ${insertedIssues.length} issues:`);
     insertedIssues.forEach((issue, idx) => {
       console.log(`   ${idx + 1}. [${issue.trackingCode}] ${issue.title}`);
-      console.log(`      District: ${issue.district} | Domain: ${issue.domain} | Severity: ${issue.severityScore}/5 | Status: ${issue.status}`);
-      console.log(`      Citizen: ${issue.citizenName} (${issue.citizenMobile}) | DedupFingerprint: ${issue.dedupFingerprint}`);
+      console.log(
+        `      District: ${issue.district} | Domain: ${issue.domain} | Severity: ${issue.severityScore}/5 | Status: ${issue.status}`,
+      );
+      console.log(
+        `      Citizen: ${issue.citizenName} (${issue.citizenMobile}) | DedupFingerprint: ${issue.dedupFingerprint}`,
+      );
     });
 
     // 3. Seed 3 Role-Based Test Accounts
-    console.log("\nStep 4: Inserting 3 test accounts for role-based portal access...");
+    console.log(
+      "\nStep 4: Inserting 3 test accounts for role-based portal access...",
+    );
     const usersData = [
       {
         name: "Dr. Arvind Kumar",
@@ -347,17 +414,22 @@ async function runSeed() {
     const insertedUsers = await User.insertMany(usersData);
     console.log(`[OK] Inserted ${insertedUsers.length} user accounts:`);
     insertedUsers.forEach((u, idx) => {
-      console.log(`   ${idx + 1}. [Role: ${u.role.toUpperCase()}] ${u.name} <${u.email}> (Pass: ${u.passwordHash})`);
+      console.log(
+        `   ${idx + 1}. [Role: ${u.role.toUpperCase()}] ${u.name} <${u.email}> (Pass: ${u.passwordHash})`,
+      );
     });
 
     // 4. Seed Multi-Role Operational Notifications
-    console.log("\nStep 5: Inserting operational state notifications across roles...");
+    console.log(
+      "\nStep 5: Inserting operational state notifications across roles...",
+    );
     const sampleNotifications = [
       {
         recipientRole: "GOV",
         recipientId: "gov_admin_nodal",
         title: "⚡ Circuit Breaker Disaster Alert",
-        message: "Damodar River chemical discharge detected near Bokaro Thermal. Emergency fast-track triggered.",
+        message:
+          "Damodar River chemical discharge detected near Bokaro Thermal. Emergency fast-track triggered.",
         type: "CIRCUIT_BREAKER_DISASTER",
         priority: "CRITICAL",
         actionUrl: "/dashboard/gov/triage",
@@ -367,7 +439,8 @@ async function runSeed() {
         recipientRole: "GOV",
         recipientId: "gov_admin_nodal",
         title: "🏆 Human Panel Determination Required",
-        message: "BIT Mesra and NIT Jamshedpur submitted competitive bids for Fluoride Filtration. 1 Winner + 2 Runners-Up to be selected.",
+        message:
+          "BIT Mesra and NIT Jamshedpur submitted competitive bids for Fluoride Filtration. 1 Winner + 2 Runners-Up to be selected.",
         type: "PANEL_DECISION",
         priority: "HIGH",
         actionUrl: "/dashboard/gov/allocations",
@@ -377,7 +450,8 @@ async function runSeed() {
         recipientRole: "RO",
         recipientId: insertedColleges[0]._id.toString(),
         title: "🎯 Challenge Awarded: Winning RO",
-        message: "Your institution's proposal for 'Groundwater Heavy-Metal Bioremediation' was approved as Lead RO by the State Nodal Panel!",
+        message:
+          "Your institution's proposal for 'Groundwater Heavy-Metal Bioremediation' was approved as Lead RO by the State Nodal Panel!",
         type: "PANEL_DECISION",
         priority: "HIGH",
         actionUrl: "/dashboard/college/projects",
@@ -387,7 +461,8 @@ async function runSeed() {
         recipientRole: "RO",
         recipientId: insertedColleges[0]._id.toString(),
         title: "🤝 L3 Subcontracting Recommendation",
-        message: "Consider delegating ground sensor calibration to Chaibasa Polytechnic (Tier L3G) for rural deployment.",
+        message:
+          "Consider delegating ground sensor calibration to Chaibasa Polytechnic (Tier L3G) for rural deployment.",
         type: "L3_SUBCONTRACT_INVITE",
         priority: "NORMAL",
         actionUrl: "/dashboard/college/projects",
@@ -397,7 +472,8 @@ async function runSeed() {
         recipientRole: "INDUSTRY",
         recipientId: "all_csr_partners",
         title: "💰 Milestone Escrow Verification Ready",
-        message: "Milestone #1 for Patamda Check-Dam IoT telemetry has achieved nodal signoff. Escrow payout ready for release.",
+        message:
+          "Milestone #1 for Patamda Check-Dam IoT telemetry has achieved nodal signoff. Escrow payout ready for release.",
         type: "MILESTONE_PAYOUT_RELEASED",
         priority: "NORMAL",
         actionUrl: "/dashboard/industry/escrow",
@@ -407,7 +483,8 @@ async function runSeed() {
         recipientRole: "CITIZEN",
         recipientPhone: "9876543210",
         title: "✅ Ground Resolution In Progress",
-        message: "BIT Mesra field engineering team deployed automated water testing units in Ranchi Sadar.",
+        message:
+          "BIT Mesra field engineering team deployed automated water testing units in Ranchi Sadar.",
         type: "CITIZEN_STATUS_UPDATE",
         priority: "NORMAL",
         actionUrl: "/track",
@@ -415,12 +492,21 @@ async function runSeed() {
       },
     ];
 
-    const insertedNotifications = await Notification.insertMany(sampleNotifications);
-    console.log(`[OK] Inserted ${insertedNotifications.length} operational notifications.`);
+    const insertedNotifications =
+      await Notification.insertMany(sampleNotifications);
+    console.log(
+      `[OK] Inserted ${insertedNotifications.length} operational notifications.`,
+    );
 
-    console.log("\n==================================================================");
-    console.log(" [SUCCESS] Database schemas, users, and connectDB() fully verified!");
-    console.log("==================================================================");
+    console.log(
+      "\n==================================================================",
+    );
+    console.log(
+      " [SUCCESS] Database schemas, users, and connectDB() fully verified!",
+    );
+    console.log(
+      "==================================================================",
+    );
   } catch (error) {
     console.error("\n[ERROR] Seed execution failed:", error);
     process.exit(1);

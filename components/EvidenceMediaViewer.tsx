@@ -27,8 +27,11 @@ export const EvidenceMediaViewer: React.FC<MediaProps> = ({
 
   if (validUrls.length === 0) {
     return (
-      <div className={`flex items-center gap-1.5 text-xs text-slate-400 italic py-1 ${className}`}>
-        <ImageIcon className="w-3.5 h-3.5 text-slate-400" /> No citizen field photos attached
+      <div
+        className={`flex items-center gap-1.5 text-xs text-slate-400 italic py-1 ${className}`}
+      >
+        <ImageIcon className="w-3.5 h-3.5 text-slate-400" /> No citizen field
+        photos attached
       </div>
     );
   }
@@ -87,7 +90,9 @@ export const EvidenceMediaViewer: React.FC<MediaProps> = ({
                 }}
               />
               <div className="w-full pt-2 px-2 flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold text-slate-700">Citizen Field Photo Evidence</span>
+                <span className="font-semibold text-slate-700">
+                  Citizen Field Photo Evidence
+                </span>
                 <a
                   href={activeImage}
                   target="_blank"

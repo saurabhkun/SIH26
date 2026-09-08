@@ -3,9 +3,15 @@ import { JHARKHAND_DISTRICTS } from "../lib/data/districts";
 import { signSessionToken, verifySessionToken } from "../lib/auth/session";
 
 async function runSystemVerification() {
-  console.log("================================================================================");
-  console.log("🏛️  CIVICRESOLVE SYSTEM ARCHITECTURE & CLAIM VERIFICATION TEST RUNNER");
-  console.log("================================================================================\n");
+  console.log(
+    "================================================================================",
+  );
+  console.log(
+    "🏛️  CIVICRESOLVE SYSTEM ARCHITECTURE & CLAIM VERIFICATION TEST RUNNER",
+  );
+  console.log(
+    "================================================================================\n",
+  );
 
   let passed = 0;
   let total = 0;
@@ -29,21 +35,23 @@ async function runSystemVerification() {
   assertClaim(
     "24 Jharkhand Administrative Districts & Divisions Integrity",
     districtCount === 24 && uniqueDistricts === 24 && divisions === 5,
-    `Verified ${districtCount} distinct districts across ${divisions} administrative divisions (Palamu, North/South Chotanagpur, Kolhan, Santhal Pargana)`
+    `Verified ${districtCount} distinct districts across ${divisions} administrative divisions (Palamu, North/South Chotanagpur, Kolhan, Santhal Pargana)`,
   );
 
   // Claim 2: Track A Disaster Fast-Track Circuit Breaker
   const disasterTriage = runTriageCircuitBreaker({
     title: "Urgent Bridge Collapse Over Damodar",
-    description: "Structural failure and bridge collapse reported near industrial corridor",
+    description:
+      "Structural failure and bridge collapse reported near industrial corridor",
     domain: "Infrastructure",
     severityScore: 94,
     district: "Ranchi",
   });
   assertClaim(
     "Track A: Disaster Fast-Track Circuit Breaker Bypass",
-    disasterTriage.urgencyTrack === "DISASTER_FAST_TRACK" && disasterTriage.hazardSeverity >= 92,
-    `Bypasses academic bidding; routes directly to Disaster Response Desk (${disasterTriage.assignedNodalOfficer})`
+    disasterTriage.urgencyTrack === "DISASTER_FAST_TRACK" &&
+      disasterTriage.hazardSeverity >= 92,
+    `Bypasses academic bidding; routes directly to Disaster Response Desk (${disasterTriage.assignedNodalOfficer})`,
   );
 
   // Claim 3: Track B Routine Municipal Grievance Routing
@@ -57,13 +65,14 @@ async function runSystemVerification() {
   assertClaim(
     "Track B: Traditional Municipal Grievance Triage",
     municipalTriage.urgencyTrack === "TRADITIONAL_GOVT_GRIEVANCE",
-    `Bypasses academic R&D; routed directly to Urban Local Body / Municipal Works`
+    `Bypasses academic R&D; routed directly to Urban Local Body / Municipal Works`,
   );
 
   // Claim 4: Track C Academic Innovation Pipeline
   const innovationTriage = runTriageCircuitBreaker({
     title: "Fluoride Contamination Groundwater Remediation",
-    description: "Developing novel bio-sorption filter arrays for deep tube-wells",
+    description:
+      "Developing novel bio-sorption filter arrays for deep tube-wells",
     domain: "Water & Sanitation",
     severityScore: 68,
     district: "Garhwa",
@@ -71,7 +80,7 @@ async function runSystemVerification() {
   assertClaim(
     "Track C: Academic Innovation & CSR Pipeline Routing",
     innovationTriage.urgencyTrack === "RO_INNOVATION_PIPELINE",
-    `Engages multi-tier academic consortium bidding (L1/L2) and CSR co-funding escrow`
+    `Engages multi-tier academic consortium bidding (L1/L2) and CSR co-funding escrow`,
   );
 
   // Claim 5: 4-Factor AI Proposal Scoring Matrix Bounds
@@ -84,7 +93,7 @@ async function runSystemVerification() {
   assertClaim(
     "4-Factor AI Proposal Scoring Matrix Calibration (0–100)",
     compositeScore === 89 && compositeScore <= 100 && compositeScore >= 0,
-    `Composite Score: ${compositeScore}/100 [Feasibility: ${feasibility}/30, Lab: ${labMatch}/30, Track: ${trackRecord}/20, Novelty: ${novelty}/20]`
+    `Composite Score: ${compositeScore}/100 [Feasibility: ${feasibility}/30, Lab: ${labMatch}/30, Track: ${trackRecord}/20, Novelty: ${novelty}/20]`,
   );
 
   // Claim 6: HMAC-SHA256 Session Token Security & Tamper Resistance
@@ -100,8 +109,10 @@ async function runSystemVerification() {
   const verifiedTampered = verifySessionToken(tamperedToken);
   assertClaim(
     "HMAC-SHA256 Cryptographic Session Signing & Anti-Tamper Shield",
-    verified !== null && verified.email === testPayload.email && verifiedTampered === null,
-    `Valid token verified correctly; altered token rejected with null signature`
+    verified !== null &&
+      verified.email === testPayload.email &&
+      verifiedTampered === null,
+    `Valid token verified correctly; altered token rejected with null signature`,
   );
 
   // Claim 7: 5-Stage Contingency Escalation Ladder State Invariants
@@ -109,15 +120,16 @@ async function runSystemVerification() {
   assertClaim(
     "5-Stage Contingency Escalation Protocol",
     stages.length === 5,
-    "Stage 1 (Tier Broadcast) ➔ Stage 2 (Window Eval) ➔ Stage 3 (Widened Spectrum + Sweeteners) ➔ Stage 4 (Domain Expert Direct Nomination) ➔ Stage 5 (Govt Public Works Egress)"
+    "Stage 1 (Tier Broadcast) ➔ Stage 2 (Window Eval) ➔ Stage 3 (Widened Spectrum + Sweeteners) ➔ Stage 4 (Domain Expert Direct Nomination) ➔ Stage 5 (Govt Public Works Egress)",
   );
 
   // Claim 8: Hierarchical L1/L2 Subcontracting Topology (L3R / L3G)
   const allowedSubcontractRoles = ["L3R", "L3G"];
   assertClaim(
     "Hierarchical Institutional Subcontracting (L1/L2 ➔ L3R/L3G)",
-    allowedSubcontractRoles.includes("L3R") && allowedSubcontractRoles.includes("L3G"),
-    "L3R (Research-Capable Local Testing & Sensor Calibration) | L3G (Ground Site Survey & Execution)"
+    allowedSubcontractRoles.includes("L3R") &&
+      allowedSubcontractRoles.includes("L3G"),
+    "L3R (Research-Capable Local Testing & Sensor Calibration) | L3G (Ground Site Survey & Execution)",
   );
 
   // Claim 9: Multi-Role Notification Center & Real-Time Operational Alerts Engine
@@ -137,15 +149,23 @@ async function runSystemVerification() {
   assertClaim(
     "Multi-Role Notification Center & Operational Alert Engine (10 Types / 4 Priorities)",
     notificationTypes.length === 10 && targetRoles.length === 5,
-    "10 Notification State Types across GOV, RO, INDUSTRY, and CITIZEN with real-time polling & critical hazard alerts"
+    "10 Notification State Types across GOV, RO, INDUSTRY, and CITIZEN with real-time polling & critical hazard alerts",
   );
 
-  console.log("\n================================================================================");
-  console.log(`🎯 VERIFICATION SUMMARY: ${passed}/${total} CLAIMS VERIFIED EMPIRICALLY`);
-  console.log("================================================================================\n");
+  console.log(
+    "\n================================================================================",
+  );
+  console.log(
+    `🎯 VERIFICATION SUMMARY: ${passed}/${total} CLAIMS VERIFIED EMPIRICALLY`,
+  );
+  console.log(
+    "================================================================================\n",
+  );
 
   if (passed === total) {
-    console.log("✅ All CivicResolve state machine and architectural invariants are 100% sound.\n");
+    console.log(
+      "✅ All CivicResolve state machine and architectural invariants are 100% sound.\n",
+    );
     process.exit(0);
   } else {
     console.error("❌ Some verification checks failed.\n");

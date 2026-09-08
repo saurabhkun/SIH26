@@ -87,12 +87,15 @@ export default function RegisterPage() {
         role,
         email: email.trim(),
         password,
-        institutionName: role === "college" ? institutionName.trim() : undefined,
+        institutionName:
+          role === "college" ? institutionName.trim() : undefined,
         district: role === "college" ? district : undefined,
-        facultyLeadName: role === "college" ? facultyLeadName.trim() : undefined,
+        facultyLeadName:
+          role === "college" ? facultyLeadName.trim() : undefined,
         labEquipment: role === "college" ? labEquipmentTags : undefined,
         companyName: role === "industry" ? companyName.trim() : undefined,
-        csrRegistrationNo: role === "industry" ? csrRegistrationNo.trim() : undefined,
+        csrRegistrationNo:
+          role === "industry" ? csrRegistrationNo.trim() : undefined,
         csrDomainFocus: role === "industry" ? csrDomainFocus : undefined,
       };
 
@@ -105,15 +108,26 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Registration failed. Please check your inputs.");
+        throw new Error(
+          data.error || "Registration failed. Please check your inputs.",
+        );
       }
 
-      setSuccessMsg(data.message || "Account registered successfully! Redirecting...");
+      setSuccessMsg(
+        data.message || "Account registered successfully! Redirecting...",
+      );
       setTimeout(() => {
-        router.push(data.redirectUrl || (role === "college" ? "/dashboard/college" : "/dashboard/industry"));
+        router.push(
+          data.redirectUrl ||
+            (role === "college" ? "/dashboard/college" : "/dashboard/industry"),
+        );
       }, 1000);
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "An unexpected registration error occurred.");
+      setErrorMsg(
+        err instanceof Error
+          ? err.message
+          : "An unexpected registration error occurred.",
+      );
     } finally {
       setLoading(false);
     }
@@ -124,11 +138,18 @@ export default function RegisterPage() {
       {/* Top Banner */}
       <div className="bg-civic-primary text-white py-2 px-4 sm:px-8 border-b border-civic-primaryHover flex justify-between items-center text-xs">
         <div className="flex items-center space-x-2">
-          <span className="font-semibold tracking-wider uppercase text-[11px] text-white">Government of Jharkhand</span>
+          <span className="font-semibold tracking-wider uppercase text-[11px] text-white">
+            Government of Jharkhand
+          </span>
           <span className="text-civic-accent">|</span>
-          <span className="text-slate-200">Higher &amp; Technical Education Department</span>
+          <span className="text-slate-200">
+            Higher &amp; Technical Education Department
+          </span>
         </div>
-        <Link href="/" className="text-civic-accent hover:text-white flex items-center gap-1 font-medium text-[11px] transition-colors">
+        <Link
+          href="/"
+          className="text-civic-accent hover:text-white flex items-center gap-1 font-medium text-[11px] transition-colors"
+        >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Portal
         </Link>
       </div>
@@ -142,13 +163,16 @@ export default function RegisterPage() {
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-civic-accent/25 text-civic-primaryHover border border-civic-accent">
                 Institutional Registration
               </span>
-              <span className="text-xs text-civic-textMuted">CivicResolve Autonomous Network</span>
+              <span className="text-xs text-civic-textMuted">
+                CivicResolve Autonomous Network
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-serif font-bold text-civic-textDark">
               Join the State R&amp;D Innovation Ecosystem
             </h1>
             <p className="text-xs sm:text-sm text-civic-textMuted mt-1">
-              Onboard your accredited higher education institution or corporate CSR foundation to resolve grassroots challenges across Jharkhand.
+              Onboard your accredited higher education institution or corporate
+              CSR foundation to resolve grassroots challenges across Jharkhand.
             </p>
           </div>
 
@@ -252,7 +276,11 @@ export default function RegisterPage() {
                         className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-civic-border rounded-lg text-civic-textDark focus:outline-none focus:ring-1 focus:ring-civic-primary focus:border-civic-primary"
                       >
                         {JHARKHAND_DISTRICTS.map((d) => (
-                          <option key={d.name} value={d.name} className="bg-white text-civic-textDark">
+                          <option
+                            key={d.name}
+                            value={d.name}
+                            className="bg-white text-civic-textDark"
+                          >
                             {d.name} ({d.division})
                           </option>
                         ))}
@@ -279,7 +307,8 @@ export default function RegisterPage() {
 
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-bold uppercase tracking-wider text-civic-textDark mb-1.5">
-                      Available Specialized Lab Equipment &amp; R&amp;D Facilities
+                      Available Specialized Lab Equipment &amp; R&amp;D
+                      Facilities
                     </label>
                     <div className="relative mb-2">
                       <FlaskConical className="w-4 h-4 absolute left-3 top-3 text-civic-textMuted" />
@@ -375,7 +404,11 @@ export default function RegisterPage() {
                       className="w-full px-3.5 py-2 text-sm bg-white border border-civic-border rounded-lg text-civic-textDark focus:outline-none focus:ring-1 focus:ring-civic-primary focus:border-civic-primary"
                     >
                       {ISSUE_DOMAINS.map((domain) => (
-                        <option key={domain} value={domain} className="bg-white text-civic-textDark">
+                        <option
+                          key={domain}
+                          value={domain}
+                          className="bg-white text-civic-textDark"
+                        >
                           {domain}
                         </option>
                       ))}
@@ -438,7 +471,9 @@ export default function RegisterPage() {
                 disabled={loading}
                 className="w-full sm:w-auto px-7 py-2.5 bg-civic-primary hover:bg-civic-primaryHover text-white font-bold text-sm rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
               >
-                {loading ? "Registering Institution..." : "Complete Registration"}
+                {loading
+                  ? "Registering Institution..."
+                  : "Complete Registration"}
                 <ArrowRight className="w-4 h-4 text-white" />
               </button>
             </div>
@@ -448,13 +483,17 @@ export default function RegisterPage() {
         {/* Security Notice */}
         <div className="mt-4 text-center text-xs text-civic-textMuted flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Verified under Government of Jharkhand Societal Innovation Platform Protocol</span>
+          <span>
+            Verified under Government of Jharkhand Societal Innovation Platform
+            Protocol
+          </span>
         </div>
       </div>
 
       {/* Footer */}
       <footer className="bg-civic-surface border-t border-civic-border py-4 text-center text-xs text-civic-textMuted">
-        &copy; 2026 Department of Higher &amp; Technical Education, Government of Jharkhand.
+        &copy; 2026 Department of Higher &amp; Technical Education, Government
+        of Jharkhand.
       </footer>
     </div>
   );

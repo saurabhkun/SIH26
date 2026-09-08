@@ -6,7 +6,7 @@ import crypto from "crypto";
 export function generateDedupFingerprint(
   description: string,
   district: string,
-  location?: { lat?: number; lng?: number }
+  location?: { lat?: number; lng?: number },
 ): string {
   const normalizedDesc = description
     .toLowerCase()

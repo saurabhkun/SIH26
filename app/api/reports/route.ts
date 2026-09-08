@@ -5,7 +5,11 @@ import connectDB from "@/lib/db";
 import Issue from "@/lib/models/Issue";
 import { formatTrackingCode } from "@/lib/utils/dedup";
 import { createNotification } from "@/lib/notifications";
-import { getAllUnifiedIssues, mapToFlutterReport, mapCategoryToDomain } from "@/lib/utils/reportsAdapter";
+import {
+  getAllUnifiedIssues,
+  mapToFlutterReport,
+  mapCategoryToDomain,
+} from "@/lib/utils/reportsAdapter";
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +22,10 @@ export async function GET(req: NextRequest) {
 
     if (userId) {
       filtered = allIssues.filter(
-        (item) => item.citizenMobile === userId || item.user_id === userId || item.contact_number === userId
+        (item) =>
+          item.citizenMobile === userId ||
+          item.user_id === userId ||
+          item.contact_number === userId,
       );
     }
 
@@ -45,29 +52,43 @@ export async function POST(req: NextRequest) {
         });
       }
     } catch (insertErr) {
-      console.warn("Could not insert directly into 'reports' collection:", insertErr);
+      console.warn(
+        "Could not insert directly into 'reports' collection:",
+        insertErr,
+      );
     }
 
     // Find the latest issue for tracking code generation
     const lastIssue = await Issue.findOne({ citizenMobile: data.user_id })
       .sort({ submissionIndexForMobile: -1 })
       .select("submissionIndexForMobile");
-      
-    const submissionIndexForMobile = lastIssue ? lastIssue.submissionIndexForMobile + 1 : 1;
-    const trackingCode = formatTrackingCode(data.user_id || "9999999999", submissionIndexForMobile);
 
-    const attachments = data.image_urls?.map((url: string) => ({
-      url,
-      type: "photo",
-      filename: "phone_upload.jpg",
-    })) || [];
+    const submissionIndexForMobile = lastIssue
+      ? lastIssue.submissionIndexForMobile + 1
+      : 1;
+    const trackingCode = formatTrackingCode(
+      data.user_id || "9999999999",
+      submissionIndexForMobile,
+    );
+
+    const attachments =
+      data.image_urls?.map((url: string) => ({
+        url,
+        type: "photo",
+        filename: "phone_upload.jpg",
+      })) || [];
 
     const newIssue = new Issue({
       title: data.title || "Citizen Reported Challenge",
       description: data.description || "",
       attachments,
       domain: mapCategoryToDomain(data.category, data.title),
-      severityScore: data.priority === "high" || data.priority === "critical" ? 4 : data.priority === "medium" ? 3 : 2,
+      severityScore:
+        data.priority === "high" || data.priority === "critical"
+          ? 4
+          : data.priority === "medium"
+            ? 3
+            : 2,
       aiTags: [data.category || "mobile_app"],
       district: (data.location || "Ranchi").split(",")[0].trim() || "Ranchi",
       address: data.location || "Jharkhand",

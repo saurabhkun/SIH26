@@ -15,17 +15,13 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const {
-      pledgeId,
-      razorpayOrderId,
-      razorpayPaymentId,
-      razorpaySignature,
-    } = body;
+    const { pledgeId, razorpayOrderId, razorpayPaymentId, razorpaySignature } =
+      body;
 
     if (!pledgeId) {
       return NextResponse.json(
         { success: false, error: "pledgeId is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -33,7 +29,7 @@ export async function POST(request: NextRequest) {
     if (!pledge) {
       return NextResponse.json(
         { success: false, error: "Pledge record not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -54,7 +50,10 @@ export async function POST(request: NextRequest) {
     // Update linked proposal status to Approved or In_Progress if currently Submitted
     const proposal = await Proposal.findById(pledge.proposal);
     if (proposal) {
-      if (proposal.status === "Submitted" || proposal.status === "Under_Government_Review") {
+      if (
+        proposal.status === "Submitted" ||
+        proposal.status === "Under_Government_Review"
+      ) {
         proposal.status = "Approved";
         await proposal.save();
       }
@@ -81,8 +80,14 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to verify sandbox payment";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to verify sandbox payment";
     console.error("POST /api/payments/verify error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

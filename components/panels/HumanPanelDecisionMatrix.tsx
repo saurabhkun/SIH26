@@ -55,12 +55,18 @@ export default function HumanPanelDecisionMatrix({
 }: HumanPanelDecisionMatrixProps) {
   // Automatically select the highest AI composite score as the default recommendation
   const sortedProposals = [...proposals].sort(
-    (a, b) => b.aiEvaluation.compositeScore - a.aiEvaluation.compositeScore
+    (a, b) => b.aiEvaluation.compositeScore - a.aiEvaluation.compositeScore,
   );
 
-  const [winnerId, setWinnerId] = useState<string>(sortedProposals[0]?.id || "");
-  const [runnerUp1Id, setRunnerUp1Id] = useState<string>(sortedProposals[1]?.id || "");
-  const [runnerUp2Id, setRunnerUp2Id] = useState<string>(sortedProposals[2]?.id || "");
+  const [winnerId, setWinnerId] = useState<string>(
+    sortedProposals[0]?.id || "",
+  );
+  const [runnerUp1Id, setRunnerUp1Id] = useState<string>(
+    sortedProposals[1]?.id || "",
+  );
+  const [runnerUp2Id, setRunnerUp2Id] = useState<string>(
+    sortedProposals[2]?.id || "",
+  );
   const [panelRemarks, setPanelRemarks] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -69,12 +75,20 @@ export default function HumanPanelDecisionMatrix({
       setErrorMsg("Please select a Winning Research Organization.");
       return;
     }
-    if (winnerId === runnerUp1Id || winnerId === runnerUp2Id || (runnerUp1Id && runnerUp1Id === runnerUp2Id)) {
-      setErrorMsg("A college cannot hold multiple standings (Winner and Runner-Up must be distinct).");
+    if (
+      winnerId === runnerUp1Id ||
+      winnerId === runnerUp2Id ||
+      (runnerUp1Id && runnerUp1Id === runnerUp2Id)
+    ) {
+      setErrorMsg(
+        "A college cannot hold multiple standings (Winner and Runner-Up must be distinct).",
+      );
       return;
     }
     if (!panelRemarks.trim()) {
-      setErrorMsg("Government Nodal & Domain Expert panel remarks are mandatory.");
+      setErrorMsg(
+        "Government Nodal & Domain Expert panel remarks are mandatory.",
+      );
       return;
     }
 
@@ -102,7 +116,8 @@ export default function HumanPanelDecisionMatrix({
             AI-Assisted Human Decision Panel Matrix
           </h2>
           <p className="text-xs text-slate-600 mt-0.5">
-            Review AI composite pre-scores for &ldquo;{challengeTitle}&rdquo; and finalize the binding award with designated backup runners-up.
+            Review AI composite pre-scores for &ldquo;{challengeTitle}&rdquo;
+            and finalize the binding award with designated backup runners-up.
           </p>
         </div>
 
@@ -128,10 +143,10 @@ export default function HumanPanelDecisionMatrix({
                 isWinner
                   ? "border-2 border-green-700 bg-green-50/40 shadow-xs"
                   : isRunnerUp1
-                  ? "border-2 border-blue-700 bg-blue-50/40"
-                  : isRunnerUp2
-                  ? "border-2 border-amber-700 bg-amber-50/40"
-                  : "border-slate-300 bg-white"
+                    ? "border-2 border-blue-700 bg-blue-50/40"
+                    : isRunnerUp2
+                      ? "border-2 border-amber-700 bg-amber-50/40"
+                      : "border-slate-300 bg-white"
               }`}
             >
               {/* Card Header & Tier Badge */}
@@ -148,7 +163,9 @@ export default function HumanPanelDecisionMatrix({
                   <div className="text-xs font-bold text-navy">
                     ₹{prop.estimatedCost.toLocaleString("en-IN")}
                   </div>
-                  <div className="text-[10px] text-slate-500">Budget Requested</div>
+                  <div className="text-[10px] text-slate-500">
+                    Budget Requested
+                  </div>
                 </div>
               </div>
 
@@ -199,12 +216,17 @@ export default function HumanPanelDecisionMatrix({
               {/* Technical Scope & Team Summary */}
               <div className="text-xs text-slate-700 space-y-1.5 my-2 flex-1">
                 <p className="text-[11px] text-slate-600 line-clamp-2">
-                  <span className="font-semibold text-slate-800">Methodology: </span>
+                  <span className="font-semibold text-slate-800">
+                    Methodology:{" "}
+                  </span>
                   {prop.methodologySummary}
                 </p>
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-600">
                   <Users className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Lead: {prop.facultyLead.name} ({prop.studentTeamSize} Students)</span>
+                  <span>
+                    Lead: {prop.facultyLead.name} ({prop.studentTeamSize}{" "}
+                    Students)
+                  </span>
                 </div>
                 {prop.utilizedLabs.length > 0 && (
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-600">
@@ -276,7 +298,8 @@ export default function HumanPanelDecisionMatrix({
 
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold text-slate-700">
-            Mandatory Panel Determination Remarks (Nodal Officer &amp; Domain Expert):
+            Mandatory Panel Determination Remarks (Nodal Officer &amp; Domain
+            Expert):
           </label>
           <textarea
             value={panelRemarks}
@@ -289,7 +312,8 @@ export default function HumanPanelDecisionMatrix({
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
           <div className="text-[11px] text-slate-500">
-            * In case of lead breach or dropout, custody will automatically cascade to Runner-Up #1.
+            * In case of lead breach or dropout, custody will automatically
+            cascade to Runner-Up #1.
           </div>
           <button
             type="button"
@@ -298,7 +322,9 @@ export default function HumanPanelDecisionMatrix({
             className="w-full sm:w-auto px-6 py-2.5 bg-navy text-gold text-xs font-bold border border-gold hover:bg-navyLight disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
           >
             <CheckCircle2 className="w-4 h-4 text-gold" />
-            <span>{isSubmitting ? "Finalizing Award..." : "Confirm & Award Custody"}</span>
+            <span>
+              {isSubmitting ? "Finalizing Award..." : "Confirm & Award Custody"}
+            </span>
           </button>
         </div>
       </div>

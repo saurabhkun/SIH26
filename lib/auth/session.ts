@@ -4,7 +4,8 @@ import { UserRole } from "@/lib/models/User";
 
 const SESSION_COOKIE_NAME = "civicresolve_session";
 const SESSION_SECRET =
-  process.env.SESSION_SECRET || "civicresolve_gov_jharkhand_secure_secret_key_2026";
+  process.env.SESSION_SECRET ||
+  "civicresolve_gov_jharkhand_secure_secret_key_2026";
 
 export interface SessionUser {
   id: string;
@@ -52,7 +53,9 @@ export function verifySessionToken(token: string): SessionUser | null {
       return null;
     }
 
-    const payloadStr = Buffer.from(base64Payload, "base64url").toString("utf-8");
+    const payloadStr = Buffer.from(base64Payload, "base64url").toString(
+      "utf-8",
+    );
     const payload = JSON.parse(payloadStr);
 
     if (payload.exp && Date.now() > payload.exp) {

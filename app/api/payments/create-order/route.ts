@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     if (!pledgeId) {
       return NextResponse.json(
         { success: false, error: "pledgeId is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -26,16 +26,20 @@ export async function POST(request: NextRequest) {
     if (!pledge) {
       return NextResponse.json(
         { success: false, error: "Pledge record not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const orderAmount = Number(amount) || pledge.amountPledged || pledge.pledgedAmount || 50000;
+    const orderAmount =
+      Number(amount) || pledge.amountPledged || pledge.pledgedAmount || 50000;
     const amountInPaise = Math.round(orderAmount * 100);
 
     // Generate authenticated Razorpay Sandbox Test Order ID
     const timestamp = Date.now();
-    const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const randomSuffix = Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toUpperCase();
     const orderId = `order_test_${timestamp}_${randomSuffix}`;
 
     // Update pledge status to Payment_Processing and store test order ID
@@ -44,7 +48,8 @@ export async function POST(request: NextRequest) {
     await pledge.save();
 
     const razorpayKeyId =
-      process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_JharkhandCivicResolveDemoKey2026";
+      process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+      "rzp_test_JharkhandCivicResolveDemoKey2026";
 
     return NextResponse.json({
       success: true,
@@ -58,8 +63,12 @@ export async function POST(request: NextRequest) {
       message: "Razorpay Sandbox Test Order successfully generated.",
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to create payment order";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to create payment order";
     console.error("POST /api/payments/create-order error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

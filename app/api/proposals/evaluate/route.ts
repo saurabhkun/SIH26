@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (!issueId || !winnerProposalId) {
       return NextResponse.json(
         { success: false, error: "issueId and winnerProposalId are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -36,10 +36,16 @@ export async function POST(request: NextRequest) {
     ]);
 
     if (!issue) {
-      return NextResponse.json({ success: false, error: "Issue not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Issue not found" },
+        { status: 404 },
+      );
     }
     if (!winningProposal) {
-      return NextResponse.json({ success: false, error: "Winning proposal not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Winning proposal not found" },
+        { status: 404 },
+      );
     }
 
     // 1. Update Winning Proposal
@@ -53,7 +59,11 @@ export async function POST(request: NextRequest) {
     await winningProposal.save();
 
     // 2. Update Backup Runners-Up
-    const backupRunnersUp: Array<{ proposalId: unknown; collegeId?: unknown; rank: 1 | 2 }> = [];
+    const backupRunnersUp: Array<{
+      proposalId: unknown;
+      collegeId?: unknown;
+      rank: 1 | 2;
+    }> = [];
 
     if (runnerUp1ProposalId) {
       const prop1 = await Proposal.findById(runnerUp1ProposalId);
@@ -92,7 +102,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Update Issue Custody & Lifecycle Status
-    const winCollegeId = winningProposal.collegeId?._id || winningProposal.collegeId || winningProposal.college;
+    const winCollegeId =
+      winningProposal.collegeId?._id ||
+      winningProposal.collegeId ||
+      winningProposal.college;
     issue.assignedLeadCollege = winCollegeId;
     issue.assignedColleges = [winCollegeId];
     issue.winningProposal = winningProposal._id;
@@ -121,8 +134,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to finalize evaluation";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to finalize evaluation";
     console.error("POST /api/proposals/evaluate error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

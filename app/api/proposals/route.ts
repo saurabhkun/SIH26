@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import Proposal, { IMilestone, ITeamMember, ProposalStatus } from "@/lib/models/Proposal";
+import Proposal, {
+  IMilestone,
+  ITeamMember,
+  ProposalStatus,
+} from "@/lib/models/Proposal";
 import Issue from "@/lib/models/Issue";
 import College from "@/lib/models/College";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -30,7 +34,9 @@ export async function GET(request: NextRequest) {
         college = await College.findById(sessionUser.collegeId);
       }
       if (!college && sessionUser?.email) {
-        college = await College.findOne({ email: sessionUser.email.toLowerCase() });
+        college = await College.findOne({
+          email: sessionUser.email.toLowerCase(),
+        });
       }
       if (!college) {
         college = await College.findOne().sort({ createdAt: 1 });
@@ -51,7 +57,10 @@ export async function GET(request: NextRequest) {
     }
 
     const proposals = await Proposal.find(query)
-      .populate("issue", "title description trackingCode district domain severityScore status citizenName address mediaUrls attachments")
+      .populate(
+        "issue",
+        "title description trackingCode district domain severityScore status citizenName address mediaUrls attachments",
+      )
       .populate("college", "name district tier capabilities")
       .sort({ createdAt: -1 })
       .lean();
@@ -62,9 +71,13 @@ export async function GET(request: NextRequest) {
       data: proposals,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to fetch proposals";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to fetch proposals";
     console.error("GET /api/proposals error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }
 
@@ -92,9 +105,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required fields: issueId, title, technicalScope, and facultyMentor are required.",
+          error:
+            "Missing required fields: issueId, title, technicalScope, and facultyMentor are required.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -105,7 +119,9 @@ export async function POST(request: NextRequest) {
       college = await College.findById(sessionUser.collegeId);
     }
     if (!college && sessionUser?.email) {
-      college = await College.findOne({ email: sessionUser.email.toLowerCase() });
+      college = await College.findOne({
+        email: sessionUser.email.toLowerCase(),
+      });
     }
     if (!college) {
       college = await College.findOne().sort({ createdAt: 1 });
@@ -115,11 +131,17 @@ export async function POST(request: NextRequest) {
         name: "Birla Institute of Technology, Mesra",
         district: "Ranchi",
         tier: "L1",
-        capabilities: ["Water Resources", "Environment", "Agriculture", "Energy"],
+        capabilities: [
+          "Water Resources",
+          "Environment",
+          "Agriculture",
+          "Energy",
+        ],
         facilities: [
           {
             name: "Environmental Engineering & Water Testing Lab",
-            description: "Advanced spectrometry and heavy metal trace detection facility.",
+            description:
+              "Advanced spectrometry and heavy metal trace detection facility.",
             relatedDomains: ["Water Resources", "Environment"],
           },
         ],
@@ -141,8 +163,12 @@ export async function POST(request: NextRequest) {
 
     if (!college) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized: No valid Higher Education Institution identified." },
-        { status: 401 }
+        {
+          success: false,
+          error:
+            "Unauthorized: No valid Higher Education Institution identified.",
+        },
+        { status: 401 },
       );
     }
 
@@ -166,7 +192,7 @@ export async function POST(request: NextRequest) {
           fairnessCapReached: true,
           error: `Fairness Rule Violation: ${college.name} currently has ${activeProposalsCount} active proposals (maximum limit is ${maxAllowed}). Complete or close existing projects before claiming new civic challenges.`,
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -175,75 +201,115 @@ export async function POST(request: NextRequest) {
     if (!issue) {
       return NextResponse.json(
         { success: false, error: "Target civic issue not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // 4. Format milestones and team members
-    const formattedTeam: ITeamMember[] = Array.isArray(team) && team.length > 0
-      ? team.map((m: { name: string; role: string; discipline: string }) => ({
-          name: m.name?.trim() || "Student Researcher",
-          role: m.role?.trim() || "Lead Developer",
-          discipline: m.discipline?.trim() || "Engineering",
-        }))
-      : [
-          {
-            name: "Student Innovation Lead",
-            role: "Project Lead",
-            discipline: "Technology & Engineering",
-          },
-        ];
+    const formattedTeam: ITeamMember[] =
+      Array.isArray(team) && team.length > 0
+        ? team.map((m: { name: string; role: string; discipline: string }) => ({
+            name: m.name?.trim() || "Student Researcher",
+            role: m.role?.trim() || "Lead Developer",
+            discipline: m.discipline?.trim() || "Engineering",
+          }))
+        : [
+            {
+              name: "Student Innovation Lead",
+              role: "Project Lead",
+              discipline: "Technology & Engineering",
+            },
+          ];
 
-    const formattedMilestones: IMilestone[] = Array.isArray(milestones) && milestones.length > 0
-      ? milestones.map((m: { title: string; description: string; dueDate?: string; fundingReleaseAmount?: number; payoutPercentage?: number }, idx: number) => {
-          const target = m.dueDate || new Date(Date.now() + (idx + 1) * 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-          return {
-            id: `m-${idx + 1}`,
-            title: m.title?.trim() || `Milestone ${idx + 1}`,
-            description: m.description?.trim() || "Deliverable execution and testing",
-            targetDate: target,
-            dueDate: new Date(target),
-            payoutPercentage: m.payoutPercentage || Math.round(100 / (milestones.length || 3)),
-            status: "Pending" as const,
-            fundingReleaseAmount: Number(m.fundingReleaseAmount) || Math.round((Number(budgetRequested) || 150000) / (milestones.length || 3)),
-            fundingReleased: false,
-          };
-        })
-      : [
-          {
-            id: "m-1",
-            title: "Phase 1: Field Assessment & Sensor Prototyping",
-            description: "Site visits, water sampling, and baseline laboratory calibration",
-            targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-            dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            payoutPercentage: 40,
-            status: "Pending" as const,
-            fundingReleaseAmount: Math.round((Number(budgetRequested) || 150000) * 0.4),
-            fundingReleased: false,
-          },
-          {
-            id: "m-2",
-            title: "Phase 2: Deployment & Pilot Community Testing",
-            description: "Install modular filtration unit and continuous telemetry",
-            targetDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-            dueDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-            payoutPercentage: 40,
-            status: "Pending" as const,
-            fundingReleaseAmount: Math.round((Number(budgetRequested) || 150000) * 0.4),
-            fundingReleased: false,
-          },
-          {
-            id: "m-3",
-            title: "Phase 3: Final Handover & Nodal Certification",
-            description: "Government inspection report and user manual handover to panchayat",
-            targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-            dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-            payoutPercentage: 20,
-            status: "Pending" as const,
-            fundingReleaseAmount: Math.round((Number(budgetRequested) || 150000) * 0.2),
-            fundingReleased: false,
-          },
-        ];
+    const formattedMilestones: IMilestone[] =
+      Array.isArray(milestones) && milestones.length > 0
+        ? milestones.map(
+            (
+              m: {
+                title: string;
+                description: string;
+                dueDate?: string;
+                fundingReleaseAmount?: number;
+                payoutPercentage?: number;
+              },
+              idx: number,
+            ) => {
+              const target =
+                m.dueDate ||
+                new Date(Date.now() + (idx + 1) * 30 * 24 * 60 * 60 * 1000)
+                  .toISOString()
+                  .split("T")[0];
+              return {
+                id: `m-${idx + 1}`,
+                title: m.title?.trim() || `Milestone ${idx + 1}`,
+                description:
+                  m.description?.trim() || "Deliverable execution and testing",
+                targetDate: target,
+                dueDate: new Date(target),
+                payoutPercentage:
+                  m.payoutPercentage ||
+                  Math.round(100 / (milestones.length || 3)),
+                status: "Pending" as const,
+                fundingReleaseAmount:
+                  Number(m.fundingReleaseAmount) ||
+                  Math.round(
+                    (Number(budgetRequested) || 150000) /
+                      (milestones.length || 3),
+                  ),
+                fundingReleased: false,
+              };
+            },
+          )
+        : [
+            {
+              id: "m-1",
+              title: "Phase 1: Field Assessment & Sensor Prototyping",
+              description:
+                "Site visits, water sampling, and baseline laboratory calibration",
+              targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0],
+              dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              payoutPercentage: 40,
+              status: "Pending" as const,
+              fundingReleaseAmount: Math.round(
+                (Number(budgetRequested) || 150000) * 0.4,
+              ),
+              fundingReleased: false,
+            },
+            {
+              id: "m-2",
+              title: "Phase 2: Deployment & Pilot Community Testing",
+              description:
+                "Install modular filtration unit and continuous telemetry",
+              targetDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0],
+              dueDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+              payoutPercentage: 40,
+              status: "Pending" as const,
+              fundingReleaseAmount: Math.round(
+                (Number(budgetRequested) || 150000) * 0.4,
+              ),
+              fundingReleased: false,
+            },
+            {
+              id: "m-3",
+              title: "Phase 3: Final Handover & Nodal Certification",
+              description:
+                "Government inspection report and user manual handover to panchayat",
+              targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0],
+              dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+              payoutPercentage: 20,
+              status: "Pending" as const,
+              fundingReleaseAmount: Math.round(
+                (Number(budgetRequested) || 150000) * 0.2,
+              ),
+              fundingReleased: false,
+            },
+          ];
 
     // 5. Create Proposal doc
     const newProposal = await Proposal.create({
@@ -259,7 +325,9 @@ export async function POST(request: NextRequest) {
       facultyLead: {
         name: facultyMentor.trim(),
         email: college.email || "rnd.director@institution.ac.in",
-        specialization: (college.capabilities && college.capabilities[0]) || "Applied Research & Innovation",
+        specialization:
+          (college.capabilities && college.capabilities[0]) ||
+          "Applied Research & Innovation",
         designation: "Principal Investigator / Professor",
       },
       facultyMentor: facultyMentor.trim(),
@@ -276,7 +344,11 @@ export async function POST(request: NextRequest) {
 
     // 6. Update Issue doc: set status to Proposal_Submitted and push college to assignedColleges
     issue.status = "Proposal_Submitted";
-    if (!issue.assignedColleges.some((id: unknown) => id?.toString() === college._id.toString())) {
+    if (
+      !issue.assignedColleges.some(
+        (id: unknown) => id?.toString() === college._id.toString(),
+      )
+    ) {
       issue.assignedColleges.push(college._id);
     }
     await issue.save();
@@ -320,8 +392,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to create proposal";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to create proposal";
     console.error("POST /api/proposals error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

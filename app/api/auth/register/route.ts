@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (!role || !email || !password) {
       return NextResponse.json(
         { success: false, error: "Role, email, and password are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -38,24 +38,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Government departmental nodal accounts are invitation-only by State Administration.",
+          error:
+            "Government departmental nodal accounts are invitation-only by State Administration.",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     const normalizedEmail = email.toLowerCase().trim();
     if (!normalizedEmail.includes("@")) {
       return NextResponse.json(
-        { success: false, error: "Please provide a valid institutional or corporate email address." },
-        { status: 400 }
+        {
+          success: false,
+          error:
+            "Please provide a valid institutional or corporate email address.",
+        },
+        { status: 400 },
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
-        { success: false, error: "Password must be at least 6 characters long." },
-        { status: 400 }
+        {
+          success: false,
+          error: "Password must be at least 6 characters long.",
+        },
+        { status: 400 },
       );
     }
 
@@ -65,8 +73,12 @@ export async function POST(request: NextRequest) {
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return NextResponse.json(
-        { success: false, error: "An account with this email address already exists. Please sign in." },
-        { status: 409 }
+        {
+          success: false,
+          error:
+            "An account with this email address already exists. Please sign in.",
+        },
+        { status: 409 },
       );
     }
 
@@ -76,8 +88,11 @@ export async function POST(request: NextRequest) {
     if (role === "college") {
       if (!institutionName || !district) {
         return NextResponse.json(
-          { success: false, error: "Institution Name and District are required." },
-          { status: 400 }
+          {
+            success: false,
+            error: "Institution Name and District are required.",
+          },
+          { status: 400 },
         );
       }
 
@@ -96,8 +111,11 @@ export async function POST(request: NextRequest) {
       const equipmentList = Array.isArray(labEquipment)
         ? labEquipment
         : typeof labEquipment === "string"
-        ? labEquipment.split(",").map((s: string) => s.trim()).filter(Boolean)
-        : [];
+          ? labEquipment
+              .split(",")
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+          : [];
 
       // Create or update College doc
       const collegeDoc = await College.create({
@@ -122,7 +140,8 @@ export async function POST(request: NextRequest) {
             ]
           : [],
         activeFacultyCount: tier === "L1" ? 40 : tier === "L2" ? 25 : 15,
-        availableStudentWorkforce: tier === "L1" ? 180 : tier === "L2" ? 120 : 60,
+        availableStudentWorkforce:
+          tier === "L1" ? 180 : tier === "L2" ? 120 : 60,
         reputationScore: tier === "L1" ? 4.9 : 4.6,
         verified: true,
       });
@@ -172,8 +191,11 @@ export async function POST(request: NextRequest) {
     } else if (role === "industry") {
       if (!companyName || !csrRegistrationNo) {
         return NextResponse.json(
-          { success: false, error: "Company Name and MCA CSR Registration Number are required." },
-          { status: 400 }
+          {
+            success: false,
+            error: "Company Name and MCA CSR Registration Number are required.",
+          },
+          { status: 400 },
         );
       }
 
@@ -183,7 +205,9 @@ export async function POST(request: NextRequest) {
         email: normalizedEmail,
         passwordHash,
         role: "industry",
-        designation: csrDomainFocus ? `Head of CSR (${csrDomainFocus})` : "Head of CSR & Sustainability",
+        designation: csrDomainFocus
+          ? `Head of CSR (${csrDomainFocus})`
+          : "Head of CSR & Sustainability",
         organizationName: companyName.trim(),
       });
 
@@ -219,11 +243,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: "Invalid role specified." },
-      { status: 400 }
+      { status: 400 },
     );
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Registration failed";
+    const errorMsg =
+      error instanceof Error ? error.message : "Registration failed";
     console.error("POST /api/auth/register error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

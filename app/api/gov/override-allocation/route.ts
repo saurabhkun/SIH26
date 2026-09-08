@@ -27,11 +27,15 @@ export async function GET() {
       Issue.find({
         status: { $nin: ["Resolved", "Duplicate", "Rejected"] },
       })
-        .select("_id trackingCode title domain district status severityScore escalationStage urgencyTrack createdAt")
+        .select(
+          "_id trackingCode title domain district status severityScore escalationStage urgencyTrack createdAt",
+        )
         .sort({ severityScore: -1, createdAt: -1 })
         .lean(),
       College.find()
-        .select("_id name code tier district verified capabilities facilities researchSpecializations reputationScore")
+        .select(
+          "_id name code tier district verified capabilities facilities researchSpecializations reputationScore",
+        )
         .sort({ name: 1 })
         .lean(),
     ]);
@@ -43,9 +47,13 @@ export async function GET() {
       justifications: OVERRIDE_JUSTIFICATIONS,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to load allocation data";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to load allocation data";
     console.error("GET /api/gov/override-allocation error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }
 
@@ -57,7 +65,10 @@ export async function POST(req: NextRequest) {
   try {
     const user = getCurrentUser();
     if (user && user.role !== "gov") {
-      return NextResponse.json({ success: false, error: "Unauthorized. Government access required." }, { status: 403 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized. Government access required." },
+        { status: 403 },
+      );
     }
 
     await dbConnect();
@@ -69,9 +80,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required fields: issueId, collegeId, and override reason are mandatory.",
+          error:
+            "Missing required fields: issueId, collegeId, and override reason are mandatory.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,21 +93,32 @@ export async function POST(req: NextRequest) {
     ]);
 
     if (!issue) {
-      return NextResponse.json({ success: false, error: "Target Issue record not found." }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Target Issue record not found." },
+        { status: 404 },
+      );
     }
     if (!college) {
-      return NextResponse.json({ success: false, error: "Target Institution not found." }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Target Institution not found." },
+        { status: 404 },
+      );
     }
 
     // 1. Update issue state machine
     issue.status = "DIRECTLY_ALLOCATED";
     issue.assignedLeadCollege = college._id;
-    
+
     // Add college to assigned list if not already present
     const collegeObjId = new mongoose.Types.ObjectId(college._id.toString());
-    const existingList = (issue.assignedColleges || []).map((id: mongoose.Types.ObjectId) => id.toString());
+    const existingList = (issue.assignedColleges || []).map(
+      (id: mongoose.Types.ObjectId) => id.toString(),
+    );
     if (!existingList.includes(college._id.toString())) {
-      issue.assignedColleges = [...(issue.assignedColleges || []), collegeObjId];
+      issue.assignedColleges = [
+        ...(issue.assignedColleges || []),
+        collegeObjId,
+      ];
     }
 
     // Record direct nomination metadata
@@ -107,7 +130,9 @@ export async function POST(req: NextRequest) {
     };
 
     if (remarks) {
-      const existingRationale = issue.triageRationale ? `${issue.triageRationale}\n` : "";
+      const existingRationale = issue.triageRationale
+        ? `${issue.triageRationale}\n`
+        : "";
       issue.triageRationale = `${existingRationale}[Gov Override: ${reason}] ${remarks.trim()}`;
     }
 
@@ -120,18 +145,24 @@ export async function POST(req: NextRequest) {
       console.warn("Report sync warning:", syncErr);
     }
 
-    const isCritical = reason.includes("Disaster") || issue.urgencyTrack === "DISASTER_FAST_TRACK";
+    const isCritical =
+      reason.includes("Disaster") ||
+      issue.urgencyTrack === "DISASTER_FAST_TRACK";
 
     // 2. Dispatch Immediate Priority Notification to the Institution
     await createNotification({
       recipientRole: "RO",
       recipientType: "college",
       recipientId: college._id.toString(),
-      title: isCritical ? "CRITICAL: Immediate Government Allocation Directive" : "Direct Project Allocation Override",
+      title: isCritical
+        ? "CRITICAL: Immediate Government Allocation Directive"
+        : "Direct Project Allocation Override",
       message: `Directive (${reason}): Issue "${issue.title}" (${issue.trackingCode}) in ${issue.district} has been directly assigned to ${college.name} by the State Nodal Review Office.${
         remarks ? ` Officer remarks: "${remarks.trim()}"` : ""
       }`,
-      type: isCritical ? "CIRCUIT_BREAKER_DISASTER" : "DIRECT_NOMINATION_REQUEST",
+      type: isCritical
+        ? "CIRCUIT_BREAKER_DISASTER"
+        : "DIRECT_NOMINATION_REQUEST",
       priority: isCritical ? "CRITICAL" : "HIGH",
       relatedIssueId: issue._id,
       actionUrl: `/dashboard/college/marketplace`,
@@ -179,8 +210,14 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to execute allocation override";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to execute allocation override";
     console.error("POST /api/gov/override-allocation error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

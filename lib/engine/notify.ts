@@ -7,7 +7,8 @@ import Notification, {
 import mongoose from "mongoose";
 
 export interface DispatchOptions {
-  recipientRole: RecipientRole | "gov" | "college" | "industry" | "citizen" | "all";
+  recipientRole:
+    RecipientRole | "gov" | "college" | "industry" | "citizen" | "all";
   recipientId?: string | mongoose.Types.ObjectId;
   recipientPhone?: string;
   relatedIssueId?: string | mongoose.Types.ObjectId;
@@ -20,7 +21,7 @@ export interface DispatchOptions {
 }
 
 function normalizeRole(
-  role: string
+  role: string,
 ): "GOV" | "RO" | "INDUSTRY" | "CITIZEN" | "ALL" {
   const upper = role.toUpperCase();
   if (upper === "COLLEGE" || upper === "RO" || upper === "HEI") return "RO";

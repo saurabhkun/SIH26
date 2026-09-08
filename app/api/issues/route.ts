@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Issue, { ISSUE_DOMAINS, FACING_SINCE_OPTIONS } from "@/lib/models/Issue";
-import { generateDedupFingerprint, formatTrackingCode } from "@/lib/utils/dedup";
+import {
+  generateDedupFingerprint,
+  formatTrackingCode,
+} from "@/lib/utils/dedup";
 import { createNotification } from "@/lib/notifications";
-import { sanitizeMediaUrl, getContextualMediaUrl } from "@/lib/constants/civicMedia";
+import {
+  sanitizeMediaUrl,
+  getContextualMediaUrl,
+} from "@/lib/constants/civicMedia";
 
 export const dynamic = "force-dynamic";
 
-import { getAllUnifiedIssues, syncIssueToReport } from "@/lib/utils/reportsAdapter";
+import {
+  getAllUnifiedIssues,
+  syncIssueToReport,
+} from "@/lib/utils/reportsAdapter";
 
 /**
  * GET /api/issues?district=X&status=Y&domain=Z
@@ -25,7 +34,9 @@ export async function GET(request: NextRequest) {
 
     if (district && district !== "all") {
       const dLower = district.toLowerCase();
-      issues = issues.filter((i) => (i.district || "").toLowerCase() === dLower);
+      issues = issues.filter(
+        (i) => (i.district || "").toLowerCase() === dLower,
+      );
     }
 
     if (status && status !== "all") {
@@ -42,11 +53,12 @@ export async function GET(request: NextRequest) {
       data: issues,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to fetch issues";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to fetch issues";
     console.error("GET /api/issues error:", error);
     return NextResponse.json(
       { success: false, error: errorMsg },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -77,32 +89,51 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // 1. Basic validation
-    if (!title || !description || !domain || !district || !facingSince || !citizenName || !citizenMobile) {
+    if (
+      !title ||
+      !description ||
+      !domain ||
+      !district ||
+      !facingSince ||
+      !citizenName ||
+      !citizenMobile
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required fields: title, description, domain, district, facingSince, citizenName, citizenMobile",
+          error:
+            "Missing required fields: title, description, domain, district, facingSince, citizenName, citizenMobile",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!ISSUE_DOMAINS.includes(domain)) {
       return NextResponse.json(
-        { success: false, error: `Invalid domain. Must be one of: ${ISSUE_DOMAINS.join(", ")}` },
-        { status: 400 }
+        {
+          success: false,
+          error: `Invalid domain. Must be one of: ${ISSUE_DOMAINS.join(", ")}`,
+        },
+        { status: 400 },
       );
     }
 
     if (!FACING_SINCE_OPTIONS.includes(facingSince)) {
       return NextResponse.json(
-        { success: false, error: `Invalid facingSince value. Must be one of: ${FACING_SINCE_OPTIONS.join(", ")}` },
-        { status: 400 }
+        {
+          success: false,
+          error: `Invalid facingSince value. Must be one of: ${FACING_SINCE_OPTIONS.join(", ")}`,
+        },
+        { status: 400 },
       );
     }
 
     // 2. Compute Deduplication Fingerprint
-    const dedupFingerprint = generateDedupFingerprint(description, district, location);
+    const dedupFingerprint = generateDedupFingerprint(
+      description,
+      district,
+      location,
+    );
 
     // 3. Search for potential duplicates / similar issues
     // Check by identical fingerprint OR same district + domain
@@ -120,10 +151,15 @@ export async function POST(request: NextRequest) {
       .lean();
 
     const similarIssueIds = existingSimilar.map((item) => item._id);
-    const hasExactDuplicate = existingSimilar.some((item) => item.dedupFingerprint === dedupFingerprint);
+    const hasExactDuplicate = existingSimilar.some(
+      (item) => item.dedupFingerprint === dedupFingerprint,
+    );
 
     // Initial status: Flag as 'Under_Review' if duplicate fingerprint or multiple matches exist, else 'Reported'
-    const initialStatus = hasExactDuplicate || similarIssueIds.length > 0 ? "Under_Review" : "Reported";
+    const initialStatus =
+      hasExactDuplicate || similarIssueIds.length > 0
+        ? "Under_Review"
+        : "Reported";
 
     // 4. Sequence number & Tracking Code generation
     const currentYear = new Date().getFullYear();
@@ -149,11 +185,18 @@ export async function POST(request: NextRequest) {
     const rawAttachments = Array.isArray(attachments) ? attachments : [];
     const sanitizedAttachments =
       rawAttachments.length > 0
-        ? rawAttachments.map((att: { url: string; type?: string; filename?: string }, idx: number) => ({
-            url: sanitizeMediaUrl(att.url, domain, idx),
-            type: (att.type === "video" || att.type === "document" ? att.type : "photo") as "photo" | "video" | "document",
-            filename: att.filename || `field_evidence_${idx + 1}.jpg`,
-          }))
+        ? rawAttachments.map(
+            (
+              att: { url: string; type?: string; filename?: string },
+              idx: number,
+            ) => ({
+              url: sanitizeMediaUrl(att.url, domain, idx),
+              type: (att.type === "video" || att.type === "document"
+                ? att.type
+                : "photo") as "photo" | "video" | "document",
+              filename: att.filename || `field_evidence_${idx + 1}.jpg`,
+            }),
+          )
         : [
             {
               url: getContextualMediaUrl(domain, 0),
@@ -173,7 +216,10 @@ export async function POST(request: NextRequest) {
       district: district.trim(),
       pincode: pincode?.trim(),
       address: address?.trim(),
-      location: location?.lat && location?.lng ? { lat: Number(location.lat), lng: Number(location.lng) } : undefined,
+      location:
+        location?.lat && location?.lng
+          ? { lat: Number(location.lat), lng: Number(location.lng) }
+          : undefined,
       facingSince,
       citizenName: citizenName.trim(),
       citizenMobile: citizenMobile.trim(),
@@ -213,14 +259,15 @@ export async function POST(request: NextRequest) {
         submissionIndexForMobile,
         data: newIssue,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to create issue";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to create issue";
     console.error("POST /api/issues error:", error);
     return NextResponse.json(
       { success: false, error: errorMsg },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 // PATCH /api/gov/colleges/[id]/verify  → toggle verified flag
 export async function PATCH(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const user = getCurrentUser();
   if (!user || user.role !== "gov") {
@@ -18,10 +18,15 @@ export async function PATCH(
   await dbConnect();
 
   const college = await College.findById(params.id);
-  if (!college) return NextResponse.json({ error: "College not found" }, { status: 404 });
+  if (!college)
+    return NextResponse.json({ error: "College not found" }, { status: 404 });
 
   college.verified = !college.verified;
   await college.save();
 
-  return NextResponse.json({ ok: true, verified: college.verified, name: college.name });
+  return NextResponse.json({
+    ok: true,
+    verified: college.verified,
+    name: college.name,
+  });
 }

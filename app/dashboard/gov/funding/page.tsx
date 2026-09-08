@@ -10,10 +10,26 @@ export default function GovFundingPage() {
 
   const navItems: NavItem[] = [
     { label: "State Overview", href: "/dashboard/gov", iconName: "dashboard" },
-    { label: "Sourced Issues Review", href: "/dashboard/gov/triage", iconName: "shield" },
-    { label: "Project Allocations", href: "/dashboard/gov/allocations", iconName: "graduation" },
-    { label: "CSR Capital Co-Funding", href: "/dashboard/gov/funding", iconName: "coins" },
-    { label: "Cabinet & Nodal Reports", href: "/dashboard/gov/reports", iconName: "reports" },
+    {
+      label: "Sourced Issues Review",
+      href: "/dashboard/gov/triage",
+      iconName: "shield",
+    },
+    {
+      label: "Project Allocations",
+      href: "/dashboard/gov/allocations",
+      iconName: "graduation",
+    },
+    {
+      label: "CSR Capital Co-Funding",
+      href: "/dashboard/gov/funding",
+      iconName: "coins",
+    },
+    {
+      label: "Cabinet & Nodal Reports",
+      href: "/dashboard/gov/reports",
+      iconName: "reports",
+    },
   ];
 
   return (

@@ -121,7 +121,9 @@ export default function CollegeDashboardPage({
 }: {
   initialTab?: "marketplace" | "tracker" | "profile";
 }) {
-  const [activeTab, setActiveTab] = useState<"marketplace" | "tracker" | "profile">(initialTab);
+  const [activeTab, setActiveTab] = useState<
+    "marketplace" | "tracker" | "profile"
+  >(initialTab);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<CollegeProfile | null>(null);
   const [marketplaceIssues, setMarketplaceIssues] = useState<IssueItem[]>([]);
@@ -129,22 +131,33 @@ export default function CollegeDashboardPage({
   const [selectedDomain, setSelectedDomain] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [expandedMarketplaceIssueIds, setExpandedMarketplaceIssueIds] = useState<Record<string, boolean>>({});
+  const [expandedMarketplaceIssueIds, setExpandedMarketplaceIssueIds] =
+    useState<Record<string, boolean>>({});
 
   const toggleExpandMarketplaceIssue = (id: string) => {
     setExpandedMarketplaceIssueIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   // Proposal modal state
-  const [claimModalIssue, setClaimModalIssue] = useState<IssueItem | null>(null);
+  const [claimModalIssue, setClaimModalIssue] = useState<IssueItem | null>(
+    null,
+  );
   const [submittingProposal, setSubmittingProposal] = useState(false);
   const [proposalTitle, setProposalTitle] = useState("");
   const [proposalScope, setProposalScope] = useState("");
   const [proposalBudget, setProposalBudget] = useState(150000);
   const [proposalMentor, setProposalMentor] = useState("");
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { name: "Aditya Kumar", role: "Student Team Lead", discipline: "Environmental Engineering" },
-    { name: "Pooja Soren", role: "Field Data Analyst", discipline: "Computer Science" },
+    {
+      name: "Aditya Kumar",
+      role: "Student Team Lead",
+      discipline: "Environmental Engineering",
+    },
+    {
+      name: "Pooja Soren",
+      role: "Field Data Analyst",
+      discipline: "Computer Science",
+    },
   ]);
   const [milestones, setMilestones] = useState<Milestone[]>([
     {
@@ -156,20 +169,25 @@ export default function CollegeDashboardPage({
     },
     {
       title: "Phase 2: Pilot Deployment & Village Testing",
-      description: "Field installation of modular unit with real-time telemetry",
+      description:
+        "Field installation of modular unit with real-time telemetry",
       dueDate: "2026-11-20",
       fundingReleaseAmount: 60000,
       status: "Pending",
     },
     {
       title: "Phase 3: Certification & Nodal Handover",
-      description: "Final performance metrics submission to District Administration",
+      description:
+        "Final performance metrics submission to District Administration",
       dueDate: "2026-12-30",
       fundingReleaseAmount: 30000,
       status: "Pending",
     },
   ]);
-  const [formFeedback, setFormFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [formFeedback, setFormFeedback] = useState<{
+    type: "success" | "error";
+    msg: string;
+  } | null>(null);
 
   // Profile Edit State
   const [savingProfile, setSavingProfile] = useState(false);
@@ -225,14 +243,17 @@ export default function CollegeDashboardPage({
     setClaimModalIssue(issue);
     setProposalTitle(`Techno-Solution Plan for ${issue.title}`);
     setProposalScope(
-      `Our team will deploy an engineered resolution for ${issue.title} located at ${issue.district}. The solution leverages our departmental laboratory capabilities to deliver localized, measurable community impact with continuous telemetry.`
+      `Our team will deploy an engineered resolution for ${issue.title} located at ${issue.district}. The solution leverages our departmental laboratory capabilities to deliver localized, measurable community impact with continuous telemetry.`,
     );
     setFormFeedback(null);
   };
 
   // Add team member row
   const addTeamMember = () => {
-    setTeamMembers([...teamMembers, { name: "", role: "Researcher", discipline: "Engineering" }]);
+    setTeamMembers([
+      ...teamMembers,
+      { name: "", role: "Researcher", discipline: "Engineering" },
+    ]);
   };
 
   // Remove team member row
@@ -324,7 +345,7 @@ export default function CollegeDashboardPage({
   const handleUpdateMilestone = async (
     proposalId: string,
     milestoneIndex: number,
-    newStatus: string
+    newStatus: string,
   ) => {
     try {
       const res = await fetch(`/api/proposals/${proposalId}/milestones`, {
@@ -336,7 +357,7 @@ export default function CollegeDashboardPage({
       if (data.success) {
         // Refresh proposals
         setMyProposals((prev) =>
-          prev.map((p) => (p._id === proposalId ? data.data : p))
+          prev.map((p) => (p._id === proposalId ? data.data : p)),
         );
       }
     } catch (err) {
@@ -363,7 +384,9 @@ export default function CollegeDashboardPage({
 
       const data = await res.json();
       if (data.success) {
-        setProfileFeedback("Institutional profile and self-reported capabilities successfully updated!");
+        setProfileFeedback(
+          "Institutional profile and self-reported capabilities successfully updated!",
+        );
         loadDashboardData();
         setTimeout(() => setProfileFeedback(null), 4000);
       } else {
@@ -379,7 +402,8 @@ export default function CollegeDashboardPage({
   // Filter marketplace issues
   const filteredIssues = marketplaceIssues.filter((issue) => {
     const matchesDomain =
-      selectedDomain === "all" || issue.domain.toLowerCase() === selectedDomain.toLowerCase();
+      selectedDomain === "all" ||
+      issue.domain.toLowerCase() === selectedDomain.toLowerCase();
     const matchesSearch =
       searchQuery === "" ||
       issue.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -419,7 +443,9 @@ export default function CollegeDashboardPage({
       userName="Dr. Ananya Sen"
       userEmail="rnd.director@bitmesra.ac.in"
       designation="Dean of Research & Innovation"
-      organizationOrCollege={profile?.name || "Birla Institute of Technology, Mesra"}
+      organizationOrCollege={
+        profile?.name || "Birla Institute of Technology, Mesra"
+      }
       navItems={navItems}
     >
       <div className="space-y-6">
@@ -473,8 +499,8 @@ export default function CollegeDashboardPage({
               >
                 <Award className="w-4 h-4 text-[#C9A227]" />
                 <span>
-                  Active Claims: <strong>{profile.activeProposalsCount}</strong> /{" "}
-                  <strong>{profile.maxConcurrentClaims}</strong> Cap
+                  Active Claims: <strong>{profile.activeProposalsCount}</strong>{" "}
+                  / <strong>{profile.maxConcurrentClaims}</strong> Cap
                 </span>
                 {profile.isAtCap ? (
                   <span className="bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-[10px] font-bold">
@@ -500,13 +526,19 @@ export default function CollegeDashboardPage({
               <div className="p-4 bg-amber-50 border border-amber-300 rounded-lg flex items-start space-x-3 text-amber-900">
                 <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <h4 className="font-bold">Fairness Rule Enforcement Active</h4>
+                  <h4 className="font-bold">
+                    Fairness Rule Enforcement Active
+                  </h4>
                   <p className="mt-1 text-amber-800">
                     Your institution has reached its allocation cap of{" "}
-                    <strong>{profile.maxConcurrentClaims} active projects</strong>. To ensure
-                    equitable distribution of state R&D resources across all Jharkhand HEIs, you
-                    must complete milestones on your existing projects in the{" "}
-                    <strong>Project Tracker</strong> before claiming new civic challenges.
+                    <strong>
+                      {profile.maxConcurrentClaims} active projects
+                    </strong>
+                    . To ensure equitable distribution of state R&D resources
+                    across all Jharkhand HEIs, you must complete milestones on
+                    your existing projects in the{" "}
+                    <strong>Project Tracker</strong> before claiming new civic
+                    challenges.
                   </p>
                 </div>
               </div>
@@ -527,13 +559,17 @@ export default function CollegeDashboardPage({
 
               <div className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 no-scrollbar scrollbar-none">
                 <Filter className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-xs font-semibold text-slate-600 flex-shrink-0">Domain:</span>
+                <span className="text-xs font-semibold text-slate-600 flex-shrink-0">
+                  Domain:
+                </span>
                 <select
                   value={selectedDomain}
                   onChange={(e) => setSelectedDomain(e.target.value)}
                   className="border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#1A365D]"
                 >
-                  <option value="all">All Domains ({marketplaceIssues.length})</option>
+                  <option value="all">
+                    All Domains ({marketplaceIssues.length})
+                  </option>
                   {ISSUE_DOMAINS.map((dom) => (
                     <option key={dom} value={dom}>
                       {dom}
@@ -547,14 +583,19 @@ export default function CollegeDashboardPage({
             {loading ? (
               <div className="p-12 text-center bg-white rounded-lg border border-slate-200">
                 <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#1A365D] mb-3" />
-                <p className="text-sm text-slate-600">Loading civic challenge marketplace...</p>
+                <p className="text-sm text-slate-600">
+                  Loading civic challenge marketplace...
+                </p>
               </div>
             ) : filteredIssues.length === 0 ? (
               <div className="p-12 text-center bg-white rounded-lg border border-slate-200">
                 <AlertCircle className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-                <h3 className="font-bold text-slate-800">No matching challenges found</h3>
+                <h3 className="font-bold text-slate-800">
+                  No matching challenges found
+                </h3>
                 <p className="text-sm text-slate-500 mt-1">
-                  Try clearing your search query or selecting a different civic domain.
+                  Try clearing your search query or selecting a different civic
+                  domain.
                 </p>
               </div>
             ) : (
@@ -608,7 +649,8 @@ export default function CollegeDashboardPage({
                               AI Capability Match
                             </span>
                             <span className="text-[11px] text-slate-600">
-                              {issue.matchingFacilityName || "Declared R&D Strength"}
+                              {issue.matchingFacilityName ||
+                                "Declared R&D Strength"}
                             </span>
                           </div>
                         )}
@@ -622,7 +664,9 @@ export default function CollegeDashboardPage({
                         <div className="mb-3.5 bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
                           <button
                             type="button"
-                            onClick={() => toggleExpandMarketplaceIssue(issue._id)}
+                            onClick={() =>
+                              toggleExpandMarketplaceIssue(issue._id)
+                            }
                             className="w-full px-3.5 py-2 flex items-center justify-between text-left hover:bg-slate-100 transition cursor-pointer"
                           >
                             <div className="flex items-center gap-2">
@@ -632,7 +676,8 @@ export default function CollegeDashboardPage({
                               </span>
                               {mediaList.length > 0 && (
                                 <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-[#FFEFD3] text-[#001B2E] px-1.5 py-0.5 rounded border border-[#FFC49B]/50">
-                                  <Camera className="w-2.5 h-2.5" /> {mediaList.length} Photos
+                                  <Camera className="w-2.5 h-2.5" />{" "}
+                                  {mediaList.length} Photos
                                 </span>
                               )}
                             </div>
@@ -657,7 +702,10 @@ export default function CollegeDashboardPage({
                                 </p>
                                 {issue.citizenName && (
                                   <p className="text-[11px] text-slate-500 mt-1">
-                                    Reported by: <strong className="text-slate-700">{issue.citizenName}</strong>
+                                    Reported by:{" "}
+                                    <strong className="text-slate-700">
+                                      {issue.citizenName}
+                                    </strong>
                                     {issue.address ? ` • ${issue.address}` : ""}
                                   </p>
                                 )}
@@ -746,7 +794,8 @@ export default function CollegeDashboardPage({
                     Active Institutional Proposals & Projects
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Track solution delivery, team rosters, and update milestone execution milestones for government and industry review.
+                    Track solution delivery, team rosters, and update milestone
+                    execution milestones for government and industry review.
                   </p>
                 </div>
                 <button
@@ -761,9 +810,13 @@ export default function CollegeDashboardPage({
               {myProposals.length === 0 ? (
                 <div className="py-12 text-center">
                   <Layers className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-                  <h4 className="font-bold text-slate-700">No active proposals yet</h4>
+                  <h4 className="font-bold text-slate-700">
+                    No active proposals yet
+                  </h4>
                   <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                    Visit the <strong>Challenge Marketplace</strong> tab to claim state civic challenges and submit technical R&D proposals.
+                    Visit the <strong>Challenge Marketplace</strong> tab to
+                    claim state civic challenges and submit technical R&D
+                    proposals.
                   </p>
                   <button
                     onClick={() => setActiveTab("marketplace")}
@@ -797,7 +850,8 @@ export default function CollegeDashboardPage({
 
                         <div className="flex items-center space-x-2">
                           <span className="px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-full">
-                            ₹{prop.budgetRequested.toLocaleString("en-IN")} Budget
+                            ₹{prop.budgetRequested.toLocaleString("en-IN")}{" "}
+                            Budget
                           </span>
                           <span className="px-3 py-1 bg-[#1A365D] text-white text-xs font-bold rounded-full">
                             Status: {prop.status.replace(/_/g, " ")}
@@ -807,7 +861,8 @@ export default function CollegeDashboardPage({
 
                       {/* Scope Summary & Mentor */}
                       <p className="text-xs text-slate-600 bg-white p-3 rounded-lg border border-slate-200">
-                        <strong>Technical Abstract:</strong> {prop.technicalScope}
+                        <strong>Technical Abstract:</strong>{" "}
+                        {prop.technicalScope}
                       </p>
 
                       <div className="flex flex-wrap gap-4 text-xs text-slate-600">
@@ -815,8 +870,12 @@ export default function CollegeDashboardPage({
                           <strong>Faculty Mentor:</strong> {prop.facultyMentor}
                         </div>
                         <div>
-                          <strong>Team Members ({prop.team?.length || 0}):</strong>{" "}
-                          {prop.team?.map((m) => `${m.name} (${m.role})`).join(", ")}
+                          <strong>
+                            Team Members ({prop.team?.length || 0}):
+                          </strong>{" "}
+                          {prop.team
+                            ?.map((m) => `${m.name} (${m.role})`)
+                            .join(", ")}
                         </div>
                       </div>
 
@@ -835,17 +894,20 @@ export default function CollegeDashboardPage({
                                 m.status === "Completed"
                                   ? "bg-emerald-50/70 border-emerald-300 text-emerald-900"
                                   : m.status === "In_Progress"
-                                  ? "bg-blue-50/70 border-blue-300 text-blue-900"
-                                  : m.status === "Delayed"
-                                  ? "bg-red-50/70 border-red-300 text-red-900"
-                                  : "bg-white border-slate-200 text-slate-700"
+                                    ? "bg-blue-50/70 border-blue-300 text-blue-900"
+                                    : m.status === "Delayed"
+                                      ? "bg-red-50/70 border-red-300 text-red-900"
+                                      : "bg-white border-slate-200 text-slate-700"
                               }`}
                             >
                               <div>
                                 <div className="flex justify-between items-start mb-1.5">
                                   <span className="font-bold">{m.title}</span>
                                   <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/80 border">
-                                    ₹{m.fundingReleaseAmount?.toLocaleString("en-IN")}
+                                    ₹
+                                    {m.fundingReleaseAmount?.toLocaleString(
+                                      "en-IN",
+                                    )}
                                   </span>
                                 </div>
                                 <p className="text-[11px] text-slate-600 mb-2 leading-relaxed">
@@ -855,19 +917,28 @@ export default function CollegeDashboardPage({
 
                               <div className="border-t border-slate-200/60 pt-2 flex items-center justify-between mt-2">
                                 <span className="text-[10px] text-slate-500">
-                                  Due: {new Date(m.dueDate).toLocaleDateString("en-IN")}
+                                  Due:{" "}
+                                  {new Date(m.dueDate).toLocaleDateString(
+                                    "en-IN",
+                                  )}
                                 </span>
 
                                 {/* Status Selector Dropdown */}
                                 <select
                                   value={m.status}
                                   onChange={(e) =>
-                                    handleUpdateMilestone(prop._id, mIdx, e.target.value)
+                                    handleUpdateMilestone(
+                                      prop._id,
+                                      mIdx,
+                                      e.target.value,
+                                    )
                                   }
                                   className="text-[11px] font-bold py-1 px-1.5 rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-[#1A365D]"
                                 >
                                   <option value="Pending">Pending</option>
-                                  <option value="In_Progress">In Progress</option>
+                                  <option value="In_Progress">
+                                    In Progress
+                                  </option>
                                   <option value="Completed">Completed</option>
                                   <option value="Delayed">Delayed</option>
                                 </select>
@@ -894,7 +965,10 @@ export default function CollegeDashboardPage({
                 Institutional Capabilities & Faculty Roster
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Self-report your institution&apos;s core technical competencies, advanced laboratory equipment, and certified faculty mentors. The state AI engine uses these to match relevant civic challenges.
+                Self-report your institution&apos;s core technical competencies,
+                advanced laboratory equipment, and certified faculty mentors.
+                The state AI engine uses these to match relevant civic
+                challenges.
               </p>
             </div>
 
@@ -925,7 +999,9 @@ export default function CollegeDashboardPage({
                         type="button"
                         onClick={() => {
                           if (isChecked) {
-                            setEditCapabilities(editCapabilities.filter((c) => c !== dom));
+                            setEditCapabilities(
+                              editCapabilities.filter((c) => c !== dom),
+                            );
                           } else {
                             setEditCapabilities([...editCapabilities, dom]);
                           }
@@ -937,7 +1013,9 @@ export default function CollegeDashboardPage({
                         }`}
                       >
                         <span>{dom}</span>
-                        {isChecked && <CheckCircle className="w-3.5 h-3.5 text-[#1A365D]" />}
+                        {isChecked && (
+                          <CheckCircle className="w-3.5 h-3.5 text-[#1A365D]" />
+                        )}
                       </button>
                     );
                   })}
@@ -1002,7 +1080,9 @@ export default function CollegeDashboardPage({
                       <button
                         type="button"
                         onClick={() =>
-                          setEditFacilities(editFacilities.filter((_, i) => i !== idx))
+                          setEditFacilities(
+                            editFacilities.filter((_, i) => i !== idx),
+                          )
                         }
                         className="text-red-600 hover:text-red-800 text-xs font-semibold p-1"
                       >
@@ -1092,7 +1172,9 @@ export default function CollegeDashboardPage({
                         <button
                           type="button"
                           onClick={() =>
-                            setEditFaculty(editFaculty.filter((_, i) => i !== idx))
+                            setEditFaculty(
+                              editFaculty.filter((_, i) => i !== idx),
+                            )
                           }
                           className="text-red-600 hover:text-red-800 p-1"
                         >
@@ -1158,7 +1240,10 @@ export default function CollegeDashboardPage({
               </div>
 
               {/* Modal Body / Form */}
-              <form onSubmit={handleSubmitProposal} className="p-6 overflow-y-auto space-y-5">
+              <form
+                onSubmit={handleSubmitProposal}
+                className="p-6 overflow-y-auto space-y-5"
+              >
                 {formFeedback && (
                   <div
                     className={`p-3 rounded-md text-xs font-semibold ${
@@ -1181,7 +1266,9 @@ export default function CollegeDashboardPage({
                       </span>
                     </div>
                     <VoiceAudioPlayer
-                      textToRead={claimModalIssue.description || claimModalIssue.title}
+                      textToRead={
+                        claimModalIssue.description || claimModalIssue.title
+                      }
                       audioUrl={claimModalIssue.audioUrl}
                     />
                   </div>
@@ -1196,7 +1283,8 @@ export default function CollegeDashboardPage({
                     </span>
                     <EvidenceMediaViewer
                       mediaUrls={
-                        claimModalIssue.mediaUrls && claimModalIssue.mediaUrls.length > 0
+                        claimModalIssue.mediaUrls &&
+                        claimModalIssue.mediaUrls.length > 0
                           ? claimModalIssue.mediaUrls
                           : claimModalIssue.attachments?.map((a) => a.url) || []
                       }
@@ -1246,7 +1334,9 @@ export default function CollegeDashboardPage({
                         step="5000"
                         required
                         value={proposalBudget}
-                        onChange={(e) => setProposalBudget(Number(e.target.value))}
+                        onChange={(e) =>
+                          setProposalBudget(Number(e.target.value))
+                        }
                         className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-md text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1A365D]"
                       />
                     </div>
@@ -1380,14 +1470,18 @@ export default function CollegeDashboardPage({
                             className="font-bold border border-slate-300 rounded px-2 py-1 bg-white w-2/3"
                           />
                           <div className="flex items-center space-x-2">
-                            <span className="text-[11px] text-slate-500 font-semibold">₹</span>
+                            <span className="text-[11px] text-slate-500 font-semibold">
+                              ₹
+                            </span>
                             <input
                               type="number"
                               placeholder="Tranche"
                               value={m.fundingReleaseAmount}
                               onChange={(e) => {
                                 const copy = [...milestones];
-                                copy[idx].fundingReleaseAmount = Number(e.target.value);
+                                copy[idx].fundingReleaseAmount = Number(
+                                  e.target.value,
+                                );
                                 setMilestones(copy);
                               }}
                               className="w-24 font-mono font-bold border border-slate-300 rounded px-2 py-1 bg-white"

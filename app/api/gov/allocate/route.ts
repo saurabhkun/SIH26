@@ -19,10 +19,18 @@ export async function POST(req: NextRequest) {
   await dbConnect();
 
   const body = await req.json();
-  const { issueId, collegeId, reason = "Nodal Discretionary Assignment", remarks = "" } = body;
+  const {
+    issueId,
+    collegeId,
+    reason = "Nodal Discretionary Assignment",
+    remarks = "",
+  } = body;
 
   if (!issueId || !collegeId) {
-    return NextResponse.json({ error: "issueId and collegeId are required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "issueId and collegeId are required" },
+      { status: 400 },
+    );
   }
 
   const [issue, college] = await Promise.all([
@@ -30,14 +38,18 @@ export async function POST(req: NextRequest) {
     College.findById(collegeId),
   ]);
 
-  if (!issue) return NextResponse.json({ error: "Issue not found" }, { status: 404 });
-  if (!college) return NextResponse.json({ error: "College not found" }, { status: 404 });
+  if (!issue)
+    return NextResponse.json({ error: "Issue not found" }, { status: 404 });
+  if (!college)
+    return NextResponse.json({ error: "College not found" }, { status: 404 });
 
   // Override: set issue status to DIRECTLY_ALLOCATED and push college
   issue.status = "DIRECTLY_ALLOCATED";
   issue.assignedLeadCollege = college._id;
   const collegeObjId = new mongoose.Types.ObjectId(college._id.toString());
-  const existingList = (issue.assignedColleges || []).map((id: mongoose.Types.ObjectId) => id.toString());
+  const existingList = (issue.assignedColleges || []).map(
+    (id: mongoose.Types.ObjectId) => id.toString(),
+  );
   if (!existingList.includes(college._id.toString())) {
     issue.assignedColleges = [...(issue.assignedColleges || []), collegeObjId];
   }
@@ -83,6 +95,9 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  return NextResponse.json({ ok: true, college: college.name, issueStatus: "DIRECTLY_ALLOCATED" });
+  return NextResponse.json({
+    ok: true,
+    college: college.name,
+    issueStatus: "DIRECTLY_ALLOCATED",
+  });
 }
-

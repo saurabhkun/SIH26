@@ -32,7 +32,8 @@ const ROLES: RoleOption[] = [
     id: "gov",
     title: "Government Department",
     badge: "State & District Nodal",
-    description: "State Nodal Review Officers, District Magistrates, and Domain Taskforces.",
+    description:
+      "State Nodal Review Officers, District Magistrates, and Domain Taskforces.",
     icon: Landmark,
     demoEmail: "officer@jharkhand.gov.in",
     demoPass: "Gov@1234",
@@ -42,7 +43,8 @@ const ROLES: RoleOption[] = [
     id: "college",
     title: "University / College Portal",
     badge: "HEI Faculty & Student Teams",
-    description: "University R&D Directors, Faculty Mentors, and Multidisciplinary Student Innovators.",
+    description:
+      "University R&D Directors, Faculty Mentors, and Multidisciplinary Student Innovators.",
     icon: GraduationCap,
     demoEmail: "rnd.director@bitmesra.ac.in",
     demoPass: "College@1234",
@@ -52,7 +54,8 @@ const ROLES: RoleOption[] = [
     id: "industry",
     title: "Industry & CSR Partner",
     badge: "Corporate & CSR Sponsors",
-    description: "CSR Foundations, Industry Sponsors, Mentors, and Technology Adoption Partners.",
+    description:
+      "CSR Foundations, Industry Sponsors, Mentors, and Technology Adoption Partners.",
     icon: Briefcase,
     demoEmail: "csr.head@tatasteel.com",
     demoPass: "Industry@1234",
@@ -124,7 +127,10 @@ export default function LoginPage() {
             Higher &amp; Technical Education Department
           </span>
         </div>
-        <Link href="/" className="text-civic-accent hover:text-white transition-colors text-[11px] font-medium">
+        <Link
+          href="/"
+          className="text-civic-accent hover:text-white transition-colors text-[11px] font-medium"
+        >
           &larr; Return to Public Portal
         </Link>
       </div>
@@ -160,7 +166,8 @@ export default function LoginPage() {
             Select Your Administrative Role
           </h1>
           <p className="text-xs sm:text-sm text-civic-textMuted mt-1">
-            Choose your authorized stakeholder category below to access your dedicated management portal.
+            Choose your authorized stakeholder category below to access your
+            dedicated management portal.
           </p>
         </div>
 
@@ -220,7 +227,9 @@ export default function LoginPage() {
                         : "border-slate-300 bg-white"
                     }`}
                   >
-                    {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    {isSelected && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
                   </div>
                 </div>
               </button>
@@ -288,7 +297,10 @@ export default function LoginPage() {
               <div className="flex items-center gap-1.5 truncate">
                 <KeyRound className="w-3.5 h-3.5 text-civic-secondary flex-shrink-0" />
                 <span className="truncate">
-                  Demo: <strong className="text-civic-textDark">{activeRoleConfig.demoUser}</strong>
+                  Demo:{" "}
+                  <strong className="text-civic-textDark">
+                    {activeRoleConfig.demoUser}
+                  </strong>
                 </span>
               </div>
               <button
@@ -308,7 +320,9 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full py-2.5 bg-civic-primary hover:bg-civic-primaryHover text-white text-xs font-bold rounded-lg shadow-xs disabled:opacity-50 flex items-center justify-center gap-1.5 mt-2 cursor-pointer transition-colors"
             >
-              {isLoading ? "Validating Credentials..." : `Access ${activeRoleConfig.title}`}
+              {isLoading
+                ? "Validating Credentials..."
+                : `Access ${activeRoleConfig.title}`}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
@@ -316,7 +330,10 @@ export default function LoginPage() {
               <div className="pt-2 text-center border-t border-civic-border mt-4">
                 <p className="text-xs text-civic-textMuted">
                   New institution or CSR partner?{" "}
-                  <Link href="/register" className="font-bold text-civic-primary hover:text-civic-primaryHover underline">
+                  <Link
+                    href="/register"
+                    className="font-bold text-civic-primary hover:text-civic-primaryHover underline"
+                  >
                     Register Account &rarr;
                   </Link>
                 </p>
@@ -330,7 +347,8 @@ export default function LoginPage() {
       <footer className="bg-civic-surface border-t border-civic-border py-4 px-4 sm:px-8 text-xs text-civic-textMuted mt-auto">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
-            &copy; 2026 Department of Higher &amp; Technical Education, Government of Jharkhand.
+            &copy; 2026 Department of Higher &amp; Technical Education,
+            Government of Jharkhand.
           </div>
           <div className="text-civic-textMuted">
             State Unified Grievance &amp; Technical Problem Solving Gateway

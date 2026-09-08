@@ -22,7 +22,10 @@ export const MAP_VIEWBOX_WIDTH = 880;
 export const MAP_VIEWBOX_HEIGHT = 600;
 
 // Specific label tweaks for dense/small districts to ensure zero overlap and crystal-clear legibility
-const LABEL_TWEAKS: Record<string, { offset?: [number, number]; fontSize?: number; label?: string }> = {
+const LABEL_TWEAKS: Record<
+  string,
+  { offset?: [number, number]; fontSize?: number; label?: string }
+> = {
   Ramgarh: { offset: [0, 2], fontSize: 10 },
   Lohardaga: { offset: [-2, 0], fontSize: 10 },
   Jamtara: { offset: [2, 0], fontSize: 10 },
@@ -41,16 +44,19 @@ const LABEL_TWEAKS: Record<string, { offset?: [number, number]; fontSize?: numbe
  */
 export function getJharkhandGeoPaths(
   width = MAP_VIEWBOX_WIDTH,
-  height = MAP_VIEWBOX_HEIGHT
+  height = MAP_VIEWBOX_HEIGHT,
 ): MapGeoConfig {
-  const geojson = jharkhandGeoJson as unknown as FeatureCollection<Geometry, { district: string; dt_code?: string }>;
+  const geojson = jharkhandGeoJson as unknown as FeatureCollection<
+    Geometry,
+    { district: string; dt_code?: string }
+  >;
 
   const projection = geoMercator().fitExtent(
     [
       [35, 35],
       [width - 35, height - 35],
     ],
-    geojson
+    geojson,
   );
 
   const pathGenerator = geoPath().projection(projection);

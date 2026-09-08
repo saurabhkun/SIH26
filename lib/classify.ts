@@ -210,7 +210,7 @@ const MODERATE_SEVERITY_KEYWORDS = [
  */
 export function classifyIssueDescription(
   text: string,
-  title: string = ""
+  title: string = "",
 ): ClassificationResult {
   const combined = `${title} ${text}`.toLowerCase();
 

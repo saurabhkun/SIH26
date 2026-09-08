@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     await connectDB();
@@ -24,7 +24,7 @@ export async function POST(
     if (milestoneIndex === undefined) {
       return NextResponse.json(
         { success: false, error: "milestoneIndex is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -32,7 +32,7 @@ export async function POST(
     if (!pledge) {
       return NextResponse.json(
         { success: false, error: "Pledge record not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -40,7 +40,7 @@ export async function POST(
     if (!proposal) {
       return NextResponse.json(
         { success: false, error: "Linked proposal not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -48,7 +48,7 @@ export async function POST(
     if (idx < 0 || idx >= proposal.milestones.length) {
       return NextResponse.json(
         { success: false, error: "Invalid milestone index." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,16 +60,20 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          error: "Funds cannot be released yet: Milestone must first be marked 'Completed' or 'VERIFIED'.",
+          error:
+            "Funds cannot be released yet: Milestone must first be marked 'Completed' or 'VERIFIED'.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (targetMilestone.fundingReleased) {
       return NextResponse.json(
-        { success: false, error: "Funding for this milestone has already been released." },
-        { status: 400 }
+        {
+          success: false,
+          error: "Funding for this milestone has already been released.",
+        },
+        { status: 400 },
       );
     }
 
@@ -120,8 +124,14 @@ export async function POST(
       },
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to release milestone funds";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to release milestone funds";
     console.error("POST /api/pledges/[id]/release-milestone error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

@@ -16,7 +16,10 @@ import {
   RefreshCw,
   X,
 } from "lucide-react";
-import { NotificationType, NotificationPriority } from "@/lib/models/Notification";
+import {
+  NotificationType,
+  NotificationPriority,
+} from "@/lib/models/Notification";
 
 interface NotificationItem {
   _id: string;
@@ -35,9 +38,13 @@ interface NotificationCenterProps {
   compact?: boolean;
 }
 
-export default function NotificationCenter({ compact = false }: NotificationCenterProps) {
+export default function NotificationCenter({
+  compact = false,
+}: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"all" | "unread" | "critical">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "unread" | "critical">(
+    "all",
+  );
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [criticalCount, setCriticalCount] = useState<number>(0);
@@ -79,7 +86,10 @@ export default function NotificationCenter({ compact = false }: NotificationCent
     }
 
     function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -99,7 +109,7 @@ export default function NotificationCenter({ compact = false }: NotificationCent
     try {
       // Optimistic update
       setNotifications((prev) =>
-        prev.map((n) => (n._id === notificationId ? { ...n, read: true } : n))
+        prev.map((n) => (n._id === notificationId ? { ...n, read: true } : n)),
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
@@ -134,7 +144,9 @@ export default function NotificationCenter({ compact = false }: NotificationCent
 
   const formatTimeAgo = (dateStr: string) => {
     try {
-      const diffSec = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      const diffSec = Math.floor(
+        (Date.now() - new Date(dateStr).getTime()) / 1000,
+      );
       if (diffSec < 45) return "just now";
       if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
       if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
@@ -144,8 +156,12 @@ export default function NotificationCenter({ compact = false }: NotificationCent
     }
   };
 
-  const renderTypeIcon = (type: NotificationType, priority: NotificationPriority) => {
-    const isCritical = priority === "CRITICAL" || type === "CIRCUIT_BREAKER_DISASTER";
+  const renderTypeIcon = (
+    type: NotificationType,
+    priority: NotificationPriority,
+  ) => {
+    const isCritical =
+      priority === "CRITICAL" || type === "CIRCUIT_BREAKER_DISASTER";
     if (isCritical) {
       return (
         <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0 text-rose-600 border border-rose-300">
@@ -204,7 +220,10 @@ export default function NotificationCenter({ compact = false }: NotificationCent
 
   const filteredNotifications = notifications.filter((item) => {
     if (activeTab === "unread") return !item.read;
-    if (activeTab === "critical") return item.priority === "CRITICAL" || item.type === "CIRCUIT_BREAKER_DISASTER";
+    if (activeTab === "critical")
+      return (
+        item.priority === "CRITICAL" || item.type === "CIRCUIT_BREAKER_DISASTER"
+      );
     return true;
   });
 
@@ -273,7 +292,9 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                 title="Refresh notifications"
                 className="p-1.5 rounded text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
+                />
               </button>
 
               <button
@@ -349,18 +370,22 @@ export default function NotificationCenter({ compact = false }: NotificationCent
             ) : filteredNotifications.length === 0 ? (
               <div className="p-8 text-center text-xs text-civic-textMuted">
                 <ShieldCheck className="w-7 h-7 mx-auto text-emerald-600 mb-2 opacity-80" />
-                <p className="font-semibold text-civic-textDark">All caught up!</p>
+                <p className="font-semibold text-civic-textDark">
+                  All caught up!
+                </p>
                 <p className="text-[11px] text-civic-textMuted mt-0.5">
                   {activeTab === "unread"
                     ? "No unread operational notifications."
                     : activeTab === "critical"
-                    ? "No critical hazard alerts."
-                    : "Zero pending alerts in this portal."}
+                      ? "No critical hazard alerts."
+                      : "Zero pending alerts in this portal."}
                 </p>
               </div>
             ) : (
               filteredNotifications.map((item) => {
-                const isCritical = item.priority === "CRITICAL" || item.type === "CIRCUIT_BREAKER_DISASTER";
+                const isCritical =
+                  item.priority === "CRITICAL" ||
+                  item.type === "CIRCUIT_BREAKER_DISASTER";
 
                 return (
                   <div
@@ -372,10 +397,10 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                       isCritical
                         ? "bg-rose-50/90 border-l-4 border-rose-600 text-rose-950"
                         : item.priority === "HIGH"
-                        ? "bg-amber-50/40 border-l-4 border-amber-500"
-                        : item.read
-                        ? "bg-white hover:bg-slate-50 text-civic-textDark"
-                        : "bg-blue-50/50 hover:bg-blue-50/80 text-civic-textDark border-l-4 border-civic-primary"
+                          ? "bg-amber-50/40 border-l-4 border-amber-500"
+                          : item.read
+                            ? "bg-white hover:bg-slate-50 text-civic-textDark"
+                            : "bg-blue-50/50 hover:bg-blue-50/80 text-civic-textDark border-l-4 border-civic-primary"
                     }`}
                   >
                     {renderTypeIcon(item.type, item.priority)}
@@ -384,7 +409,9 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                       <div className="flex items-start justify-between gap-1 mb-0.5">
                         <span
                           className={`font-semibold leading-tight line-clamp-1 ${
-                            isCritical ? "text-rose-950 font-bold" : "text-civic-textDark"
+                            isCritical
+                              ? "text-rose-950 font-bold"
+                              : "text-civic-textDark"
                           }`}
                         >
                           {item.title}
@@ -444,7 +471,9 @@ export default function NotificationCenter({ compact = false }: NotificationCent
 
           {/* Footer */}
           <div className="p-2.5 bg-slate-50 border-t border-civic-border text-center text-[10.5px] text-civic-textMuted">
-            <span>Operational State Machine Alerts • Governed under SIH PS 26043</span>
+            <span>
+              Operational State Machine Alerts • Governed under SIH PS 26043
+            </span>
           </div>
         </div>
       )}

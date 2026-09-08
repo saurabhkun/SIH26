@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 // POST /api/notifications/mark-read  { ids?: string[] }  — omit ids to mark all as read
 export async function POST(req: NextRequest) {
   const user = getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
 
   await dbConnect();
 

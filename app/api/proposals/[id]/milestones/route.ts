@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     await connectDB();
@@ -23,7 +23,7 @@ export async function PATCH(
     if (milestoneIndex === undefined || !status) {
       return NextResponse.json(
         { success: false, error: "milestoneIndex and status are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -31,7 +31,7 @@ export async function PATCH(
     if (!proposal) {
       return NextResponse.json(
         { success: false, error: "Proposal not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -39,7 +39,7 @@ export async function PATCH(
     if (index < 0 || index >= proposal.milestones.length) {
       return NextResponse.json(
         { success: false, error: "Invalid milestone index." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -51,11 +51,18 @@ export async function PATCH(
     }
 
     // Auto-advance proposal overall status if all milestones completed
-    const allCompleted = proposal.milestones.every((m) => m.status === "Completed");
+    const allCompleted = proposal.milestones.every(
+      (m) => m.status === "Completed",
+    );
     if (allCompleted) {
       proposal.status = "Completed";
-    } else if (proposal.status === "Approved" || proposal.status === "Submitted") {
-      const anyActive = proposal.milestones.some((m) => m.status === "In_Progress" || m.status === "Completed");
+    } else if (
+      proposal.status === "Approved" ||
+      proposal.status === "Submitted"
+    ) {
+      const anyActive = proposal.milestones.some(
+        (m) => m.status === "In_Progress" || m.status === "Completed",
+      );
       if (anyActive) {
         proposal.status = "In_Progress";
       }
@@ -86,8 +93,12 @@ export async function PATCH(
       data: proposal,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to update milestone";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to update milestone";
     console.error("PATCH /api/proposals/[id]/milestones error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

@@ -50,7 +50,7 @@ const FacultySchema = new Schema<IFaculty>(
     specialization: { type: String, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const CollegeSchema = new Schema<ICollege>(
@@ -87,7 +87,7 @@ const CollegeSchema = new Schema<ICollege>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // High performance compound indexes

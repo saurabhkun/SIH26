@@ -83,15 +83,19 @@ const IndustryPledgeSchema = new Schema<IIndustryPledge>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 IndustryPledgeSchema.pre("save", function (this: any) {
-  if (this.companyName && !this.organizationName) this.organizationName = this.companyName;
-  if (this.organizationName && !this.companyName) this.companyName = this.organizationName;
-  if (this.pledgedAmount && !this.amountPledged) this.amountPledged = this.pledgedAmount;
-  if (this.amountPledged && !this.pledgedAmount) this.pledgedAmount = this.amountPledged;
+  if (this.companyName && !this.organizationName)
+    this.organizationName = this.companyName;
+  if (this.organizationName && !this.companyName)
+    this.companyName = this.organizationName;
+  if (this.pledgedAmount && !this.amountPledged)
+    this.amountPledged = this.pledgedAmount;
+  if (this.amountPledged && !this.pledgedAmount)
+    this.pledgedAmount = this.amountPledged;
   if (this.proposalId && !this.proposal) this.proposal = this.proposalId;
   if (this.proposal && !this.proposalId) this.proposalId = this.proposal;
   if (this.status === "Funded" && this.escrowBalance === 0) {

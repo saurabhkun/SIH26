@@ -91,12 +91,15 @@ export async function GET() {
   ]);
 
   // 6. Summary counts
-  const [totalIssues, totalResolved, totalProposals, totalFunded] = await Promise.all([
-    Issue.countDocuments(),
-    Issue.countDocuments({ status: "Resolved" }),
-    Proposal.countDocuments(),
-    IndustryPledge.countDocuments({ status: { $in: ["Funded", "Milestone_Released", "Completed"] } }),
-  ]);
+  const [totalIssues, totalResolved, totalProposals, totalFunded] =
+    await Promise.all([
+      Issue.countDocuments(),
+      Issue.countDocuments({ status: "Resolved" }),
+      Proposal.countDocuments(),
+      IndustryPledge.countDocuments({
+        status: { $in: ["Funded", "Milestone_Released", "Completed"] },
+      }),
+    ]);
 
   // 7. Build district map data — merge issue counts + capital data
   const districtMap: Record<string, { issues: number; capital: number }> = {};
@@ -116,7 +119,10 @@ export async function GET() {
 
   return NextResponse.json({
     summary: { totalIssues, totalResolved, totalProposals, totalFunded },
-    issuesByDomain: issuesByDomain.map((d) => ({ domain: d._id, count: d.count })),
+    issuesByDomain: issuesByDomain.map((d) => ({
+      domain: d._id,
+      count: d.count,
+    })),
     issuesByDistrict: Object.entries(districtMap).map(([district, v]) => ({
       district,
       issues: v.issues,
@@ -132,6 +138,9 @@ export async function GET() {
       district: d._id || "Unknown",
       capital: d.totalCapital,
     })),
-    proposalFunnel: proposalFunnel.map((p) => ({ status: p._id, count: p.count })),
+    proposalFunnel: proposalFunnel.map((p) => ({
+      status: p._id,
+      count: p.count,
+    })),
   });
 }

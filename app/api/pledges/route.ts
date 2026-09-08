@@ -37,7 +37,10 @@ export async function GET(request: NextRequest) {
       .populate({
         path: "proposal",
         populate: [
-          { path: "issue", select: "title trackingCode district domain severityScore" },
+          {
+            path: "issue",
+            select: "title trackingCode district domain severityScore",
+          },
           { path: "college", select: "name district tier" },
         ],
       })
@@ -50,9 +53,13 @@ export async function GET(request: NextRequest) {
       data: pledges,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to fetch pledges";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to fetch pledges";
     console.error("GET /api/pledges error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }
 
@@ -77,8 +84,11 @@ export async function POST(request: NextRequest) {
 
     if (!proposalId || !amountPledged || Number(amountPledged) <= 0) {
       return NextResponse.json(
-        { success: false, error: "proposalId and a positive amountPledged are required." },
-        { status: 400 }
+        {
+          success: false,
+          error: "proposalId and a positive amountPledged are required.",
+        },
+        { status: 400 },
       );
     }
 
@@ -86,13 +96,17 @@ export async function POST(request: NextRequest) {
     if (!proposal) {
       return NextResponse.json(
         { success: false, error: "Target proposal not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const sessionUser = getCurrentUser();
-    const finalOrgName = organizationName || sessionUser?.organizationName || "Tata Steel Foundation";
-    const finalEmail = contactEmail || sessionUser?.email || "csr.head@tatasteel.com";
+    const finalOrgName =
+      organizationName ||
+      sessionUser?.organizationName ||
+      "Tata Steel Foundation";
+    const finalEmail =
+      contactEmail || sessionUser?.email || "csr.head@tatasteel.com";
 
     const newPledge = await IndustryPledge.create({
       proposal: proposal._id,
@@ -106,7 +120,11 @@ export async function POST(request: NextRequest) {
       mentorshipNotes: mentorshipNotes?.trim() || "",
     });
 
-    const formattedAmount = (newPledge.amountPledged ?? newPledge.pledgedAmount ?? Number(amountPledged)).toLocaleString("en-IN");
+    const formattedAmount = (
+      newPledge.amountPledged ??
+      newPledge.pledgedAmount ??
+      Number(amountPledged)
+    ).toLocaleString("en-IN");
 
     return NextResponse.json({
       success: true,
@@ -114,8 +132,12 @@ export async function POST(request: NextRequest) {
       data: newPledge,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to create pledge";
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to create pledge";
     console.error("POST /api/pledges error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

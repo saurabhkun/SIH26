@@ -42,12 +42,15 @@ export const VoiceAudioPlayer: React.FC<AudioPlayerProps> = ({
       } else {
         const audio = new Audio(audioUrl);
         audioRef.current = audio;
-        audio.play().then(() => {
-          setIsPlaying(true);
-        }).catch((err) => {
-          console.warn("Audio playback failed:", err);
-          setIsPlaying(false);
-        });
+        audio
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.warn("Audio playback failed:", err);
+            setIsPlaying(false);
+          });
         audio.onended = () => setIsPlaying(false);
         audio.onerror = () => setIsPlaying(false);
       }
@@ -76,7 +79,10 @@ export const VoiceAudioPlayer: React.FC<AudioPlayerProps> = ({
     }
   };
 
-  const hasContent = Boolean((audioUrl && audioUrl.length > 0) || (textToRead && textToRead.trim().length > 0));
+  const hasContent = Boolean(
+    (audioUrl && audioUrl.length > 0) ||
+    (textToRead && textToRead.trim().length > 0),
+  );
 
   if (!hasContent) return null;
 

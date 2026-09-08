@@ -18,7 +18,7 @@ interface AssignedCollegeRef {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { name: string } }
+  { params }: { params: { name: string } },
 ) {
   try {
     await connectDB();
@@ -28,7 +28,7 @@ export async function GET(
 
     // Find district metadata from official districts dataset
     const districtMeta = JHARKHAND_DISTRICTS.find(
-      (d) => d.name.toLowerCase() === decodedName.toLowerCase()
+      (d) => d.name.toLowerCase() === decodedName.toLowerCase(),
     );
 
     const districtQuery = {
@@ -48,7 +48,12 @@ export async function GET(
     const totalIssues = issues.length;
     const resolvedCount = issues.filter((i) => i.status === "Resolved").length;
     const inProgressCount = issues.filter((i) =>
-      ["Assigned_HEI", "Proposal_Submitted", "Under_Prototyping", "Industry_Funded"].includes(i.status)
+      [
+        "Assigned_HEI",
+        "Proposal_Submitted",
+        "Under_Prototyping",
+        "Industry_Funded",
+      ].includes(i.status),
     ).length;
     const resolutionRate =
       totalIssues > 0 ? Math.round((resolvedCount / totalIssues) * 100) : 0;
@@ -58,9 +63,11 @@ export async function GET(
     localColleges.forEach((c) => deployedCollegeIdSet.add(c._id.toString()));
     issues.forEach((iss) => {
       if (iss.assignedColleges && Array.isArray(iss.assignedColleges)) {
-        (iss.assignedColleges as unknown as AssignedCollegeRef[]).forEach((c) => {
-          if (c?._id) deployedCollegeIdSet.add(c._id.toString());
-        });
+        (iss.assignedColleges as unknown as AssignedCollegeRef[]).forEach(
+          (c) => {
+            if (c?._id) deployedCollegeIdSet.add(c._id.toString());
+          },
+        );
       }
     });
 
@@ -76,13 +83,19 @@ export async function GET(
     const pledges = await IndustryPledge.find({
       proposal: { $in: proposalIds },
       status: {
-        $in: ["Pledged", "Payment_Processing", "Funded", "Milestone_Released", "Completed"],
+        $in: [
+          "Pledged",
+          "Payment_Processing",
+          "Funded",
+          "Milestone_Released",
+          "Completed",
+        ],
       },
     }).lean();
 
     const fundsCommitted = pledges.reduce(
       (sum, pl) => sum + (pl.amountPledged || 0),
-      0
+      0,
     );
 
     // Group issues by domain
@@ -113,11 +126,14 @@ export async function GET(
       colleges: localColleges,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to fetch district detail";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to fetch district detail";
     console.error("GET /api/districts/[name] error:", error);
     return NextResponse.json(
       { success: false, error: errorMsg },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

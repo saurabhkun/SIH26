@@ -5,7 +5,9 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import HumanPanelDecisionMatrix, { ProposalCardData } from "@/components/panels/HumanPanelDecisionMatrix";
+import HumanPanelDecisionMatrix, {
+  ProposalCardData,
+} from "@/components/panels/HumanPanelDecisionMatrix";
 import ContingencyEscalationLadder from "@/components/panels/ContingencyEscalationLadder";
 import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
 import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
@@ -31,34 +33,56 @@ export default function GovProposalEvaluationPage() {
     ])
       .then(([issuesRes, proposalsRes]) => {
         const foundIssue = issuesRes?.data?.find(
-          (i: any) => i._id === issueId || i.trackingCode === issueId
+          (i: any) => i._id === issueId || i.trackingCode === issueId,
         );
-        setIssue(foundIssue || { title: "Water Heavy Metal Contamination Infiltration", district: "Dhanbad", escalationStage: 2 });
+        setIssue(
+          foundIssue || {
+            title: "Water Heavy Metal Contamination Infiltration",
+            district: "Dhanbad",
+            escalationStage: 2,
+          },
+        );
 
-        const rawProposals = proposalsRes?.data?.filter(
-          (p: any) => p.issueId === issueId || p.issue === issueId || !issueId
-        ) || [];
+        const rawProposals =
+          proposalsRes?.data?.filter(
+            (p: any) =>
+              p.issueId === issueId || p.issue === issueId || !issueId,
+          ) || [];
 
         if (rawProposals.length > 0) {
           const mapped: ProposalCardData[] = rawProposals.map((p: any) => ({
             id: p._id,
-            collegeName: p.college?.name || p.collegeName || "Birla Institute of Technology (BIT Mesra)",
+            collegeName:
+              p.college?.name ||
+              p.collegeName ||
+              "Birla Institute of Technology (BIT Mesra)",
             collegeTier: p.college?.tier || "L1",
             facultyLead: {
-              name: p.facultyMentor || p.facultyLead?.name || "Dr. Rajeshwar Sharma",
-              specialization: p.facultyLead?.specialization || "Environmental Biotechnology",
+              name:
+                p.facultyMentor ||
+                p.facultyLead?.name ||
+                "Dr. Rajeshwar Sharma",
+              specialization:
+                p.facultyLead?.specialization || "Environmental Biotechnology",
             },
             studentTeamSize: p.team?.length || p.studentTeamSize || 5,
-            utilizedLabs: ["Central Advanced Instrumentation Lab", "IoT Water Sensing Cell"],
+            utilizedLabs: [
+              "Central Advanced Instrumentation Lab",
+              "IoT Water Sensing Cell",
+            ],
             estimatedCost: p.budgetRequested || p.estimatedCost || 185000,
-            methodologySummary: p.technicalScope || p.methodologySummary || "Deploying multi-stage nano-filtration matrices coupled with continuous telemetry sensors.",
+            methodologySummary:
+              p.technicalScope ||
+              p.methodologySummary ||
+              "Deploying multi-stage nano-filtration matrices coupled with continuous telemetry sensors.",
             aiEvaluation: p.aiEvaluation || {
               feasibilityScore: 27,
               resourceMatchScore: 28,
               trackRecordScore: 19,
               noveltyScore: 17,
               compositeScore: 91,
-              reasoningSummary: "Exceptional alignment with regional heavy-metal testing apparatus and verified faculty publication track record in electro-flocculation.",
+              reasoningSummary:
+                "Exceptional alignment with regional heavy-metal testing apparatus and verified faculty publication track record in electro-flocculation.",
             },
           }));
           setProposals(mapped);
@@ -69,54 +93,72 @@ export default function GovProposalEvaluationPage() {
               id: "prop_demo_1",
               collegeName: "Birla Institute of Technology (BIT Mesra)",
               collegeTier: "L1",
-              facultyLead: { name: "Dr. Rajeshwar Sharma", specialization: "Environmental Chemical Engineering" },
+              facultyLead: {
+                name: "Dr. Rajeshwar Sharma",
+                specialization: "Environmental Chemical Engineering",
+              },
               studentTeamSize: 6,
-              utilizedLabs: ["Advanced Spectroscopy Lab", "Environmental Chemistry Cell"],
+              utilizedLabs: [
+                "Advanced Spectroscopy Lab",
+                "Environmental Chemistry Cell",
+              ],
               estimatedCost: 220000,
-              methodologySummary: "Multi-stage granular activated carbon and magnetic iron-oxide nano-adsorbent filtration system with real-time turbidity telemetry.",
+              methodologySummary:
+                "Multi-stage granular activated carbon and magnetic iron-oxide nano-adsorbent filtration system with real-time turbidity telemetry.",
               aiEvaluation: {
                 feasibilityScore: 28,
                 resourceMatchScore: 29,
                 trackRecordScore: 19,
                 noveltyScore: 18,
                 compositeScore: 94,
-                reasoningSummary: "Top scoring candidate: Existing lab equipment directly matched to water heavy metal remediation; 98% past on-time milestone delivery.",
+                reasoningSummary:
+                  "Top scoring candidate: Existing lab equipment directly matched to water heavy metal remediation; 98% past on-time milestone delivery.",
               },
             },
             {
               id: "prop_demo_2",
               collegeName: "National Institute of Technology (NIT Jamshedpur)",
               collegeTier: "L1",
-              facultyLead: { name: "Dr. Ananya Sen", specialization: "IoT Embedded Systems & Sensors" },
+              facultyLead: {
+                name: "Dr. Ananya Sen",
+                specialization: "IoT Embedded Systems & Sensors",
+              },
               studentTeamSize: 4,
               utilizedLabs: ["Micro-Sensors & Telemetry Lab"],
               estimatedCost: 195000,
-              methodologySummary: "Solar-powered IoT sensor telemetry nodes for real-time pH and mineral anomaly alerts across 12 monitoring borewells.",
+              methodologySummary:
+                "Solar-powered IoT sensor telemetry nodes for real-time pH and mineral anomaly alerts across 12 monitoring borewells.",
               aiEvaluation: {
                 feasibilityScore: 26,
                 resourceMatchScore: 25,
                 trackRecordScore: 18,
                 noveltyScore: 19,
                 compositeScore: 88,
-                reasoningSummary: "Strong telemetry architecture; slightly lower chemical filtration capability compared to BIT Mesra.",
+                reasoningSummary:
+                  "Strong telemetry architecture; slightly lower chemical filtration capability compared to BIT Mesra.",
               },
             },
             {
               id: "prop_demo_3",
               collegeName: "Birsa Institute of Technology (BIT Sindri)",
               collegeTier: "L2",
-              facultyLead: { name: "Prof. Alok Verma", specialization: "Hydrology & Chemical Technology" },
+              facultyLead: {
+                name: "Prof. Alok Verma",
+                specialization: "Hydrology & Chemical Technology",
+              },
               studentTeamSize: 5,
               utilizedLabs: ["Regional Water Quality Cell"],
               estimatedCost: 160000,
-              methodologySummary: "Low-cost vernacular clay-sand bio-sand filtration columns tailored for rapid rural village deployment.",
+              methodologySummary:
+                "Low-cost vernacular clay-sand bio-sand filtration columns tailored for rapid rural village deployment.",
               aiEvaluation: {
                 feasibilityScore: 24,
                 resourceMatchScore: 24,
                 trackRecordScore: 16,
                 noveltyScore: 15,
                 compositeScore: 79,
-                reasoningSummary: "High cost efficiency and localized deployment potential; lower technological novelty score.",
+                reasoningSummary:
+                  "High cost efficiency and localized deployment potential; lower technological novelty score.",
               },
             },
           ]);
@@ -144,7 +186,9 @@ export default function GovProposalEvaluationPage() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setSuccessBanner(data.message || "Stage 2 Human Determination finalized successfully!");
+        setSuccessBanner(
+          data.message || "Stage 2 Human Determination finalized successfully!",
+        );
         setTimeout(() => {
           router.push("/dashboard/gov");
         }, 3000);
@@ -219,7 +263,9 @@ export default function GovProposalEvaluationPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
             <div>
               <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 border border-amber-200">
-                {issue?.trackingCode || "CR-JH-2026"} &bull; {issue?.domain || "Civic Challenge"} &bull; {issue?.district || "Jharkhand"}
+                {issue?.trackingCode || "CR-JH-2026"} &bull;{" "}
+                {issue?.domain || "Civic Challenge"} &bull;{" "}
+                {issue?.district || "Jharkhand"}
               </span>
               <h2 className="text-base font-serif font-bold text-slate-900 mt-1">
                 {issue?.title || "Regional S&T Innovation Challenge"}
@@ -236,11 +282,16 @@ export default function GovProposalEvaluationPage() {
               Verbatim Citizen Grievance Statement
             </p>
             <p className="text-xs text-slate-700 italic bg-slate-50 p-3 border border-slate-200 leading-relaxed rounded-xs">
-              &ldquo;{issue?.description || "Heavy toxic run-off and sediment accumulation affecting municipal drinking water reservoirs."}&rdquo;
+              &ldquo;
+              {issue?.description ||
+                "Heavy toxic run-off and sediment accumulation affecting municipal drinking water reservoirs."}
+              &rdquo;
             </p>
             {issue?.citizenName && (
               <p className="text-[11px] text-slate-500 mt-1">
-                Reported by: <strong className="text-slate-700">{issue.citizenName}</strong> {issue?.address ? `• ${issue.address}` : ""}
+                Reported by:{" "}
+                <strong className="text-slate-700">{issue.citizenName}</strong>{" "}
+                {issue?.address ? `• ${issue.address}` : ""}
               </p>
             )}
           </div>

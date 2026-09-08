@@ -53,21 +53,62 @@ export function getContextualMediaUrl(domain?: string, index = 0): string {
 
   if (d.includes("water") || d.includes("handpump") || d.includes("fluoride")) {
     pool = SEED_CIVIC_MEDIA.waterContamination;
-  } else if (d.includes("agri") || d.includes("crop") || d.includes("farm") || d.includes("irrigation")) {
+  } else if (
+    d.includes("agri") ||
+    d.includes("crop") ||
+    d.includes("farm") ||
+    d.includes("irrigation")
+  ) {
     pool = SEED_CIVIC_MEDIA.agritech;
-  } else if (d.includes("school") || d.includes("edu") || d.includes("student")) {
+  } else if (
+    d.includes("school") ||
+    d.includes("edu") ||
+    d.includes("student")
+  ) {
     pool = SEED_CIVIC_MEDIA.schoolInfra;
-  } else if (d.includes("road") || d.includes("pothole") || d.includes("urban") || d.includes("traffic") || d.includes("bridge")) {
+  } else if (
+    d.includes("road") ||
+    d.includes("pothole") ||
+    d.includes("urban") ||
+    d.includes("traffic") ||
+    d.includes("bridge")
+  ) {
     pool = SEED_CIVIC_MEDIA.ruralRoads;
-  } else if (d.includes("health") || d.includes("vaccine") || d.includes("doctor") || d.includes("phc")) {
+  } else if (
+    d.includes("health") ||
+    d.includes("vaccine") ||
+    d.includes("doctor") ||
+    d.includes("phc")
+  ) {
     pool = SEED_CIVIC_MEDIA.healthcare;
-  } else if (d.includes("power") || d.includes("electric") || d.includes("energy") || d.includes("solar")) {
+  } else if (
+    d.includes("power") ||
+    d.includes("electric") ||
+    d.includes("energy") ||
+    d.includes("solar")
+  ) {
     pool = SEED_CIVIC_MEDIA.energy;
-  } else if (d.includes("waste") || d.includes("sanitat") || d.includes("garbage") || d.includes("drain")) {
+  } else if (
+    d.includes("waste") ||
+    d.includes("sanitat") ||
+    d.includes("garbage") ||
+    d.includes("drain")
+  ) {
     pool = SEED_CIVIC_MEDIA.sanitation;
-  } else if (d.includes("lac") || d.includes("livelihood") || d.includes("tribal") || d.includes("shg")) {
+  } else if (
+    d.includes("lac") ||
+    d.includes("livelihood") ||
+    d.includes("tribal") ||
+    d.includes("shg")
+  ) {
     pool = SEED_CIVIC_MEDIA.ruralLivelihoods;
-  } else if (d.includes("mine") || d.includes("coal") || d.includes("forest") || d.includes("dust") || d.includes("environ")) {
+  } else if (
+    d.includes("mine") ||
+    d.includes("coal") ||
+    d.includes("forest") ||
+    d.includes("dust") ||
+    d.includes("environ")
+  ) {
     pool = SEED_CIVIC_MEDIA.environment;
   }
 
@@ -78,7 +119,11 @@ export function getContextualMediaUrl(domain?: string, index = 0): string {
  * Validates and cleanses image URLs so that invalid/fictional hosts (like storage.civicresolve.gov.in)
  * are replaced with reliable contextual photos.
  */
-export function sanitizeMediaUrl(url?: string, domain?: string, index = 0): string {
+export function sanitizeMediaUrl(
+  url?: string,
+  domain?: string,
+  index = 0,
+): string {
   if (!url || typeof url !== "string" || url.trim().length === 0) {
     return getContextualMediaUrl(domain, index);
   }

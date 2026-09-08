@@ -19,10 +19,7 @@ export type ProposalStanding =
   | "PROMOTED_FROM_RUNNER_UP";
 
 export type DirectAssignmentStatus =
-  | "NONE"
-  | "PENDING_RO_CONSENT"
-  | "ACCEPTED"
-  | "DECLINED";
+  "NONE" | "PENDING_RO_CONSENT" | "ACCEPTED" | "DECLINED";
 
 export type IssueStatus =
   | "REPORTED"
@@ -65,11 +62,11 @@ export interface ProjectMilestone {
 }
 
 export interface AIEvaluationBreakdown {
-  feasibilityScore: number;       // 0 - 30
-  resourceMatchScore: number;     // 0 - 30
-  trackRecordScore: number;       // 0 - 20
-  noveltyScore: number;           // 0 - 20
-  compositeScore: number;         // 0 - 100
+  feasibilityScore: number; // 0 - 30
+  resourceMatchScore: number; // 0 - 30
+  trackRecordScore: number; // 0 - 20
+  noveltyScore: number; // 0 - 20
+  compositeScore: number; // 0 - 100
   reasoningSummary: string;
 }
 

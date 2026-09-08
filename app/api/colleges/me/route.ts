@@ -41,12 +41,14 @@ async function resolveCurrentCollege() {
       facilities: [
         {
           name: "Environmental Engineering & Water Testing Lab",
-          description: "Advanced spectrometry and heavy metal trace detection facility.",
+          description:
+            "Advanced spectrometry and heavy metal trace detection facility.",
           relatedDomains: ["Water Resources", "Environment"],
         },
         {
           name: "Renewable Energy Research Center",
-          description: "Solar PV microgrid and biomass conversion testing setup.",
+          description:
+            "Solar PV microgrid and biomass conversion testing setup.",
           relatedDomains: ["Energy"],
         },
       ],
@@ -86,7 +88,7 @@ export async function GET() {
     if (!college) {
       return NextResponse.json(
         { success: false, error: "College institution profile not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -112,13 +114,22 @@ export async function GET() {
         ...college.toObject(),
         activeProposalsCount,
         isAtCap,
-        remainingClaims: Math.max(0, (college.maxConcurrentClaims || 3) - activeProposalsCount),
+        remainingClaims: Math.max(
+          0,
+          (college.maxConcurrentClaims || 3) - activeProposalsCount,
+        ),
       },
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to fetch college profile";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to fetch college profile";
     console.error("GET /api/colleges/me error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }
 
@@ -133,12 +144,13 @@ export async function PUT(request: NextRequest) {
     if (!college) {
       return NextResponse.json(
         { success: false, error: "College institution profile not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const body = await request.json();
-    const { capabilities, facilities, faculty, contactPerson, contactPhone } = body;
+    const { capabilities, facilities, faculty, contactPerson, contactPhone } =
+      body;
 
     if (capabilities && Array.isArray(capabilities)) {
       college.capabilities = capabilities;
@@ -164,12 +176,19 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Institution profile and self-reported capabilities updated successfully.",
+      message:
+        "Institution profile and self-reported capabilities updated successfully.",
       data: college,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to update college profile";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to update college profile";
     console.error("PUT /api/colleges/me error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

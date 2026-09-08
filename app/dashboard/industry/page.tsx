@@ -105,27 +105,32 @@ export default function IndustryDashboardPage({
 }: {
   initialTab?: "curated" | "portfolio" | "releases";
 }) {
-  const [activeTab, setActiveTab] = useState<"curated" | "portfolio" | "releases">(initialTab);
+  const [activeTab, setActiveTab] = useState<
+    "curated" | "portfolio" | "releases"
+  >(initialTab);
   const [loading, setLoading] = useState(true);
   const [proposals, setProposals] = useState<ProposalItem[]>([]);
   const [myPledges, setMyPledges] = useState<PledgeItem[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [expandedIssueIds, setExpandedIssueIds] = useState<Record<string, boolean>>({});
+  const [expandedIssueIds, setExpandedIssueIds] = useState<
+    Record<string, boolean>
+  >({});
 
   const toggleExpandIssue = (id: string) => {
     setExpandedIssueIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   // Pledge modal state
-  const [pledgeModalProposal, setPledgeModalProposal] = useState<ProposalItem | null>(null);
+  const [pledgeModalProposal, setPledgeModalProposal] =
+    useState<ProposalItem | null>(null);
   const [orgName, setOrgName] = useState("Tata Steel Foundation");
   const [contactEmail, setContactEmail] = useState("csr.head@tatasteel.com");
   const [isCSR, setIsCSR] = useState(true);
   const [pledgeAmount, setPledgeAmount] = useState(150000);
   const [mentorshipNotes, setMentorshipNotes] = useState(
-    "Tata Steel technical mentors and metallurgy lab access offered for field prototype validation."
+    "Tata Steel technical mentors and metallurgy lab access offered for field prototype validation.",
   );
 
   // Razorpay Checkout Sandbox state
@@ -143,7 +148,9 @@ export default function IndustryDashboardPage({
   } | null>(null);
 
   // Milestone fund release state
-  const [releasingMilestone, setReleasingMilestone] = useState<string | null>(null);
+  const [releasingMilestone, setReleasingMilestone] = useState<string | null>(
+    null,
+  );
   const [releaseFeedback, setReleaseFeedback] = useState<string | null>(null);
 
   // Fetch proposals and pledges
@@ -177,7 +184,9 @@ export default function IndustryDashboardPage({
   // Open Pledge Modal
   const handleOpenPledge = (proposal: ProposalItem) => {
     setPledgeModalProposal(proposal);
-    setPledgeAmount(proposal.fundingGap > 0 ? proposal.fundingGap : proposal.budgetRequested);
+    setPledgeAmount(
+      proposal.fundingGap > 0 ? proposal.fundingGap : proposal.budgetRequested,
+    );
   };
 
   // Step 1: Initiate Pledge & Open Razorpay Sandbox
@@ -268,7 +277,10 @@ export default function IndustryDashboardPage({
   };
 
   // Release Milestone Funds
-  const handleReleaseMilestoneFunds = async (pledgeId: string, milestoneIndex: number) => {
+  const handleReleaseMilestoneFunds = async (
+    pledgeId: string,
+    milestoneIndex: number,
+  ) => {
     setReleasingMilestone(`${pledgeId}_${milestoneIndex}`);
     setReleaseFeedback(null);
 
@@ -296,27 +308,34 @@ export default function IndustryDashboardPage({
 
   // Calculations
   const totalCapitalCommitted = myPledges
-    .filter((p) => ["Funded", "Milestone_Released", "Completed"].includes(p.status))
+    .filter((p) =>
+      ["Funded", "Milestone_Released", "Completed"].includes(p.status),
+    )
     .reduce((sum, p) => sum + (p.amountPledged || 0), 0);
 
   const totalCapitalDisbursed = myPledges
-    .filter((p) => ["Funded", "Milestone_Released", "Completed"].includes(p.status))
+    .filter((p) =>
+      ["Funded", "Milestone_Released", "Completed"].includes(p.status),
+    )
     .reduce((sum, p) => sum + (p.amountReleased || 0), 0);
 
   const activeProjectsSponsored = myPledges.filter((p) =>
-    ["Funded", "Milestone_Released"].includes(p.status)
+    ["Funded", "Milestone_Released"].includes(p.status),
   ).length;
 
   // Filter curated proposals
   const filteredProposals = proposals.filter((p) => {
     const domainMatch =
       selectedDomain === "all" ||
-      (p.issue?.domain && p.issue.domain.toLowerCase() === selectedDomain.toLowerCase());
+      (p.issue?.domain &&
+        p.issue.domain.toLowerCase() === selectedDomain.toLowerCase());
     const searchMatch =
       searchQuery === "" ||
       p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.issue?.district && p.issue.district.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (p.college?.name && p.college.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      (p.issue?.district &&
+        p.issue.district.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (p.college?.name &&
+        p.college.name.toLowerCase().includes(searchQuery.toLowerCase()));
     return domainMatch && searchMatch;
   });
 
@@ -442,7 +461,9 @@ export default function IndustryDashboardPage({
 
               <div className="flex items-center space-x-2 w-full md:w-auto">
                 <Filter className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-xs font-semibold text-slate-600">Domain:</span>
+                <span className="text-xs font-semibold text-slate-600">
+                  Domain:
+                </span>
                 <select
                   value={selectedDomain}
                   onChange={(e) => setSelectedDomain(e.target.value)}
@@ -462,14 +483,19 @@ export default function IndustryDashboardPage({
             {loading ? (
               <div className="p-12 text-center bg-white rounded-lg border border-slate-200">
                 <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#1A365D] mb-3" />
-                <p className="text-sm text-slate-600">Loading curated CSR innovation feed...</p>
+                <p className="text-sm text-slate-600">
+                  Loading curated CSR innovation feed...
+                </p>
               </div>
             ) : filteredProposals.length === 0 ? (
               <div className="p-12 text-center bg-white rounded-lg border border-slate-200">
                 <AlertCircle className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-                <h3 className="font-bold text-slate-800">No proposals awaiting CSR funding</h3>
+                <h3 className="font-bold text-slate-800">
+                  No proposals awaiting CSR funding
+                </h3>
                 <p className="text-sm text-slate-500 mt-1">
-                  Check back as Higher Education Institutions submit technical solution plans.
+                  Check back as Higher Education Institutions submit technical
+                  solution plans.
                 </p>
               </div>
             ) : (
@@ -503,12 +529,15 @@ export default function IndustryDashboardPage({
                           <div className="flex items-center gap-2">
                             <VoiceAudioPlayer
                               textToRead={
-                                prop.issue?.description || prop.issue?.title || prop.technicalScope
+                                prop.issue?.description ||
+                                prop.issue?.title ||
+                                prop.technicalScope
                               }
                               audioUrl={prop.issue?.audioUrl}
                             />
                             <span className="text-xs font-bold px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded shrink-0">
-                              ₹{prop.budgetRequested.toLocaleString("en-IN")} Required
+                              ₹{prop.budgetRequested.toLocaleString("en-IN")}{" "}
+                              Required
                             </span>
                           </div>
                         </div>
@@ -519,7 +548,8 @@ export default function IndustryDashboardPage({
                         </h3>
                         <p className="text-xs font-semibold text-[#1A365D] mb-3 flex items-center">
                           <Building className="w-3.5 h-3.5 mr-1 text-[#C9A227]" />
-                          {prop.college?.name || "Higher Education Institution"} ({prop.college?.tier || "L1"})
+                          {prop.college?.name || "Higher Education Institution"}{" "}
+                          ({prop.college?.tier || "L1"})
                         </p>
 
                         {/* Ground Sourced Problem & Evidence Drawer */}
@@ -536,7 +566,8 @@ export default function IndustryDashboardPage({
                               </span>
                               {mediaList.length > 0 && (
                                 <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-[#FFEFD3] text-[#001B2E] px-1.5 py-0.5 rounded border border-[#FFC49B]/50">
-                                  <Camera className="w-2.5 h-2.5" /> {mediaList.length} Photos
+                                  <Camera className="w-2.5 h-2.5" />{" "}
+                                  {mediaList.length} Photos
                                 </span>
                               )}
                             </div>
@@ -562,8 +593,13 @@ export default function IndustryDashboardPage({
                                 </p>
                                 {prop.issue?.citizenName && (
                                   <p className="text-[11px] text-slate-500 mt-1">
-                                    Reported by: <strong className="text-slate-700">{prop.issue.citizenName}</strong>
-                                    {prop.issue?.address ? ` • ${prop.issue.address}` : ""}
+                                    Reported by:{" "}
+                                    <strong className="text-slate-700">
+                                      {prop.issue.citizenName}
+                                    </strong>
+                                    {prop.issue?.address
+                                      ? ` • ${prop.issue.address}`
+                                      : ""}
                                   </p>
                                 )}
                               </div>
@@ -591,7 +627,8 @@ export default function IndustryDashboardPage({
                         {/* Milestones Preview */}
                         <div className="mb-4">
                           <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
-                            Deliverable Milestones ({prop.milestones?.length || 0})
+                            Deliverable Milestones (
+                            {prop.milestones?.length || 0})
                           </h5>
                           <div className="space-y-1.5">
                             {prop.milestones?.slice(0, 3).map((m, idx) => (
@@ -599,9 +636,14 @@ export default function IndustryDashboardPage({
                                 key={idx}
                                 className="text-[11px] flex justify-between items-center text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded"
                               >
-                                <span className="truncate max-w-[200px]">{m.title}</span>
+                                <span className="truncate max-w-[200px]">
+                                  {m.title}
+                                </span>
                                 <span className="font-mono font-bold text-slate-800">
-                                  ₹{m.fundingReleaseAmount.toLocaleString("en-IN")}
+                                  ₹
+                                  {m.fundingReleaseAmount.toLocaleString(
+                                    "en-IN",
+                                  )}
                                 </span>
                               </div>
                             ))}
@@ -645,7 +687,8 @@ export default function IndustryDashboardPage({
                     Corporate Social Responsibility Portfolio
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Live capital deployment ledger, test sandbox transaction IDs, and milestone fulfillment records.
+                    Live capital deployment ledger, test sandbox transaction
+                    IDs, and milestone fulfillment records.
                   </p>
                 </div>
                 <button
@@ -660,9 +703,13 @@ export default function IndustryDashboardPage({
               {myPledges.length === 0 ? (
                 <div className="py-12 text-center">
                   <Coins className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-                  <h4 className="font-bold text-slate-700">No CSR Pledges Recorded</h4>
+                  <h4 className="font-bold text-slate-700">
+                    No CSR Pledges Recorded
+                  </h4>
                   <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                    Browse the <strong>Curated Innovation Feed</strong> to allocate CSR capital to high-impact college engineering projects.
+                    Browse the <strong>Curated Innovation Feed</strong> to
+                    allocate CSR capital to high-impact college engineering
+                    projects.
                   </p>
                   <button
                     onClick={() => setActiveTab("curated")}
@@ -682,23 +729,28 @@ export default function IndustryDashboardPage({
                         <div>
                           <div className="flex items-center space-x-2 mb-1">
                             <span className="text-[11px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">
-                              {pledge.proposal?.issue?.trackingCode || "CR-JH-PLEDGE"}
+                              {pledge.proposal?.issue?.trackingCode ||
+                                "CR-JH-PLEDGE"}
                             </span>
                             <span className="text-xs text-slate-500">
-                              📍 {pledge.proposal?.issue?.district} | {pledge.proposal?.issue?.domain}
+                              📍 {pledge.proposal?.issue?.district} |{" "}
+                              {pledge.proposal?.issue?.domain}
                             </span>
                           </div>
                           <h3 className="font-serif font-bold text-base text-slate-900">
                             {pledge.proposal?.title}
                           </h3>
                           <p className="text-xs font-medium text-slate-600">
-                            Executing HEI: <strong>{pledge.proposal?.college?.name}</strong>
+                            Executing HEI:{" "}
+                            <strong>{pledge.proposal?.college?.name}</strong>
                           </p>
                         </div>
 
                         <div className="flex items-center space-x-3">
                           <div className="text-right">
-                            <span className="text-xs text-slate-500 block">Pledged Amount</span>
+                            <span className="text-xs text-slate-500 block">
+                              Pledged Amount
+                            </span>
                             <strong className="text-sm font-mono text-emerald-800">
                               ₹{pledge.amountPledged.toLocaleString("en-IN")}
                             </strong>
@@ -706,7 +758,8 @@ export default function IndustryDashboardPage({
 
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-bold ${
-                              pledge.status === "Funded" || pledge.status === "Completed"
+                              pledge.status === "Funded" ||
+                              pledge.status === "Completed"
                                 ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                                 : "bg-blue-100 text-blue-800 border border-blue-200"
                             }`}
@@ -739,15 +792,19 @@ export default function IndustryDashboardPage({
                             Capital Disbursed
                           </span>
                           <span className="font-mono text-slate-800 font-bold">
-                            ₹{(pledge.amountReleased || 0).toLocaleString("en-IN")} of ₹
-                            {pledge.amountPledged.toLocaleString("en-IN")}
+                            ₹
+                            {(pledge.amountReleased || 0).toLocaleString(
+                              "en-IN",
+                            )}{" "}
+                            of ₹{pledge.amountPledged.toLocaleString("en-IN")}
                           </span>
                         </div>
                       </div>
 
                       {pledge.mentorshipNotes && (
                         <p className="text-xs text-slate-600 bg-amber-50/50 p-2.5 rounded border border-amber-200/50">
-                          <strong>Industry Advisory Commitment:</strong> {pledge.mentorshipNotes}
+                          <strong>Industry Advisory Commitment:</strong>{" "}
+                          {pledge.mentorshipNotes}
                         </p>
                       )}
                     </div>
@@ -768,7 +825,9 @@ export default function IndustryDashboardPage({
                 Milestone Fund Release Desk
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                When an assigned college completes a research or deployment milestone, verify deliverables and authorize the corresponding fund tranche release from your escrow.
+                When an assigned college completes a research or deployment
+                milestone, verify deliverables and authorize the corresponding
+                fund tranche release from your escrow.
               </p>
             </div>
 
@@ -784,18 +843,29 @@ export default function IndustryDashboardPage({
               </div>
             )}
 
-            {myPledges.filter((p) => p.status === "Funded" || p.status === "Milestone_Released").length === 0 ? (
+            {myPledges.filter(
+              (p) => p.status === "Funded" || p.status === "Milestone_Released",
+            ).length === 0 ? (
               <div className="py-12 text-center">
                 <Award className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-                <h4 className="font-bold text-slate-700">No Funded Projects with Active Milestones</h4>
+                <h4 className="font-bold text-slate-700">
+                  No Funded Projects with Active Milestones
+                </h4>
                 <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                  Fund a proposal from the <strong>Curated Innovation Feed</strong> first. When the college research team marks milestones completed, they will appear here for tranche release.
+                  Fund a proposal from the{" "}
+                  <strong>Curated Innovation Feed</strong> first. When the
+                  college research team marks milestones completed, they will
+                  appear here for tranche release.
                 </p>
               </div>
             ) : (
               <div className="space-y-6">
                 {myPledges
-                  .filter((p) => ["Funded", "Milestone_Released", "Completed"].includes(p.status))
+                  .filter((p) =>
+                    ["Funded", "Milestone_Released", "Completed"].includes(
+                      p.status,
+                    ),
+                  )
                   .map((pledge) => (
                     <div
                       key={pledge._id}
@@ -807,10 +877,18 @@ export default function IndustryDashboardPage({
                             {pledge.proposal?.title}
                           </h3>
                           <p className="text-xs text-slate-600">
-                            Institution: <strong>{pledge.proposal?.college?.name}</strong> | Total Pledge:{" "}
-                            <strong>₹{pledge.amountPledged.toLocaleString("en-IN")}</strong> | Released:{" "}
+                            Institution:{" "}
+                            <strong>{pledge.proposal?.college?.name}</strong> |
+                            Total Pledge:{" "}
+                            <strong>
+                              ₹{pledge.amountPledged.toLocaleString("en-IN")}
+                            </strong>{" "}
+                            | Released:{" "}
                             <strong className="text-emerald-700">
-                              ₹{(pledge.amountReleased || 0).toLocaleString("en-IN")}
+                              ₹
+                              {(pledge.amountReleased || 0).toLocaleString(
+                                "en-IN",
+                              )}
                             </strong>
                           </p>
                         </div>
@@ -830,15 +908,18 @@ export default function IndustryDashboardPage({
                                 isReleased
                                   ? "bg-emerald-50 border-emerald-300 text-emerald-900"
                                   : isReleasePending
-                                  ? "bg-amber-50 border-amber-300 text-amber-900 ring-1 ring-amber-300"
-                                  : "bg-white border-slate-200 text-slate-600"
+                                    ? "bg-amber-50 border-amber-300 text-amber-900 ring-1 ring-amber-300"
+                                    : "bg-white border-slate-200 text-slate-600"
                               }`}
                             >
                               <div>
                                 <div className="flex justify-between items-start mb-1">
                                   <span className="font-bold">{m.title}</span>
                                   <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white border">
-                                    ₹{m.fundingReleaseAmount.toLocaleString("en-IN")}
+                                    ₹
+                                    {m.fundingReleaseAmount.toLocaleString(
+                                      "en-IN",
+                                    )}
                                   </span>
                                 </div>
                                 <p className="text-[11px] text-slate-600 mb-2 leading-relaxed">
@@ -852,7 +933,9 @@ export default function IndustryDashboardPage({
                                     College Progress:{" "}
                                     <strong
                                       className={
-                                        isCompleted ? "text-emerald-700" : "text-slate-600"
+                                        isCompleted
+                                          ? "text-emerald-700"
+                                          : "text-slate-600"
                                       }
                                     >
                                       {m.status}
@@ -867,13 +950,22 @@ export default function IndustryDashboardPage({
                                   </div>
                                 ) : isReleasePending ? (
                                   <button
-                                    onClick={() => handleReleaseMilestoneFunds(pledge._id, mIdx)}
-                                    disabled={releasingMilestone === `${pledge._id}_${mIdx}`}
+                                    onClick={() =>
+                                      handleReleaseMilestoneFunds(
+                                        pledge._id,
+                                        mIdx,
+                                      )
+                                    }
+                                    disabled={
+                                      releasingMilestone ===
+                                      `${pledge._id}_${mIdx}`
+                                    }
                                     className="w-full py-2 bg-[#1A365D] hover:bg-[#132845] text-white font-bold rounded text-[11px] shadow-sm flex items-center justify-center space-x-1.5 transition-all"
                                   >
                                     <Send className="w-3 h-3 text-[#C9A227]" />
                                     <span>
-                                      {releasingMilestone === `${pledge._id}_${mIdx}`
+                                      {releasingMilestone ===
+                                      `${pledge._id}_${mIdx}`
                                         ? "Releasing Tranche..."
                                         : `Authorize ₹${m.fundingReleaseAmount.toLocaleString("en-IN")} Release`}
                                     </span>
@@ -963,7 +1055,9 @@ export default function IndustryDashboardPage({
                         step="5000"
                         required
                         value={pledgeAmount}
-                        onChange={(e) => setPledgeAmount(Number(e.target.value))}
+                        onChange={(e) =>
+                          setPledgeAmount(Number(e.target.value))
+                        }
                         className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-md text-xs font-bold text-slate-900"
                       />
                     </div>
@@ -979,9 +1073,13 @@ export default function IndustryDashboardPage({
                     onChange={(e) => setIsCSR(e.target.checked)}
                     className="rounded border-slate-300 text-[#1A365D] focus:ring-[#1A365D] h-4 w-4"
                   />
-                  <label htmlFor="isCSRCheckbox" className="text-xs text-blue-950 font-medium">
-                    Allocate under <strong>Statutory Section 135 (2% CSR Mandate)</strong> for R&D &
-                    Public Welfare.
+                  <label
+                    htmlFor="isCSRCheckbox"
+                    className="text-xs text-blue-950 font-medium"
+                  >
+                    Allocate under{" "}
+                    <strong>Statutory Section 135 (2% CSR Mandate)</strong> for
+                    R&D & Public Welfare.
                   </label>
                 </div>
 
@@ -1032,7 +1130,9 @@ export default function IndustryDashboardPage({
                     <div className="w-6 h-6 bg-[#3395FF] rounded flex items-center justify-center font-bold text-xs text-white">
                       R
                     </div>
-                    <span className="font-bold text-sm tracking-wide">Razorpay Trusted</span>
+                    <span className="font-bold text-sm tracking-wide">
+                      Razorpay Trusted
+                    </span>
                   </div>
                   <span className="px-2 py-0.5 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded text-[10px] font-bold tracking-wider uppercase">
                     Sandbox Mode
@@ -1040,7 +1140,9 @@ export default function IndustryDashboardPage({
                 </div>
 
                 <div className="mt-3">
-                  <span className="text-xs text-slate-300 block">Total Amount to Lock</span>
+                  <span className="text-xs text-slate-300 block">
+                    Total Amount to Lock
+                  </span>
                   <h3 className="text-2xl font-bold font-mono text-white">
                     ₹{pledgeAmount.toLocaleString("en-IN")}.00
                   </h3>
@@ -1054,7 +1156,8 @@ export default function IndustryDashboardPage({
               <div className="bg-amber-50 px-4 py-2.5 border-b border-amber-200 flex items-center space-x-2 text-xs text-amber-900">
                 <ShieldCheck className="w-4 h-4 text-amber-600 flex-shrink-0" />
                 <span className="font-medium text-[11px]">
-                  <strong>Sandbox / Test Payment &mdash; No Real Money</strong>. Use test credentials below.
+                  <strong>Sandbox / Test Payment &mdash; No Real Money</strong>.
+                  Use test credentials below.
                 </span>
               </div>
 
@@ -1076,15 +1179,21 @@ export default function IndustryDashboardPage({
                   <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-left space-y-1 font-mono">
                     <div className="flex justify-between">
                       <span className="text-slate-500">Payment ID:</span>
-                      <strong className="text-emerald-700">{paymentSuccessData.paymentId}</strong>
+                      <strong className="text-emerald-700">
+                        {paymentSuccessData.paymentId}
+                      </strong>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Order ID:</span>
-                      <span className="text-slate-700">{paymentSuccessData.orderId}</span>
+                      <span className="text-slate-700">
+                        {paymentSuccessData.orderId}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Amount:</span>
-                      <strong>₹{paymentSuccessData.amount.toLocaleString("en-IN")}</strong>
+                      <strong>
+                        ₹{paymentSuccessData.amount.toLocaleString("en-IN")}
+                      </strong>
                     </div>
                   </div>
 
@@ -1174,7 +1283,10 @@ export default function IndustryDashboardPage({
                       ) : (
                         <>
                           <CreditCard className="w-3.5 h-3.5" />
-                          <span>Authorize Test ₹{pledgeAmount.toLocaleString("en-IN")}</span>
+                          <span>
+                            Authorize Test ₹
+                            {pledgeAmount.toLocaleString("en-IN")}
+                          </span>
                         </>
                       )}
                     </button>

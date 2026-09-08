@@ -63,8 +63,11 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password || !role) {
       return NextResponse.json(
-        { success: false, error: "Please provide email, password, and target portal role." },
-        { status: 400 }
+        {
+          success: false,
+          error: "Please provide email, password, and target portal role.",
+        },
+        { status: 400 },
       );
     }
 
@@ -105,7 +108,7 @@ export async function POST(request: NextRequest) {
       if (!isMatch) {
         return NextResponse.json(
           { success: false, error: "Invalid email or password credentials." },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -114,9 +117,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Account not found for this portal role. Please use demo credentials.",
+          error:
+            "Account not found for this portal role. Please use demo credentials.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -139,8 +143,8 @@ export async function POST(request: NextRequest) {
       user.role === "gov"
         ? "/dashboard/gov"
         : user.role === "college"
-        ? "/dashboard/college"
-        : "/dashboard/industry";
+          ? "/dashboard/college"
+          : "/dashboard/industry";
 
     const response = NextResponse.json({
       success: true,
@@ -162,11 +166,12 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Authentication failed";
+    const errorMsg =
+      error instanceof Error ? error.message : "Authentication failed";
     console.error("POST /api/auth/login error:", error);
     return NextResponse.json(
       { success: false, error: errorMsg },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -94,7 +94,7 @@ const MilestoneSchema = new Schema<ProjectMilestone>(
     submissionRemarks: { type: String },
     completedAt: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const ProposalSchema = new Schema<IProposal>(
@@ -239,7 +239,7 @@ const ProposalSchema = new Schema<IProposal>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -249,10 +249,14 @@ const syncFields = function (doc: any) {
   if (doc.issue && !doc.issueId) doc.issueId = doc.issue;
   if (doc.collegeId && !doc.college) doc.college = doc.collegeId;
   if (doc.college && !doc.collegeId) doc.collegeId = doc.college;
-  if (doc.methodologySummary && !doc.technicalScope) doc.technicalScope = doc.methodologySummary;
-  if (doc.technicalScope && !doc.methodologySummary) doc.methodologySummary = doc.technicalScope;
-  if (doc.estimatedCost !== undefined && doc.budgetRequested === undefined) doc.budgetRequested = doc.estimatedCost;
-  if (doc.budgetRequested !== undefined && doc.estimatedCost === undefined) doc.estimatedCost = doc.budgetRequested;
+  if (doc.methodologySummary && !doc.technicalScope)
+    doc.technicalScope = doc.methodologySummary;
+  if (doc.technicalScope && !doc.methodologySummary)
+    doc.methodologySummary = doc.technicalScope;
+  if (doc.estimatedCost !== undefined && doc.budgetRequested === undefined)
+    doc.budgetRequested = doc.estimatedCost;
+  if (doc.budgetRequested !== undefined && doc.estimatedCost === undefined)
+    doc.estimatedCost = doc.budgetRequested;
   if (!doc.facultyLead || !doc.facultyLead.name) {
     doc.facultyLead = {
       name: doc.facultyMentor || "Principal Investigator",
@@ -261,10 +265,14 @@ const syncFields = function (doc: any) {
       designation: "Principal Investigator / Professor",
     };
   } else {
-    if (!doc.facultyLead.email) doc.facultyLead.email = "mentor@institution.ac.in";
-    if (!doc.facultyLead.specialization) doc.facultyLead.specialization = "Applied Research & Innovation";
-    if (!doc.facultyLead.designation) doc.facultyLead.designation = "Principal Investigator / Professor";
-    if (!doc.facultyLead.name && doc.facultyMentor) doc.facultyLead.name = doc.facultyMentor;
+    if (!doc.facultyLead.email)
+      doc.facultyLead.email = "mentor@institution.ac.in";
+    if (!doc.facultyLead.specialization)
+      doc.facultyLead.specialization = "Applied Research & Innovation";
+    if (!doc.facultyLead.designation)
+      doc.facultyLead.designation = "Principal Investigator / Professor";
+    if (!doc.facultyLead.name && doc.facultyMentor)
+      doc.facultyLead.name = doc.facultyMentor;
   }
   if (!doc.facultyMentor && doc.facultyLead?.name) {
     doc.facultyMentor = doc.facultyLead.name;

@@ -35,8 +35,10 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#0284c7",
     borderColor: "#38bdf8",
     bgLight: "#f0f9ff",
-    description: "Fluoride/arsenic in drinking water, dry handpumps, pipeline contamination.",
-    exampleTitle: "High fluoride / toxic runoff in Panchayat drinking water supply",
+    description:
+      "Fluoride/arsenic in drinking water, dry handpumps, pipeline contamination.",
+    exampleTitle:
+      "High fluoride / toxic runoff in Panchayat drinking water supply",
   },
   {
     id: "drought-irrigation",
@@ -49,8 +51,10 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#15803d",
     borderColor: "#4ade80",
     bgLight: "#f0fdf4",
-    description: "Check dam siltation, broken canal network, dry season crop water shortage.",
-    exampleTitle: "Check dam silted and canals broken causing severe irrigation deficit",
+    description:
+      "Check dam siltation, broken canal network, dry season crop water shortage.",
+    exampleTitle:
+      "Check dam silted and canals broken causing severe irrigation deficit",
   },
   {
     id: "mining-pollution",
@@ -63,8 +67,10 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#b45309",
     borderColor: "#fbbf24",
     bgLight: "#fffbeb",
-    description: "Coal fly-ash, dust clouds, abandoned mine craters, toxic topsoil runoff.",
-    exampleTitle: "Coal dust air pollution & toxic runoff from open-cast mining site",
+    description:
+      "Coal fly-ash, dust clouds, abandoned mine craters, toxic topsoil runoff.",
+    exampleTitle:
+      "Coal dust air pollution & toxic runoff from open-cast mining site",
   },
   {
     id: "healthcare-delivery",
@@ -77,8 +83,10 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#e11d48",
     borderColor: "#fb7185",
     bgLight: "#fff1f2",
-    description: "Lack of cold-chain vaccines, non-functional PHC equipment, ambulance isolation.",
-    exampleTitle: "Primary Health Centre (PHC) lacks emergency medicines and cold storage",
+    description:
+      "Lack of cold-chain vaccines, non-functional PHC equipment, ambulance isolation.",
+    exampleTitle:
+      "Primary Health Centre (PHC) lacks emergency medicines and cold storage",
   },
   {
     id: "school-infrastructure",
@@ -91,8 +99,10 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#4f46e5",
     borderColor: "#818cf8",
     bgLight: "#eef2ff",
-    description: "Unsafe building roof, no electricity, sanitation lack for girl students, lab shortage.",
-    exampleTitle: "Dilapidated government school building lacking sanitation and power",
+    description:
+      "Unsafe building roof, no electricity, sanitation lack for girl students, lab shortage.",
+    exampleTitle:
+      "Dilapidated government school building lacking sanitation and power",
   },
   {
     id: "watershed-forest",
@@ -105,8 +115,10 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#047857",
     borderColor: "#34d399",
     bgLight: "#ecfdf5",
-    description: "Soil erosion, natural stream drying, illegal timber cutting, water table drop.",
-    exampleTitle: "Rapid depletion of village groundwater and seasonal stream drying",
+    description:
+      "Soil erosion, natural stream drying, illegal timber cutting, water table drop.",
+    exampleTitle:
+      "Rapid depletion of village groundwater and seasonal stream drying",
   },
   {
     id: "child-malnutrition",
@@ -119,8 +131,10 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#c026d3",
     borderColor: "#e879f9",
     bgLight: "#fdf4ff",
-    description: "Anganwadi ration disruptions, nutritional tracking gaps, severe wasting cases.",
-    exampleTitle: "Irregular nutritional ration and severe child stunting in tribal hamlet",
+    description:
+      "Anganwadi ration disruptions, nutritional tracking gaps, severe wasting cases.",
+    exampleTitle:
+      "Irregular nutritional ration and severe child stunting in tribal hamlet",
   },
   {
     id: "farmer-livelihoods",
@@ -133,7 +147,9 @@ export const VISUAL_CHALLENGES: VisualChallengeOption[] = [
     color: "#d97706",
     borderColor: "#fcd34d",
     bgLight: "#fffdf0",
-    description: "Lac/tussar silk support, poultry/dairy alternative income, crop failure rescue.",
-    exampleTitle: "Drought crop destruction requiring alternative lac/tussar livelihood aid",
+    description:
+      "Lac/tussar silk support, poultry/dairy alternative income, crop failure rescue.",
+    exampleTitle:
+      "Drought crop destruction requiring alternative lac/tussar livelihood aid",
   },
 ];

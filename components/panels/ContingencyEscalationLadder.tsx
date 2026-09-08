@@ -85,7 +85,8 @@ export default function ContingencyEscalationLadder({
             </h3>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Automated challenge lifecycle progression for unclaimed or high-urgency state issues
+            Automated challenge lifecycle progression for unclaimed or
+            high-urgency state issues
           </p>
         </div>
 
@@ -116,8 +117,8 @@ export default function ContingencyEscalationLadder({
                 isCurrent
                   ? `${s.activeColor} border-2 shadow-xs`
                   : isPassed
-                  ? "bg-slate-50 border-slate-300 opacity-85"
-                  : "bg-white border-slate-200 text-slate-400 opacity-60"
+                    ? "bg-slate-50 border-slate-300 opacity-85"
+                    : "bg-white border-slate-200 text-slate-400 opacity-60"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -126,8 +127,8 @@ export default function ContingencyEscalationLadder({
                     isCurrent
                       ? "bg-navy text-gold"
                       : isPassed
-                      ? "bg-green-700 text-white"
-                      : "bg-slate-200 text-slate-600"
+                        ? "bg-green-700 text-white"
+                        : "bg-slate-200 text-slate-600"
                   }`}
                 >
                   {isPassed ? <CheckCircle2 className="w-4 h-4" /> : s.stage}
@@ -184,11 +185,16 @@ export default function ContingencyEscalationLadder({
           <div className="text-xs text-slate-700 flex items-center gap-1.5">
             <AlertTriangle className="w-4 h-4 text-amber-600" />
             <span className="font-medium">Nodal Authority:</span>
-            <span>Advance challenge to next escalation stage if bidding thresholds are breached.</span>
+            <span>
+              Advance challenge to next escalation stage if bidding thresholds
+              are breached.
+            </span>
           </div>
           {onTriggerEscalation && (
             <button
-              onClick={() => onTriggerEscalation((currentStage + 1) as EscalationStage)}
+              onClick={() =>
+                onTriggerEscalation((currentStage + 1) as EscalationStage)
+              }
               className="px-3 py-1.5 bg-navy text-gold text-xs font-semibold hover:bg-navyLight border border-gold/40 flex items-center gap-1 shadow-2xs"
             >
               <span>Escalate to Stage {currentStage + 1}</span>

@@ -34,7 +34,9 @@ export async function GET(request: NextRequest) {
       }
     }
     if (!college && sessionUser?.email) {
-      college = await College.findOne({ email: sessionUser.email.toLowerCase() });
+      college = await College.findOne({
+        email: sessionUser.email.toLowerCase(),
+      });
     }
     if (!college) {
       college = await College.findOne().sort({ createdAt: 1 });
@@ -44,11 +46,17 @@ export async function GET(request: NextRequest) {
         name: "Birla Institute of Technology, Mesra",
         district: "Ranchi",
         tier: "L1",
-        capabilities: ["Water Resources", "Environment", "Agriculture", "Energy"],
+        capabilities: [
+          "Water Resources",
+          "Environment",
+          "Agriculture",
+          "Energy",
+        ],
         facilities: [
           {
             name: "Environmental Engineering & Water Testing Lab",
-            description: "Advanced spectrometry and heavy metal trace detection facility.",
+            description:
+              "Advanced spectrometry and heavy metal trace detection facility.",
             relatedDomains: ["Water Resources", "Environment"],
           },
         ],
@@ -68,11 +76,20 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const collegeCapabilities: IssueDomain[] = (college?.capabilities || []) as IssueDomain[];
+    const collegeCapabilities: IssueDomain[] = (college?.capabilities ||
+      []) as IssueDomain[];
 
     // 2. Query issues with status Assigned_HEI or Reported (or all non-resolved for testing)
     const query: Record<string, unknown> = {
-      status: { $in: ["Reported", "Assigned_HEI", "Under_Review", "Proposal_Submitted", "Approved"] },
+      status: {
+        $in: [
+          "Reported",
+          "Assigned_HEI",
+          "Under_Review",
+          "Proposal_Submitted",
+          "Approved",
+        ],
+      },
     };
 
     if (domainFilter && domainFilter !== "all") {
@@ -90,11 +107,13 @@ export async function GET(request: NextRequest) {
 
     // 3. Check proposals submitted by this college
     const collegeProposals = college
-      ? await Proposal.find({ college: college._id }).select("issue status title").lean()
+      ? await Proposal.find({ college: college._id })
+          .select("issue status title")
+          .lean()
       : [];
-    
+
     const proposalMap = new Map(
-      collegeProposals.map((p) => [p.issue.toString(), p])
+      collegeProposals.map((p) => [p.issue.toString(), p]),
     );
 
     // 4. Annotate each issue with capability match and claim status
@@ -105,7 +124,7 @@ export async function GET(request: NextRequest) {
 
       // Find matching facility if any
       const matchingFacility = (college?.facilities as any[])?.find((f: any) =>
-        f.relatedDomains?.includes(issue.domain)
+        f.relatedDomains?.includes(issue.domain),
       );
 
       return {
@@ -126,13 +145,25 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      college: college ? { id: college._id, name: college.name, capabilities: college.capabilities } : null,
+      college: college
+        ? {
+            id: college._id,
+            name: college.name,
+            capabilities: college.capabilities,
+          }
+        : null,
       count: annotatedIssues.length,
       data: annotatedIssues,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : "Failed to load challenge marketplace";
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to load challenge marketplace";
     console.error("GET /api/issues/marketplace error:", error);
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: errorMsg },
+      { status: 500 },
+    );
   }
 }

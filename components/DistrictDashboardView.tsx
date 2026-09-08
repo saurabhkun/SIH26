@@ -160,7 +160,8 @@ export default function DistrictDashboardView({
                 {districtName} District
               </h1>
               <p className="text-xs sm:text-sm text-civic-textMuted mt-1">
-                District Headquarter: {headquarter} &bull; Public Transparency &amp; Accountability Record
+                District Headquarter: {headquarter} &bull; Public Transparency
+                &amp; Accountability Record
               </p>
             </div>
             <div className="flex items-center space-x-2 text-xs text-emerald-800 bg-emerald-50 border border-emerald-300 px-3 py-2 rounded-lg">
@@ -249,10 +250,12 @@ export default function DistrictDashboardView({
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-civic-border">
               <div>
                 <h2 className="text-lg font-serif font-bold text-civic-textDark">
-                  District Challenges Log ({filteredIssues.length} of {initialIssues.length})
+                  District Challenges Log ({filteredIssues.length} of{" "}
+                  {initialIssues.length})
                 </h2>
                 <p className="text-xs text-civic-textMuted">
-                  Public ledger of registered civic issues, technical domains, and resolution milestones
+                  Public ledger of registered civic issues, technical domains,
+                  and resolution milestones
                 </p>
               </div>
 
@@ -278,7 +281,10 @@ export default function DistrictDashboardView({
 
               {/* Status Filter */}
               <div className="flex items-center space-x-1">
-                <label htmlFor="status-filter" className="text-civic-textMuted text-[11px]">
+                <label
+                  htmlFor="status-filter"
+                  className="text-civic-textMuted text-[11px]"
+                >
                   Status:
                 </label>
                 <select
@@ -302,7 +308,10 @@ export default function DistrictDashboardView({
 
               {/* Domain Filter */}
               <div className="flex items-center space-x-1">
-                <label htmlFor="domain-filter" className="text-civic-textMuted text-[11px]">
+                <label
+                  htmlFor="domain-filter"
+                  className="text-civic-textMuted text-[11px]"
+                >
                   Domain:
                 </label>
                 <select
@@ -313,14 +322,20 @@ export default function DistrictDashboardView({
                 >
                   <option value="all">All Domains</option>
                   {ISSUE_DOMAINS.map((domain) => (
-                    <option key={domain} value={domain} className="bg-white text-civic-textDark">
+                    <option
+                      key={domain}
+                      value={domain}
+                      className="bg-white text-civic-textDark"
+                    >
                       {domain}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {(selectedStatus !== "all" || selectedDomain !== "all" || searchQuery) && (
+              {(selectedStatus !== "all" ||
+                selectedDomain !== "all" ||
+                searchQuery) && (
                 <button
                   onClick={() => {
                     setSelectedStatus("all");
@@ -338,7 +353,9 @@ export default function DistrictDashboardView({
             {filteredIssues.length === 0 ? (
               <div className="py-12 text-center text-civic-textMuted">
                 <AlertCircle className="w-8 h-8 mx-auto text-civic-textMuted mb-2" />
-                <p className="text-sm font-semibold text-civic-textDark">No issues found matching criteria</p>
+                <p className="text-sm font-semibold text-civic-textDark">
+                  No issues found matching criteria
+                </p>
                 <p className="text-xs text-civic-textMuted mt-1">
                   Try adjusting your filter options or search term.
                 </p>
@@ -358,7 +375,9 @@ export default function DistrictDashboardView({
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-xs">
                     {filteredIssues.map((issue) => {
-                      const dateStr = new Date(issue.createdAt).toLocaleDateString("en-IN", {
+                      const dateStr = new Date(
+                        issue.createdAt,
+                      ).toLocaleDateString("en-IN", {
                         day: "2-digit",
                         month: "short",
                         year: "numeric",
@@ -379,14 +398,18 @@ export default function DistrictDashboardView({
                             <p className="text-civic-textMuted text-[11px] line-clamp-2 mt-0.5">
                               {issue.description}
                             </p>
-                            {issue.assignedColleges && issue.assignedColleges.length > 0 && (
-                              <div className="mt-1 text-[10.5px] text-civic-textDark font-medium flex items-center gap-1">
-                                <Building className="w-3 h-3 text-civic-secondary" />
-                                <span>
-                                  Assigned HEI: {issue.assignedColleges.map((c) => c.name).join(", ")}
-                                </span>
-                              </div>
-                            )}
+                            {issue.assignedColleges &&
+                              issue.assignedColleges.length > 0 && (
+                                <div className="mt-1 text-[10.5px] text-civic-textDark font-medium flex items-center gap-1">
+                                  <Building className="w-3 h-3 text-civic-secondary" />
+                                  <span>
+                                    Assigned HEI:{" "}
+                                    {issue.assignedColleges
+                                      .map((c) => c.name)
+                                      .join(", ")}
+                                  </span>
+                                </div>
+                              )}
                           </td>
                           <td className="py-3 px-3 whitespace-nowrap text-civic-textMuted">
                             <span className="inline-block px-2.5 py-0.5 bg-civic-accent/25 border border-civic-accent text-[11px] text-civic-primaryHover font-medium rounded-full">
@@ -399,8 +422,8 @@ export default function DistrictDashboardView({
                                 issue.severityScore >= 4
                                   ? "text-red-800 bg-red-50 border-red-200"
                                   : issue.severityScore === 3
-                                  ? "text-amber-800 bg-amber-50 border-amber-200"
-                                  : "text-emerald-800 bg-emerald-50 border-emerald-200"
+                                    ? "text-amber-800 bg-amber-50 border-amber-200"
+                                    : "text-emerald-800 bg-emerald-50 border-emerald-200"
                               }`}
                             >
                               Level {issue.severityScore}/5
@@ -409,7 +432,7 @@ export default function DistrictDashboardView({
                           <td className="py-3 px-3 whitespace-nowrap">
                             <span
                               className={`inline-block px-2.5 py-0.5 text-[11px] border font-medium rounded-full ${getStatusBadge(
-                                issue.status
+                                issue.status,
                               )}`}
                             >
                               {issue.status.replace(/_/g, " ")}
@@ -436,7 +459,8 @@ export default function DistrictDashboardView({
       <footer className="bg-civic-surface border-t border-civic-border py-4 px-4 sm:px-8 text-xs text-civic-textMuted mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
-            &copy; 2026 Department of Higher &amp; Technical Education, Government of Jharkhand.
+            &copy; 2026 Department of Higher &amp; Technical Education,
+            Government of Jharkhand.
           </div>
           <div className="text-civic-textMuted">
             District Portal &bull; {districtName}

@@ -3,10 +3,18 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { animate, stagger } from "animejs";
-import { getJharkhandGeoPaths, DistrictGeoPath, MAP_VIEWBOX_WIDTH, MAP_VIEWBOX_HEIGHT } from "@/lib/geo";
+import {
+  getJharkhandGeoPaths,
+  DistrictGeoPath,
+  MAP_VIEWBOX_WIDTH,
+  MAP_VIEWBOX_HEIGHT,
+} from "@/lib/geo";
 
 // Mock issue density data (0 - 100) and reported issue counts for 24 Jharkhand districts
-export const DEFAULT_DISTRICT_STATS: Record<string, { count: number; density: number }> = {
+export const DEFAULT_DISTRICT_STATS: Record<
+  string,
+  { count: number; density: number }
+> = {
   Ranchi: { count: 142, density: 88 },
   Dhanbad: { count: 118, density: 82 },
   "East Singhbhum": { count: 96, density: 76 },
@@ -84,21 +92,43 @@ export default function JharkhandMap({
   const [isNavigating, setIsNavigating] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
 
-  const [liveData, setLiveData] = useState<Record<string, { count: number; density: number }>>(
-    propData || DEFAULT_DISTRICT_STATS
-  );
+  const [liveData, setLiveData] = useState<
+    Record<string, { count: number; density: number }>
+  >(propData || DEFAULT_DISTRICT_STATS);
 
   // Warm up the Next.js route cache for all 24 districts in the background
   useEffect(() => {
     const districts = [
-      "Garhwa", "Palamu", "Chatra", "Hazaribagh", "Koderma", "Giridih",
-      "Deoghar", "Dumka", "Godda", "Sahibganj", "Pakur", "Jamtara",
-      "Dhanbad", "Bokaro", "Ramgarh", "Ranchi", "Lohardaga", "Latehar",
-      "Gumla", "Simdega", "Khunti", "West Singhbhum", "Saraikela Kharsawan", "East Singhbhum",
+      "Garhwa",
+      "Palamu",
+      "Chatra",
+      "Hazaribagh",
+      "Koderma",
+      "Giridih",
+      "Deoghar",
+      "Dumka",
+      "Godda",
+      "Sahibganj",
+      "Pakur",
+      "Jamtara",
+      "Dhanbad",
+      "Bokaro",
+      "Ramgarh",
+      "Ranchi",
+      "Lohardaga",
+      "Latehar",
+      "Gumla",
+      "Simdega",
+      "Khunti",
+      "West Singhbhum",
+      "Saraikela Kharsawan",
+      "East Singhbhum",
       "Seraikela Kharsawan",
     ];
     districts.forEach((district) => {
-      router.prefetch(`/district/${encodeURIComponent(district.toLowerCase())}`);
+      router.prefetch(
+        `/district/${encodeURIComponent(district.toLowerCase())}`,
+      );
       router.prefetch(`/district/${encodeURIComponent(district)}`);
     });
   }, [router]);
@@ -128,7 +158,10 @@ export default function JharkhandMap({
         }
       })
       .catch((err) => {
-        console.warn("Could not fetch live district summary, using defaults:", err);
+        console.warn(
+          "Could not fetch live district summary, using defaults:",
+          err,
+        );
       });
 
     return () => {
@@ -152,11 +185,14 @@ export default function JharkhandMap({
     if (typeof window === "undefined" || !svgRef.current) return;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    const districtPaths = svgRef.current.querySelectorAll<SVGPathElement>(".district-path");
-    const textLabels = svgRef.current.querySelectorAll<SVGTextElement>(".district-text-label");
+    const districtPaths =
+      svgRef.current.querySelectorAll<SVGPathElement>(".district-path");
+    const textLabels = svgRef.current.querySelectorAll<SVGTextElement>(
+      ".district-text-label",
+    );
 
     if (prefersReducedMotion) {
       districtPaths.forEach((el) => {
@@ -189,13 +225,15 @@ export default function JharkhandMap({
     if (onSelectDistrict) {
       onSelectDistrict(districtName);
     } else {
-      router.push(`/district/${encodeURIComponent(districtName.toLowerCase())}`);
+      router.push(
+        `/district/${encodeURIComponent(districtName.toLowerCase())}`,
+      );
     }
   };
 
   const handleMouseEnter = (
     e: React.MouseEvent<SVGPathElement>,
-    district: DistrictGeoPath
+    district: DistrictGeoPath,
   ) => {
     // Bring hovered path element to top of SVG render stack to prevent border clipping
     if (e.currentTarget && e.currentTarget.parentNode) {
@@ -245,7 +283,8 @@ export default function JharkhandMap({
               </h2>
             </div>
             <p className="text-xs text-civic-textMuted mt-0.5">
-              Geographic choropleth map of all 24 districts (Click any district to view logged issues)
+              Geographic choropleth map of all 24 districts (Click any district
+              to view logged issues)
             </p>
           </div>
 
@@ -266,7 +305,9 @@ export default function JharkhandMap({
                 className="w-2.5 h-2.5 inline-block rounded-xs"
                 style={{ backgroundColor: "#6096BA" }}
               />
-              <span className="text-[10.5px] text-civic-primary font-medium">Mod (35-70)</span>
+              <span className="text-[10.5px] text-civic-primary font-medium">
+                Mod (35-70)
+              </span>
             </div>
             <div className="flex items-center space-x-1">
               <span
@@ -348,7 +389,10 @@ export default function JharkhandMap({
           {/* 24 District Features: Paths and Labels */}
           <g id="jharkhand-districts-layer">
             {geoConfig.districts.map((district) => {
-              const stat = activeData[district.name] || { count: 0, density: 0 };
+              const stat = activeData[district.name] || {
+                count: 0,
+                density: 0,
+              };
               const fillColor = getDensityColor(stat.density);
               const isSelected = selectedDistrict === district.name;
 
@@ -399,7 +443,8 @@ export default function JharkhandMap({
                   fontWeight="600"
                   fontFamily="Inter, -apple-system, BlinkMacSystemFont, sans-serif"
                   style={{
-                    textShadow: "0 1px 3px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.9)",
+                    textShadow:
+                      "0 1px 3px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.9)",
                     letterSpacing: "-0.01em",
                     pointerEvents: "none",
                     opacity: 1,
@@ -407,18 +452,30 @@ export default function JharkhandMap({
                 >
                   {district.name === "Seraikela Kharsawan" ? (
                     <>
-                      <tspan x={cx} dy="-5">Seraikela</tspan>
-                      <tspan x={cx} dy="10">Kharsawan</tspan>
+                      <tspan x={cx} dy="-5">
+                        Seraikela
+                      </tspan>
+                      <tspan x={cx} dy="10">
+                        Kharsawan
+                      </tspan>
                     </>
                   ) : district.name === "East Singhbhum" ? (
                     <>
-                      <tspan x={cx} dy="-5">East</tspan>
-                      <tspan x={cx} dy="10">Singhbhum</tspan>
+                      <tspan x={cx} dy="-5">
+                        East
+                      </tspan>
+                      <tspan x={cx} dy="10">
+                        Singhbhum
+                      </tspan>
                     </>
                   ) : district.name === "West Singhbhum" ? (
                     <>
-                      <tspan x={cx} dy="-5">West</tspan>
-                      <tspan x={cx} dy="10">Singhbhum</tspan>
+                      <tspan x={cx} dy="-5">
+                        West
+                      </tspan>
+                      <tspan x={cx} dy="10">
+                        Singhbhum
+                      </tspan>
                     </>
                   ) : (
                     district.name
@@ -453,7 +510,9 @@ export default function JharkhandMap({
             </div>
             <div className="flex justify-between gap-4">
               <span>Density Index:</span>
-              <span className="font-bold text-white">{tooltip.density}/100</span>
+              <span className="font-bold text-white">
+                {tooltip.density}/100
+              </span>
             </div>
           </div>
         )}
@@ -463,7 +522,8 @@ export default function JharkhandMap({
       {!compact && (
         <div className="w-full text-left mt-2 flex flex-col sm:flex-row justify-between text-[11px] text-civic-textMuted">
           <p>
-            * Official district boundaries rendered from Survey/Census spatial data (CC BY 4.0).
+            * Official district boundaries rendered from Survey/Census spatial
+            data (CC BY 4.0).
           </p>
           <p className="italic">
             Click any district for public grievance records &amp; HEI projects
@@ -473,4 +533,3 @@ export default function JharkhandMap({
     </div>
   );
 }
-
