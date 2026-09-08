@@ -525,7 +525,7 @@ export default function CollegeDashboardPage({
                 />
               </div>
 
-              <div className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+              <div className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 no-scrollbar scrollbar-none">
                 <Filter className="w-4 h-4 text-slate-500 flex-shrink-0" />
                 <span className="text-xs font-semibold text-slate-600 flex-shrink-0">Domain:</span>
                 <select

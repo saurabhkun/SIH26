@@ -1660,7 +1660,7 @@ export default function GovDashboardClient({ initialTab = "analytics" }: { initi
       </div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-2 border-b border-civic-border mb-6 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex items-center gap-2 border-b border-civic-border mb-6 overflow-x-auto pb-1 no-scrollbar scrollbar-none">
         {tabs.map((t) => {
           const isActive = activeTab === t.id;
           return (

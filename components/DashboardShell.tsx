@@ -192,12 +192,7 @@ export default function DashboardShell({
               const isCurrent =
                 item.active !== undefined
                   ? item.active
-                  : pathname === item.href ||
-                    (item.href !== "/dashboard/gov" &&
-                      item.href !== "/dashboard/college" &&
-                      item.href !== "/dashboard/industry" &&
-                      item.href.length > 2 &&
-                      pathname.startsWith(item.href));
+                  : pathname === item.href;
 
               return (
                 <Link
