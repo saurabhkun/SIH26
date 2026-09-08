@@ -120,11 +120,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFEFD3]/30 flex flex-col justify-between text-[#001B2E]">
+    <div className="min-h-screen bg-[#001B2E] flex flex-col justify-between text-[#FFEFD3]">
       {/* Top Banner */}
-      <div className="bg-[#001B2E] text-white py-2.5 px-4 sm:px-8 border-b border-[#FFC49B]/30 flex justify-between items-center text-xs">
+      <div className="bg-[#001422] text-white py-2.5 px-4 sm:px-8 border-b border-[#294C60]/80 flex justify-between items-center text-xs">
         <div className="flex items-center space-x-2">
-          <span className="font-semibold tracking-wider uppercase text-[11px]">Government of Jharkhand</span>
+          <span className="font-semibold tracking-wider uppercase text-[11px] text-white">Government of Jharkhand</span>
           <span className="text-[#FFC49B]">|</span>
           <span className="text-[#ADB6C4]">Smart India Hackathon 2026 &bull; PS 26043</span>
         </div>
@@ -135,16 +135,16 @@ export default function RegisterPage() {
 
       {/* Main Container */}
       <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 flex flex-col justify-center">
-        <div className="bg-white border border-[#294C60]/20 rounded-md shadow-lg overflow-hidden">
+        <div className="bg-[#001625] border border-[#294C60] rounded-xs shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-[#001B2E] text-white p-6 sm:p-8 border-b border-[#FFC49B]/30">
+          <div className="bg-[#001422] text-white p-6 sm:p-8 border-b border-[#294C60]">
             <div className="flex items-center space-x-3 mb-2">
-              <span className="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-[#FFC49B] text-[#001B2E]">
+              <span className="px-2.5 py-0.5 rounded-xs text-[11px] font-bold uppercase tracking-wider bg-[#FFC49B] text-[#001B2E]">
                 Institutional Registration
               </span>
               <span className="text-xs text-[#ADB6C4]">CivicResolve Autonomous Network</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#FFEFD3]">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white">
               Join the State R&amp;D Innovation Ecosystem
             </h1>
             <p className="text-xs sm:text-sm text-[#ADB6C4] mt-1">
@@ -153,20 +153,20 @@ export default function RegisterPage() {
           </div>
 
           {/* Role Selector Tabs */}
-          <div className="grid grid-cols-2 border-b border-[#294C60]/15 bg-[#FFEFD3]/40">
+          <div className="grid grid-cols-2 border-b border-[#294C60] bg-[#001B2E]">
             <button
               type="button"
               onClick={() => {
                 setRole("college");
                 setErrorMsg("");
               }}
-              className={`py-3.5 px-4 flex items-center justify-center gap-2 font-semibold text-sm transition-colors border-b-2 ${
+              className={`py-3.5 px-4 flex items-center justify-center gap-2 font-semibold text-sm transition-colors border-b-2 cursor-pointer ${
                 role === "college"
-                  ? "bg-white text-[#001B2E] border-[#FFC49B] shadow-xs"
-                  : "text-[#294C60] border-transparent hover:bg-white/60"
+                  ? "bg-[#294C60]/60 text-white border-[#FFC49B] shadow-xs"
+                  : "text-[#ADB6C4] border-transparent hover:bg-[#294C60]/30 hover:text-white"
               }`}
             >
-              <GraduationCap className="w-5 h-5 text-[#294C60]" />
+              <GraduationCap className="w-5 h-5 text-[#FFC49B]" />
               <span>University / College</span>
             </button>
             <button
@@ -175,13 +175,13 @@ export default function RegisterPage() {
                 setRole("industry");
                 setErrorMsg("");
               }}
-              className={`py-3.5 px-4 flex items-center justify-center gap-2 font-semibold text-sm transition-colors border-b-2 ${
+              className={`py-3.5 px-4 flex items-center justify-center gap-2 font-semibold text-sm transition-colors border-b-2 cursor-pointer ${
                 role === "industry"
-                  ? "bg-white text-[#001B2E] border-[#FFC49B] shadow-xs"
-                  : "text-[#294C60] border-transparent hover:bg-white/60"
+                  ? "bg-[#294C60]/60 text-white border-[#FFC49B] shadow-xs"
+                  : "text-[#ADB6C4] border-transparent hover:bg-[#294C60]/30 hover:text-white"
               }`}
             >
-              <Briefcase className="w-5 h-5 text-[#294C60]" />
+              <Briefcase className="w-5 h-5 text-[#FFC49B]" />
               <span>Industry / CSR Partner</span>
             </button>
           </div>
@@ -207,7 +207,7 @@ export default function RegisterPage() {
                 {/* University Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
                       Institution Name *
                     </label>
                     <div className="relative">
@@ -218,13 +218,13 @@ export default function RegisterPage() {
                         value={institutionName}
                         onChange={(e) => setInstitutionName(e.target.value)}
                         placeholder="e.g. Birla Institute of Technology, Mesra / NIT Jamshedpur"
-                        className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                        className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
                       Official Institutional Email *
                     </label>
                     <div className="relative">
@@ -235,13 +235,13 @@ export default function RegisterPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="rnd.director@institution.ac.in"
-                        className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                        className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
                       District (Jharkhand) *
                     </label>
                     <div className="relative">
@@ -249,20 +249,20 @@ export default function RegisterPage() {
                       <select
                         value={district}
                         onChange={(e) => setDistrict(e.target.value)}
-                        className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B] bg-white"
+                        className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                       >
                         {JHARKHAND_DISTRICTS.map((d) => (
-                          <option key={d.name} value={d.name}>
-                            {d.name} ({d.division} Division)
+                          <option key={d.name} value={d.name} className="bg-[#001B2E] text-white">
+                            {d.name} ({d.division})
                           </option>
                         ))}
                       </select>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
-                      Faculty Lead / Dean Name *
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
+                      Primary Faculty Lead / Dean of R&amp;D *
                     </label>
                     <div className="relative">
                       <User className="w-4 h-4 absolute left-3 top-3 text-[#ADB6C4]" />
@@ -271,38 +271,39 @@ export default function RegisterPage() {
                         required
                         value={facultyLeadName}
                         onChange={(e) => setFacultyLeadName(e.target.value)}
-                        placeholder="Dr. Ananya Sen"
-                        className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                        placeholder="e.g. Dr. Sudhanshu Shekhar"
+                        className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                       />
                     </div>
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
-                      Lab Equipment &amp; Capabilities Tags (Type and press Enter)
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
+                      Available Specialized Lab Equipment &amp; R&amp;D Facilities
                     </label>
-                    <div className="relative">
+                    <div className="relative mb-2">
                       <FlaskConical className="w-4 h-4 absolute left-3 top-3 text-[#ADB6C4]" />
                       <input
                         type="text"
                         value={labEquipmentInput}
                         onChange={(e) => setLabEquipmentInput(e.target.value)}
                         onKeyDown={handleAddTag}
-                        placeholder="e.g. Gas Chromatography, Soil Nitrate Sensor, Drone Telemetry..."
-                        className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                        placeholder="Type equipment name and press Enter or comma (e.g. Water Quality Spectrophotometer)"
+                        className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                       />
                     </div>
-                    <div className="flex flex-wrap gap-2 mt-2.5">
+                    {/* Tags List */}
+                    <div className="flex flex-wrap gap-1.5">
                       {labEquipmentTags.map((tag) => (
                         <span
                           key={tag}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FFEFD3] text-[#001B2E] border border-[#FFC49B] text-xs font-medium"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#294C60]/50 text-[#FFEFD3] border border-[#294C60] rounded-xs text-xs font-medium"
                         >
                           {tag}
                           <button
                             type="button"
                             onClick={() => handleRemoveTag(tag)}
-                            className="text-[#294C60] hover:text-red-700 font-bold"
+                            className="text-[#FFC49B] hover:text-white font-bold ml-1 cursor-pointer"
                           >
                             &times;
                           </button>
@@ -314,11 +315,11 @@ export default function RegisterPage() {
               </>
             ) : (
               <>
-                {/* Industry Fields */}
+                {/* Industry / CSR Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
-                      Corporate / Foundation Name *
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
+                      Company / Foundation Name *
                     </label>
                     <div className="relative">
                       <Building2 className="w-4 h-4 absolute left-3 top-3 text-[#ADB6C4]" />
@@ -327,29 +328,15 @@ export default function RegisterPage() {
                         required
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
-                        placeholder="e.g. Tata Steel Foundation / Coal India CSR"
-                        className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                        placeholder="e.g. Tata Steel Foundation / Jindal CSR Wing"
+                        className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
-                      MCA CSR Registration Number *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={csrRegistrationNo}
-                      onChange={(e) => setCsrRegistrationNo(e.target.value)}
-                      placeholder="CSR00012345"
-                      className="w-full px-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
-                      Corporate Contact Email *
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
+                      Corporate / CSR Email Address *
                     </label>
                     <div className="relative">
                       <Mail className="w-4 h-4 absolute left-3 top-3 text-[#ADB6C4]" />
@@ -358,23 +345,37 @@ export default function RegisterPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="csr.lead@corporation.com"
-                        className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                        placeholder="csr.lead@company.com"
+                        className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                       />
                     </div>
                   </div>
 
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
+                      MCA CSR-1 Registration No. *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={csrRegistrationNo}
+                      onChange={(e) => setCsrRegistrationNo(e.target.value)}
+                      placeholder="e.g. CSR00012345"
+                      className="w-full px-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
+                    />
+                  </div>
+
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
-                      Primary CSR Domain Focus
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
+                      Primary CSR Mandate / Societal Domain *
                     </label>
                     <select
                       value={csrDomainFocus}
                       onChange={(e) => setCsrDomainFocus(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B] bg-white font-medium"
+                      className="w-full px-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                     >
                       {ISSUE_DOMAINS.map((domain) => (
-                        <option key={domain} value={domain}>
+                        <option key={domain} value={domain} className="bg-[#001B2E] text-white">
                           {domain}
                         </option>
                       ))}
@@ -385,9 +386,9 @@ export default function RegisterPage() {
             )}
 
             {/* Password Credentials */}
-            <div className="border-t border-[#294C60]/15 pt-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="border-t border-[#294C60]/60 pt-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
                   Account Password *
                 </label>
                 <div className="relative">
@@ -399,13 +400,13 @@ export default function RegisterPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min 6 characters"
-                    className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                    className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#294C60] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#FFEFD3] mb-1.5">
                   Confirm Password *
                 </label>
                 <div className="relative">
@@ -417,7 +418,7 @@ export default function RegisterPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter password"
-                    className="w-full pl-9 pr-3.5 py-2 text-sm border border-[#294C60]/30 rounded focus:outline-none focus:ring-2 focus:ring-[#FFC49B]"
+                    className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#001B2E] border border-[#294C60] rounded-xs text-white placeholder-[#ADB6C4]/50 focus:outline-none focus:ring-1 focus:ring-[#FFC49B] focus:border-[#FFC49B]"
                   />
                 </div>
               </div>
@@ -427,7 +428,7 @@ export default function RegisterPage() {
             <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4">
               <Link
                 href="/login"
-                className="text-xs font-semibold text-[#294C60] hover:text-[#001B2E] hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-[#FFC49B] hover:text-white hover:underline flex items-center gap-1"
               >
                 Already registered? Sign In &rarr;
               </Link>
@@ -435,24 +436,24 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto px-7 py-3 bg-[#001B2E] hover:bg-[#294C60] text-[#FFEFD3] font-bold text-sm rounded shadow-md transition-all flex items-center justify-center gap-2 border border-[#FFC49B]/30 disabled:opacity-60"
+                className="w-full sm:w-auto px-7 py-3 bg-[#FFC49B] hover:bg-[#FFC49B]/90 text-[#001B2E] font-bold text-sm rounded-xs shadow-md transition-all flex items-center justify-center gap-2 border border-[#FFC49B] disabled:opacity-60 cursor-pointer"
               >
                 {loading ? "Registering Institution..." : "Complete Registration"}
-                <ArrowRight className="w-4 h-4 text-[#FFC49B]" />
+                <ArrowRight className="w-4 h-4 text-[#001B2E]" />
               </button>
             </div>
           </form>
         </div>
 
         {/* Security Notice */}
-        <div className="mt-4 text-center text-xs text-[#294C60] flex items-center justify-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-emerald-700" />
+        <div className="mt-4 text-center text-xs text-[#ADB6C4] flex items-center justify-center gap-1.5">
+          <ShieldCheck className="w-4 h-4 text-emerald-400" />
           <span>Verified under Government of Jharkhand Societal Innovation Platform Protocol</span>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-[#294C60]/20 py-3 text-center text-xs text-[#294C60]">
+      <footer className="bg-[#001422] border-t border-[#294C60]/70 py-3 text-center text-xs text-[#ADB6C4]">
         &copy; 2026 Department of Higher &amp; Technical Education, Government of Jharkhand.
       </footer>
     </div>

@@ -12,35 +12,36 @@
   --navy: #001B2E;
   --navy-light: #294C60;
   --gold: #FFC49B;
-  --bg: #FFEFD3;
-  --ink: #001B2E;
+  --bg: #001B2E;
+  --ink: #FFEFD3;
 }
 
 body {
   background-color: var(--bg);
   color: var(--ink);
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-source-serif-4), Georgia, serif;
 }
 
-/* Custom theme scrollbars & utility styles */
+/* Custom dark blue theme scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FFEFD3;
+  background: #001624;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ADB6C4;
+  background: #294C60;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #294C60;
+  background: #FFC49B;
 }

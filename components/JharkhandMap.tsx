@@ -216,22 +216,22 @@ export default function JharkhandMap({
     <div className="w-full flex flex-col items-center" ref={containerRef}>
       {/* Map Header & Legend (Shown if not in compact mode) */}
       {!compact && (
-        <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-3 border-b border-slate-200">
+        <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-3 border-b border-[#294C60]/60">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-navy inline-block" />
-              <h2 className="text-base sm:text-lg font-serif font-bold text-navy">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FFC49B] inline-block" />
+              <h2 className="text-base sm:text-lg font-serif font-bold text-white">
                 Jharkhand District Civic Problem Density
               </h2>
             </div>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-[#ADB6C4] mt-0.5">
               Geographic choropleth map of all 24 districts (Click any district to view logged issues)
             </p>
           </div>
 
           {/* 3-Stop Color Legend */}
-          <div className="flex items-center space-x-3 text-xs text-slate-700 bg-white border border-slate-300 px-3 py-1.5 rounded-xs">
-            <span className="font-medium text-slate-500 text-[11px] uppercase tracking-wider">
+          <div className="flex items-center space-x-3 text-xs text-[#FFEFD3] bg-[#001422] border border-[#294C60] px-3 py-1.5 rounded-xs shadow-xs">
+            <span className="font-semibold text-[#ADB6C4] text-[11px] uppercase tracking-wider">
               Density:
             </span>
             <div className="flex items-center space-x-1">
@@ -244,9 +244,9 @@ export default function JharkhandMap({
             <div className="flex items-center space-x-1">
               <span
                 className="w-2.5 h-2.5 inline-block rounded-xs"
-                style={{ backgroundColor: "#C9A227" }}
+                style={{ backgroundColor: "#FFC49B" }}
               />
-              <span className="text-[10.5px]">Mod (35-70)</span>
+              <span className="text-[10.5px] text-[#FFC49B]">Mod (35-70)</span>
             </div>
             <div className="flex items-center space-x-1">
               <span
@@ -260,7 +260,7 @@ export default function JharkhandMap({
       )}
 
       {/* SVG Geographic Choropleth Map Container */}
-      <div className="w-full relative bg-[#F8FAFC] border border-slate-200 p-2 sm:p-3 rounded-xs overflow-hidden flex justify-center shadow-xs">
+      <div className="w-full relative bg-[#001422] border border-[#294C60] p-2 sm:p-3 rounded-xs overflow-hidden flex justify-center shadow-md">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${geoConfig.width} ${geoConfig.height}`}

@@ -28,14 +28,14 @@ export default function Home() {
       </div>
 
       {/* Main Navbar */}
-      <header className="bg-white border-b border-brand-slate/40 py-3.5 px-4 sm:px-8 shadow-xs">
+      <header className="bg-[#001422] border-b border-[#294C60]/70 py-3.5 px-4 sm:px-8 shadow-sm">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
             <Link href="/" className="group block">
-              <span className="text-2xl sm:text-3xl font-serif font-bold text-brand-prussian tracking-tight block leading-tight">
+              <span className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight block leading-tight">
                 CivicResolve
               </span>
-              <span className="text-[11px] sm:text-xs text-brand-charcoal block mt-0.5 tracking-normal">
+              <span className="text-[11px] sm:text-xs text-[#ADB6C4] block mt-0.5 tracking-normal">
                 Government of Jharkhand &middot; Department of Higher & Technical Education
               </span>
             </Link>
@@ -43,20 +43,20 @@ export default function Home() {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setIsWizardOpen(true)}
-              className="inline-flex items-center px-3.5 py-1.5 bg-brand-prussian text-brand-peach text-xs font-semibold border border-brand-peach/60 hover:bg-brand-charcoal transition-colors rounded-xs"
+              className="inline-flex items-center px-3.5 py-1.5 bg-[#FFC49B] text-[#001B2E] text-xs font-bold border border-[#FFC49B] hover:bg-[#FFC49B]/90 transition-colors rounded-xs shadow-xs cursor-pointer"
             >
-              <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-brand-peach" />
+              <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-[#001B2E]" />
               Report an Issue
             </button>
             <Link
               href="/register"
-              className="inline-flex items-center px-3.5 py-1.5 bg-brand-papaya text-brand-prussian text-xs font-semibold border border-brand-peach hover:bg-brand-peach/40 transition-colors rounded-xs"
+              className="inline-flex items-center px-3.5 py-1.5 bg-[#294C60]/60 text-[#FFEFD3] text-xs font-semibold border border-[#294C60] hover:bg-[#294C60] transition-colors rounded-xs"
             >
               Register
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center px-4 py-1.5 bg-slate-100 text-brand-prussian text-xs font-semibold border border-brand-slate/50 hover:bg-brand-papaya transition-colors rounded-xs"
+              className="inline-flex items-center px-4 py-1.5 bg-[#001B2E] text-[#FFEFD3] text-xs font-semibold border border-[#ADB6C4]/40 hover:bg-[#294C60]/40 transition-colors rounded-xs"
             >
               Login
             </Link>
@@ -65,35 +65,35 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-bg border-b border-slate-300 py-8 px-4 sm:px-8">
+      <section className="bg-[#001B2E] border-b border-[#294C60]/60 py-10 px-4 sm:px-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 text-navy bg-navy/5 border border-navy/20 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider mb-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-gold" />
+            <div className="inline-flex items-center gap-1.5 text-[#FFC49B] bg-[#294C60]/40 border border-[#FFC49B]/30 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider mb-3 rounded-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#FFC49B]" />
               <span>State Problem Sourcing & HEI Solution Bridge</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-navy leading-tight mb-2">
+            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white leading-tight mb-2">
               Report a civic problem in your district
             </h1>
-            <p className="text-sm sm:text-base text-slate-700 leading-normal">
+            <p className="text-sm sm:text-base text-[#ADB6C4] leading-relaxed">
               A state platform enabling citizens to log grassroots challenges across all 24 districts of Jharkhand for collaborative resolution by university research teams and industry partners.
             </p>
           </div>
 
-          <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2.5">
+          <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3">
             <button
               id="report-issue-hero-btn"
               onClick={() => setIsWizardOpen(true)}
-              className="px-5 py-2.5 bg-navy text-gold text-sm font-bold border border-gold hover:bg-navyLight flex items-center justify-center gap-2 shadow-xs"
+              className="px-5 py-2.5 bg-[#FFC49B] text-[#001B2E] text-sm font-bold border border-[#FFC49B] hover:bg-[#FFC49B]/90 flex items-center justify-center gap-2 shadow-md cursor-pointer rounded-xs"
             >
-              <PlusCircle className="w-4 h-4 text-gold" />
+              <PlusCircle className="w-4 h-4 text-[#001B2E]" />
               Report an Issue
             </button>
             <a
               href="#heatmap-section"
-              className="px-4 py-2.5 bg-white text-navy text-sm font-semibold border border-slate-300 hover:bg-slate-50 flex items-center justify-center gap-1.5"
+              className="px-4 py-2.5 bg-[#294C60]/40 text-[#FFEFD3] text-sm font-semibold border border-[#294C60] hover:bg-[#294C60] flex items-center justify-center gap-1.5 rounded-xs"
             >
-              <MapPin className="w-4 h-4 text-navy" />
+              <MapPin className="w-4 h-4 text-[#FFC49B]" />
               View District Map
             </a>
           </div>
@@ -102,7 +102,7 @@ export default function Home() {
 
       {/* Modal / Embedded Citizen Submission Wizard */}
       {isWizardOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-sm overflow-hidden">
           <CitizenSubmissionWizard
             onClose={() => setIsWizardOpen(false)}
             onCancel={() => setIsWizardOpen(false)}
@@ -114,21 +114,21 @@ export default function Home() {
       )}
 
       {/* Schematic Map Section */}
-      <section className="py-8 px-4 sm:px-8 flex-1">
+      <section className="py-8 px-4 sm:px-8 flex-1 bg-[#001625]">
         <div className="max-w-6xl mx-auto">
-          <div id="heatmap-section" className="border border-slate-300 bg-white p-4 sm:p-6">
+          <div id="heatmap-section" className="border border-[#294C60] bg-[#001B2E] p-4 sm:p-6 rounded-xs shadow-lg">
             <JharkhandMap />
           </div>
         </div>
       </section>
 
       {/* Plain Official Footer */}
-      <footer className="bg-white border-t border-slate-300 py-4 px-4 sm:px-8 text-xs text-slate-600 mt-auto">
+      <footer className="bg-[#001422] border-t border-[#294C60]/70 py-4 px-4 sm:px-8 text-xs text-[#ADB6C4] mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
             &copy; 2026 Department of Higher & Technical Education, Government of Jharkhand.
           </div>
-          <div className="text-slate-500">
+          <div className="text-[#ADB6C4]/80">
             CivicResolve Platform &bull; Public Transparency Portal
           </div>
         </div>
