@@ -259,15 +259,11 @@ export default function CitizenSubmissionWizard({
     }
   }, [description, title, isAiOverridden]);
 
-  // Handle Visual Challenge Card Selection
+  // Handle Visual Challenge Card Selection (Do NOT touch description or title state)
   const handleSelectChallenge = (option: VisualChallengeOption) => {
     setSelectedChallengeId(option.id);
     setSelectedDomain(option.domain);
     setSelectedSeverity(option.defaultSeverity);
-
-    if (!title) {
-      setTitle(option.exampleTitle);
-    }
   };
 
   // Handle File Upload & Convert to Data URL
@@ -544,27 +540,26 @@ export default function CitizenSubmissionWizard({
                 {VISUAL_CHALLENGES.map((option) => {
                   const isSelected = selectedChallengeId === option.id;
                   return (
-                    <button
+                    <div
                       key={option.id}
-                      type="button"
                       onClick={() => handleSelectChallenge(option)}
-                      className={`text-left p-3 border transition-all duration-150 flex flex-col justify-between rounded-lg relative group cursor-pointer ${
+                      className={`relative cursor-pointer rounded-xl border p-4 transition-all flex flex-col justify-between ${
                         isSelected
-                          ? "bg-navy/5 border-[#1E3A8A] ring-2 ring-[#1E3A8A] shadow-sm"
-                          : "bg-white border-slate-200 hover:border-[#1E3A8A]/60 hover:bg-slate-50/70"
+                          ? "border-[#1E3A8A] bg-blue-50/30 ring-1 ring-[#1E3A8A] shadow-xs"
+                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70"
                       }`}
                     >
                       {/* Active Checkmark Badge */}
                       {isSelected && (
-                        <div className="absolute top-2 right-2 w-4 h-4 bg-[#1E3A8A] text-white rounded-full flex items-center justify-center shadow-xs">
-                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        <div className="absolute top-2.5 right-2.5 w-5 h-5 bg-[#1E3A8A] text-white rounded-full flex items-center justify-center text-xs shadow-xs font-bold">
+                          ✓
                         </div>
                       )}
 
                       <div>
                         <div className="flex items-center space-x-2.5 mb-1.5">
                           <div
-                            className="p-2 rounded-xs flex items-center justify-center"
+                            className="p-2 rounded-lg flex items-center justify-center"
                             style={{
                               backgroundColor: option.bgLight,
                               border: `1px solid ${option.borderColor}55`,
@@ -573,7 +568,7 @@ export default function CitizenSubmissionWizard({
                             {renderChallengeIcon(option.iconName, option.color)}
                           </div>
                           <span
-                            className="text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-xs"
+                            className="text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
                             style={{
                               backgroundColor: `${option.color}15`,
                               color: option.color,
@@ -595,7 +590,7 @@ export default function CitizenSubmissionWizard({
                       <div className="text-[10.5px] text-slate-600 mt-2 line-clamp-2 leading-relaxed border-t border-slate-100 pt-1.5">
                         {option.description}
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -675,11 +670,12 @@ export default function CitizenSubmissionWizard({
               >
                 {/* Text Area */}
                 <textarea
+                  id="issue-description"
                   rows={4}
                   placeholder="Describe the problem, affected families, location, or tap the mic 🎙️ below to speak in Hindi or English..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-3 text-sm focus:outline-none resize-y border-none bg-transparent placeholder-slate-400 text-slate-900"
+                  className="w-full min-h-[140px] p-3 text-slate-800 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent outline-none resize-y"
                   required
                 />
 
