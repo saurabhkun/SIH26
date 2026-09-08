@@ -305,7 +305,7 @@ npm run seed
 | Role                                  | Email                         | Password        | Access Portal         |
 | :------------------------------------ | :---------------------------- | :-------------- | :-------------------- |
 | 🏛️ **State Nodal Officer**            | `officer@jharkhand.gov.in`    | `Gov@1234`      | `/dashboard/gov`      |
-| 🎓 **University Lead (BIT Mesra)**    | `rnd.director@bitmesra.ac.in` | `College@1234`  | `/dashboard/college`  |
+| 🎓 **University Lead (BIT Mesra)**    | `director.rnd@bitmesra.ac.in` | `College@1234`  | `/dashboard/college`  |
 | 🏭 **Industry CSR Head (Tata Steel)** | `csr.head@tatasteel.com`      | `Industry@1234` | `/dashboard/industry` |
 
 ### 4. Run Empirical Verification Suite

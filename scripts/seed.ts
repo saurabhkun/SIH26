@@ -100,7 +100,7 @@ async function runSeed() {
             email: "rverma@bitmesra.ac.in",
           },
         ],
-        email: "rnd.director@bitmesra.ac.in",
+        email: "director.rnd@bitmesra.ac.in",
         contactPerson: "Dr. A. K. Sinha (Dean R&D)",
         contactPhone: "+91-651-2275444",
         maxConcurrentClaims: 5,
@@ -394,7 +394,7 @@ async function runSeed() {
       },
       {
         name: "Dr. Ananya Sen",
-        email: "rnd.director@bitmesra.ac.in",
+        email: "director.rnd@bitmesra.ac.in",
         passwordHash: "College@1234",
         role: "college" as const,
         designation: "Dean of Research & Innovation",

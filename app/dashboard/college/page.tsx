@@ -441,7 +441,7 @@ export default function CollegeDashboardPage({
       role="college"
       roleTitle="University & College Innovation Portal"
       userName="Dr. Ananya Sen"
-      userEmail="rnd.director@bitmesra.ac.in"
+      userEmail="director.rnd@bitmesra.ac.in"
       designation="Dean of Research & Innovation"
       organizationOrCollege={
         profile?.name || "Birla Institute of Technology, Mesra"

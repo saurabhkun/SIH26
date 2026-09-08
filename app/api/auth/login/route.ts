@@ -26,9 +26,9 @@ const DEMO_ACCOUNTS: Record<
     designation: "State Nodal Review Officer",
     district: "Ranchi",
   },
-  "rnd.director@bitmesra.ac.in": {
+  "director.rnd@bitmesra.ac.in": {
     name: "Dr. Ananya Sen",
-    email: "rnd.director@bitmesra.ac.in",
+    email: "director.rnd@bitmesra.ac.in",
     passwordHash: "College@1234",
     role: "college",
     designation: "Dean of Research & Innovation",

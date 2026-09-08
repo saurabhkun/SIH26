@@ -258,7 +258,7 @@ export default function RegisterPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="rnd.director@institution.ac.in"
+                        placeholder="director.rnd@institution.ac.in"
                         className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-civic-border rounded-lg text-civic-textDark placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-civic-primary focus:border-civic-primary"
                       />
                     </div>

@@ -57,7 +57,7 @@ async function resolveCurrentCollege() {
           name: "Dr. Ananya Sen",
           department: "Civil & Environmental Engineering",
           specialization: "Groundwater Arsenic Remediation & Filtration",
-          email: "rnd.director@bitmesra.ac.in",
+          email: "director.rnd@bitmesra.ac.in",
         },
         {
           name: "Prof. Rajesh Verma",
@@ -66,7 +66,7 @@ async function resolveCurrentCollege() {
           email: "rverma@bitmesra.ac.in",
         },
       ],
-      email: "rnd.director@bitmesra.ac.in",
+      email: "director.rnd@bitmesra.ac.in",
       contactPerson: "Dr. A. K. Sinha (Dean R&D)",
       contactPhone: "+91-651-2275444",
       maxConcurrentClaims: 5,

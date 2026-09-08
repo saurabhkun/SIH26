@@ -46,7 +46,7 @@ const ROLES: RoleOption[] = [
     description:
       "University R&D Directors, Faculty Mentors, and Multidisciplinary Student Innovators.",
     icon: GraduationCap,
-    demoEmail: "rnd.director@bitmesra.ac.in",
+    demoEmail: "director.rnd@bitmesra.ac.in",
     demoPass: "College@1234",
     demoUser: "Dr. Ananya Sen (BIT Mesra)",
   },

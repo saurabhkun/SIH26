@@ -150,10 +150,10 @@ export async function POST(request: NextRequest) {
             name: "Dr. Ananya Sen",
             department: "Civil & Environmental Engineering",
             specialization: "Groundwater Arsenic Remediation & Filtration",
-            email: "rnd.director@bitmesra.ac.in",
+            email: "director.rnd@bitmesra.ac.in",
           },
         ],
-        email: "rnd.director@bitmesra.ac.in",
+        email: "director.rnd@bitmesra.ac.in",
         contactPerson: "Dr. A. K. Sinha (Dean R&D)",
         contactPhone: "+91-651-2275444",
         maxConcurrentClaims: 5,
@@ -324,7 +324,7 @@ export async function POST(request: NextRequest) {
       budgetRequested: Number(budgetRequested) || 150000,
       facultyLead: {
         name: facultyMentor.trim(),
-        email: college.email || "rnd.director@institution.ac.in",
+        email: college.email || "director.rnd@institution.ac.in",
         specialization:
           (college.capabilities && college.capabilities[0]) ||
           "Applied Research & Innovation",
