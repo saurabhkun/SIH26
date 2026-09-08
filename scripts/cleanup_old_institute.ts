@@ -153,12 +153,13 @@ async function runCleanup() {
     { email: "director.rnd@bitmesra.ac.in" },
     {
       $set: {
-        name: "BIT Mesra R&D Cell",
+        name: "Dr. Ananya Sen",
         email: "director.rnd@bitmesra.ac.in",
-        password: "$2a$10$YourHashedPasswordPlaceholderOrBcrypt",
+        passwordHash: "College@1234",
         role: "college",
+        designation: "Dean of Research & Innovation",
         district: "Ranchi",
-        collegeId: collegeDoc?._id,
+        college: collegeDoc?._id,
         isVerified: true,
         updatedAt: new Date(),
       },
