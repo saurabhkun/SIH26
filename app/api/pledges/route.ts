@@ -74,19 +74,30 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       proposalId,
+      companyName,
       organizationName,
       contactEmail,
+      csrEmail,
       isCSR,
       amountPledged,
+      pledgedAmount,
+      fundingAmount,
       mentorshipOffered,
       mentorshipNotes,
+      section135Mandate,
+      isSection135,
     } = body;
 
-    if (!proposalId || !amountPledged || Number(amountPledged) <= 0) {
+    const parsedAmount = Number(
+      pledgedAmount ?? amountPledged ?? fundingAmount ?? 0,
+    );
+
+    if (!proposalId || isNaN(parsedAmount) || parsedAmount < 1000) {
       return NextResponse.json(
         {
           success: false,
-          error: "proposalId and a positive amountPledged are required.",
+          error:
+            "proposalId and a valid pledged amount (minimum ₹1,000) are required.",
         },
         { status: 400 },
       );
@@ -101,20 +112,31 @@ export async function POST(request: NextRequest) {
     }
 
     const sessionUser = getCurrentUser();
-    const finalOrgName =
+    const rawOrg =
+      companyName ||
       organizationName ||
       sessionUser?.organizationName ||
       "Tata Steel Foundation";
-    const finalEmail =
-      contactEmail || sessionUser?.email || "csr.head@tatasteel.com";
+    const finalOrgName = String(rawOrg).trim();
+
+    const rawEmail =
+      contactEmail || csrEmail || sessionUser?.email || "csr.head@tatasteel.com";
+    const finalEmail = String(rawEmail).trim().toLowerCase();
+
+    const isCsrFlag =
+      isCSR !== false || section135Mandate === true || isSection135 === true;
 
     const newPledge = await IndustryPledge.create({
       proposal: proposal._id,
-      organizationName: finalOrgName.trim(),
-      contactEmail: finalEmail.trim().toLowerCase(),
-      isCSR: isCSR !== false,
-      amountPledged: Number(amountPledged),
+      proposalId: proposal._id,
+      companyName: finalOrgName,
+      organizationName: finalOrgName,
+      contactEmail: finalEmail,
+      isCSR: isCsrFlag,
+      pledgedAmount: parsedAmount,
+      amountPledged: parsedAmount,
       amountReleased: 0,
+      escrowBalance: 0,
       status: "Pledged",
       mentorshipOffered: !!mentorshipOffered,
       mentorshipNotes: mentorshipNotes?.trim() || "",
@@ -123,7 +145,7 @@ export async function POST(request: NextRequest) {
     const formattedAmount = (
       newPledge.amountPledged ??
       newPledge.pledgedAmount ??
-      Number(amountPledged)
+      parsedAmount
     ).toLocaleString("en-IN");
 
     return NextResponse.json({

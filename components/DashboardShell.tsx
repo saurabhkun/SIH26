@@ -188,7 +188,7 @@ export default function DashboardShell({
       </header>
 
       {/* Body Layout: Sticky Sidebar + Main Content Grid */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Sticky Left Sidebar Column */}
         <aside className="lg:col-span-3 sticky top-6 space-y-4">
           {/* Navigation Card */}
@@ -238,7 +238,7 @@ export default function DashboardShell({
         </aside>
 
         {/* Main Content Area */}
-        <main className="lg:col-span-9 min-w-0 bg-civic-surface border border-civic-border rounded-xl p-6 shadow-xs text-civic-textDark">
+        <main className="lg:col-span-9 min-w-0 bg-civic-surface border border-civic-border rounded-xl p-6 shadow-xs text-civic-textDark space-y-6">
           {children}
         </main>
       </div>

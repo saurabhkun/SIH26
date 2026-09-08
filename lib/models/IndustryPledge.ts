@@ -65,7 +65,7 @@ const IndustryPledgeSchema = new Schema<IIndustryPledge>(
       lowercase: true,
     },
     isCSR: { type: Boolean, default: true },
-    pledgedAmount: { type: Number, required: true, min: 0 },
+    pledgedAmount: { type: Number, required: true, min: 1000 },
     escrowBalance: { type: Number, default: 0, min: 0 },
     amountPledged: { type: Number },
     amountReleased: { type: Number, default: 0, min: 0 },
@@ -87,14 +87,36 @@ const IndustryPledgeSchema = new Schema<IIndustryPledge>(
 );
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+IndustryPledgeSchema.pre("validate", function (this: any, next) {
+  if (this.companyName && !this.organizationName) {
+    this.organizationName = this.companyName;
+  }
+  if (this.organizationName && !this.companyName) {
+    this.companyName = this.organizationName;
+  }
+  if (this.pledgedAmount != null && this.amountPledged == null) {
+    this.amountPledged = this.pledgedAmount;
+  }
+  if (this.amountPledged != null && this.pledgedAmount == null) {
+    this.pledgedAmount = this.amountPledged;
+  }
+  if (this.proposalId && !this.proposal) {
+    this.proposal = this.proposalId;
+  }
+  if (this.proposal && !this.proposalId) {
+    this.proposalId = this.proposal;
+  }
+  if (typeof next === "function") next();
+});
+
 IndustryPledgeSchema.pre("save", function (this: any) {
   if (this.companyName && !this.organizationName)
     this.organizationName = this.companyName;
   if (this.organizationName && !this.companyName)
     this.companyName = this.organizationName;
-  if (this.pledgedAmount && !this.amountPledged)
+  if (this.pledgedAmount != null && this.amountPledged == null)
     this.amountPledged = this.pledgedAmount;
-  if (this.amountPledged && !this.pledgedAmount)
+  if (this.amountPledged != null && this.pledgedAmount == null)
     this.pledgedAmount = this.amountPledged;
   if (this.proposalId && !this.proposal) this.proposal = this.proposalId;
   if (this.proposal && !this.proposalId) this.proposalId = this.proposal;

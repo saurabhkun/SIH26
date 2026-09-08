@@ -8,6 +8,7 @@ import { JHARKHAND_DISTRICTS } from "@/lib/data/districts";
 import { syncReportsToIssues } from "@/lib/utils/reportsAdapter";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface AssignedCollegeRef {
   _id: string;
@@ -24,15 +25,21 @@ export async function GET(
     await connectDB();
     await syncReportsToIssues();
 
-    const decodedName = decodeURIComponent(params.name);
+    const decodedName = decodeURIComponent(params.name || "").trim();
 
     // Find district metadata from official districts dataset
     const districtMeta = JHARKHAND_DISTRICTS.find(
       (d) => d.name.toLowerCase() === decodedName.toLowerCase(),
     );
 
+    const districtParam = (districtMeta ? districtMeta.name : decodedName).trim();
+    const escapedParam = districtParam.replace(
+      /[-[\]{}()*+?.,\\^$|#\s]/g,
+      "\\$&",
+    );
+
     const districtQuery = {
-      district: { $regex: new RegExp(`^${decodedName}$`, "i") },
+      district: { $regex: new RegExp(`^${escapedParam}$`, "i") },
     };
 
     // 1. Fetch all issues in this district

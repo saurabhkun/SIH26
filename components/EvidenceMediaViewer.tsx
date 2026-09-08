@@ -20,10 +20,15 @@ export const EvidenceMediaViewer: React.FC<MediaProps> = ({
 }) => {
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
-  // Filter and sanitize URLs
+  // Render real citizen uploads directly without inserting random placeholders
   const validUrls = (mediaUrls || [])
     .filter((u): u is string => typeof u === "string" && u.trim().length > 0)
-    .map((u, idx) => sanitizeMediaUrl(u, domain, idx));
+    .map((u, idx) => {
+      if (u.startsWith("data:image/") || u.startsWith("http://") || u.startsWith("https://")) {
+        return sanitizeMediaUrl(u, domain, idx);
+      }
+      return sanitizeMediaUrl(u, domain, idx);
+    });
 
   if (validUrls.length === 0) {
     return (

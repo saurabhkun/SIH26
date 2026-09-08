@@ -9,6 +9,7 @@ import { syncReportsToIssues } from "@/lib/utils/reportsAdapter";
 import DistrictDashboardView from "@/components/DistrictDashboardView";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface DistrictPageProps {
   params: {
@@ -38,7 +39,7 @@ interface IssueDocumentResult {
 }
 
 export default async function DistrictPage({ params }: DistrictPageProps) {
-  const decodedName = decodeURIComponent(params.districtName);
+  const decodedName = decodeURIComponent(params.districtName || "").trim();
 
   const districtMeta = JHARKHAND_DISTRICTS.find(
     (d) => d.name.toLowerCase() === decodedName.toLowerCase(),
@@ -58,8 +59,13 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
     await connectDB();
     await syncReportsToIssues();
 
+    const districtParam = targetName.trim();
+    const escapedParam = districtParam.replace(
+      /[-[\]{}()*+?.,\\^$|#\s]/g,
+      "\\$&",
+    );
     const districtQuery = {
-      district: { $regex: new RegExp(`^${targetName}$`, "i") },
+      district: { $regex: new RegExp(`^${escapedParam}$`, "i") },
     };
 
     // 1. Fetch issues in this district

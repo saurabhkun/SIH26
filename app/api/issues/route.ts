@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
       location,
       severityScore = 3,
       attachments = [],
+      mediaUrls = [],
       aiTags = [],
     } = body;
 
@@ -140,13 +141,10 @@ export async function POST(request: NextRequest) {
     const existingSimilar = await Issue.find({
       $or: [
         { dedupFingerprint },
-        {
-          district: { $regex: new RegExp(`^${district}$`, "i") },
-          domain,
-        },
+        { district: district.trim(), domain },
       ],
     })
-      .select("_id trackingCode title dedupFingerprint")
+      .select("_id dedupFingerprint title trackingCode")
       .limit(5)
       .lean();
 
@@ -181,7 +179,12 @@ export async function POST(request: NextRequest) {
 
     const submissionIndexForMobile = recentSubmissionsCount + 1;
 
-    // 6. Sanitize & Prepare Attachments
+    // 6. Sanitize & Prepare Attachments & Media URLs
+    const rawMediaUrls = Array.isArray(mediaUrls) ? mediaUrls : [];
+    const directMediaUrls = rawMediaUrls.filter(
+      (u): u is string => typeof u === "string" && u.trim().length > 0,
+    );
+
     const rawAttachments = Array.isArray(attachments) ? attachments : [];
     const sanitizedAttachments =
       rawAttachments.length > 0
@@ -197,19 +200,31 @@ export async function POST(request: NextRequest) {
               filename: att.filename || `field_evidence_${idx + 1}.jpg`,
             }),
           )
-        : [
-            {
-              url: getContextualMediaUrl(domain, 0),
+        : directMediaUrls.length > 0
+          ? directMediaUrls.map((u, idx) => ({
+              url: u,
               type: "photo" as const,
-              filename: "field_evidence.jpg",
-            },
-          ];
+              filename: `field_evidence_${idx + 1}.jpg`,
+            }))
+          : [
+              {
+                url: getContextualMediaUrl(domain, 0),
+                type: "photo" as const,
+                filename: "field_evidence.jpg",
+              },
+            ];
+
+    const finalMediaUrls =
+      directMediaUrls.length > 0
+        ? directMediaUrls
+        : sanitizedAttachments.map((a) => a.url);
 
     // 7. Save Issue Document
     const newIssue = await Issue.create({
       title: title.trim(),
       description: description.trim(),
       attachments: sanitizedAttachments,
+      mediaUrls: finalMediaUrls,
       domain,
       severityScore: Math.min(5, Math.max(1, Number(severityScore) || 3)),
       aiTags,

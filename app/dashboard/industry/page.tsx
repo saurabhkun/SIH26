@@ -196,18 +196,25 @@ export default function IndustryDashboardPage({
 
     try {
       // 1. Create Pledge record
+      const payload = {
+        proposalId: pledgeModalProposal._id,
+        companyName: (orgName || "").trim(),
+        organizationName: (orgName || "").trim(),
+        contactEmail: (contactEmail || "").trim(),
+        csrEmail: (contactEmail || "").trim(),
+        pledgedAmount: Number(pledgeAmount),
+        amountPledged: Number(pledgeAmount),
+        fundingAmount: Number(pledgeAmount),
+        mentorshipNotes: mentorshipNotes || "",
+        section135Mandate: isCSR,
+        isCSR: isCSR,
+        mentorshipOffered: true,
+      };
+
       const resPledge = await fetch("/api/pledges", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          proposalId: pledgeModalProposal._id,
-          organizationName: orgName,
-          contactEmail: contactEmail,
-          isCSR: isCSR,
-          amountPledged: Number(pledgeAmount),
-          mentorshipOffered: true,
-          mentorshipNotes: mentorshipNotes,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const pledgeData = await resPledge.json();
@@ -499,7 +506,7 @@ export default function IndustryDashboardPage({
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                 {filteredProposals.map((prop) => {
                   const mediaList =
                     prop.issue?.mediaUrls && prop.issue.mediaUrls.length > 0
@@ -1051,7 +1058,7 @@ export default function IndustryDashboardPage({
                       <DollarSign className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
                       <input
                         type="number"
-                        min="10000"
+                        min="1000"
                         step="5000"
                         required
                         value={pledgeAmount}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Droplets,
   Sprout,
@@ -50,6 +51,7 @@ interface MockFile {
   name: string;
   size: string;
   type: "photo" | "document" | "video";
+  dataUrl?: string;
 }
 
 // Global declaration for Web Speech Recognition API
@@ -100,6 +102,7 @@ export default function CitizenSubmissionWizard({
   onClose,
   defaultDistrict = "Ranchi",
 }: CitizenSubmissionWizardProps) {
+  const router = useRouter();
   const handleClose = onClose || onCancel;
 
   // Step state (1 = Challenge Selection & Description, 2 = Spatiotemporal, 3 = Identity & Verification, 4 = Success)
@@ -267,23 +270,38 @@ export default function CitizenSubmissionWizard({
     }
   };
 
-  // Handle File Upload
+  // Handle File Upload & Convert to Data URL
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles: MockFile[] = Array.from(e.target.files).map((f) => {
+      const selectedFiles = Array.from(e.target.files);
+      selectedFiles.forEach((f) => {
         const isDoc =
           f.name.endsWith(".pdf") ||
           f.name.endsWith(".doc") ||
           f.name.endsWith(".docx");
         const isVid = f.name.endsWith(".mp4") || f.name.endsWith(".mov");
         const sizeMb = (f.size / (1024 * 1024)).toFixed(1);
-        return {
-          name: f.name,
-          size: `${sizeMb} MB`,
-          type: isDoc ? "document" : isVid ? "video" : "photo",
+        const fileType: "photo" | "document" | "video" = isDoc
+          ? "document"
+          : isVid
+          ? "video"
+          : "photo";
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64Url = event.target?.result as string;
+          setFiles((prev) => [
+            ...prev,
+            {
+              name: f.name,
+              size: `${sizeMb} MB`,
+              type: fileType,
+              dataUrl: base64Url || "",
+            },
+          ]);
         };
+        reader.readAsDataURL(f);
       });
-      setFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
@@ -325,6 +343,10 @@ export default function CitizenSubmissionWizard({
     setSubmitError("");
 
     try {
+      const realUserMediaUrls = files
+        .filter((f) => f.dataUrl && f.dataUrl.length > 0)
+        .map((f) => f.dataUrl as string);
+
       const payload = {
         title:
           title.trim() ||
@@ -340,8 +362,9 @@ export default function CitizenSubmissionWizard({
         citizenName: citizenName.trim(),
         citizenMobile: citizenMobile.trim(),
         aiTags,
+        mediaUrls: realUserMediaUrls,
         attachments: files.map((f, idx) => ({
-          url: getContextualMediaUrl(selectedDomain, idx),
+          url: f.dataUrl || getContextualMediaUrl(selectedDomain, idx),
           type: f.type,
           filename: f.name,
         })),
@@ -365,6 +388,9 @@ export default function CitizenSubmissionWizard({
         submissionIndexForMobile: data.submissionIndexForMobile,
         district,
       });
+
+      // Refresh client router to update district pages immediately
+      router.refresh();
 
       setStep(4);
       if (onSuccess) {
@@ -1204,6 +1230,7 @@ export default function CitizenSubmissionWizard({
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4 border-t border-slate-200">
               <Link
                 href={`/district/${encodeURIComponent(submissionResult.district)}`}
+                onClick={() => router.refresh()}
                 className="inline-flex items-center justify-center px-4 py-2 bg-navy text-gold text-xs font-semibold border border-gold/50 hover:bg-navyLight"
               >
                 View {submissionResult.district} Dashboard &rarr;
