@@ -109,12 +109,10 @@ export default function CitizenSubmissionWizard({
   const [step, setStep] = useState<number>(1);
 
   // Selected Visual Challenge Option (Defaults to null to force intentional selection)
-  const [selectedChallengeId, setSelectedChallengeId] = useState<string | null>(
-    null,
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Step 1 Form State
-  const [title, setTitle] = useState("");
+  const [headline, setHeadline] = useState("");
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState<MockFile[]>([]);
   const [selectedDomain, setSelectedDomain] =
@@ -213,10 +211,10 @@ export default function CitizenSubmissionWizard({
             : trimmedSpoken;
           setDescription(combined);
 
-          if (!title) {
+          if (!headline) {
             const firstWords = trimmedSpoken.split(" ").slice(0, 7).join(" ");
             if (firstWords.length > 4) {
-              setTitle(firstWords);
+              setHeadline(firstWords);
             }
           }
         }
@@ -246,26 +244,26 @@ export default function CitizenSubmissionWizard({
   // Run AI classification as citizen types or speaks description
   useEffect(() => {
     if (description.length >= 10) {
-      const res = classifyIssueDescription(description, title);
+      const res = classifyIssueDescription(description, headline);
       setAiSuggestedDomain(res.suggestedDomain);
       setAiSuggestedSeverity(res.suggestedSeverity);
       setAiTags(res.aiTags);
       setAiConfidence(res.confidence);
 
-      if (!isAiOverridden) {
+      if (!isAiOverridden && !selectedCategory) {
         setSelectedDomain(res.suggestedDomain);
         setSelectedSeverity(res.suggestedSeverity);
       }
     }
-  }, [description, title, isAiOverridden]);
+  }, [description, headline, isAiOverridden, selectedCategory]);
 
-  // Handle Visual Challenge Card Selection (Dynamically populate headline, keep description untouched)
-  const handleSelectChallenge = (option: VisualChallengeOption) => {
-    setSelectedChallengeId(option.id);
-    setSelectedDomain(option.domain);
-    setSelectedSeverity(option.defaultSeverity);
-    // Automatically populate/override headline with the selected category title
-    setTitle(option.title);
+  // Handle Category Card Selection (Directly wire category title to headline input)
+  const handleCategorySelect = (cat: VisualChallengeOption) => {
+    setSelectedCategory(cat.id);
+    setSelectedDomain(cat.domain);
+    setSelectedSeverity(cat.defaultSeverity);
+    // Overwrite headline with the selected category title
+    setHeadline(cat.title);
   };
 
   // Handle File Upload & Convert to Data URL
@@ -347,8 +345,8 @@ export default function CitizenSubmissionWizard({
 
       const payload = {
         title:
-          title.trim() ||
-          VISUAL_CHALLENGES.find((c) => c.id === selectedChallengeId)?.title ||
+          headline.trim() ||
+          VISUAL_CHALLENGES.find((c) => c.id === selectedCategory)?.title ||
           "Grassroots Civic Issue",
         description: description.trim(),
         domain: selectedDomain,
@@ -539,12 +537,12 @@ export default function CitizenSubmissionWizard({
 
               {/* 8 Visual Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                {VISUAL_CHALLENGES.map((option) => {
-                  const isSelected = selectedChallengeId === option.id;
+                {VISUAL_CHALLENGES.map((cat) => {
+                  const isSelected = selectedCategory === cat.id;
                   return (
                     <div
-                      key={option.id}
-                      onClick={() => handleSelectChallenge(option)}
+                      key={cat.id}
+                      onClick={() => handleCategorySelect(cat)}
                       className={`cursor-pointer rounded-xl border p-4 transition-all flex flex-col justify-between relative ${
                         isSelected
                           ? "border-[#1E3A8A] bg-blue-50/40 ring-1 ring-[#1E3A8A] shadow-xs"
@@ -563,34 +561,34 @@ export default function CitizenSubmissionWizard({
                           <div
                             className="p-2 rounded-lg flex items-center justify-center"
                             style={{
-                              backgroundColor: option.bgLight,
-                              border: `1px solid ${option.borderColor}55`,
+                              backgroundColor: cat.bgLight,
+                              border: `1px solid ${cat.borderColor}55`,
                             }}
                           >
-                            {renderChallengeIcon(option.iconName, option.color)}
+                            {renderChallengeIcon(cat.iconName, cat.color)}
                           </div>
                           <span
                             className="text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
                             style={{
-                              backgroundColor: `${option.color}15`,
-                              color: option.color,
-                              border: `1px solid ${option.color}33`,
+                              backgroundColor: `${cat.color}15`,
+                              color: cat.color,
+                              border: `1px solid ${cat.color}33`,
                             }}
                           >
-                            {option.badge}
+                            {cat.badge}
                           </span>
                         </div>
 
                         <div className="font-bold text-xs text-navy leading-snug line-clamp-2">
-                          {option.title}
+                          {cat.title}
                         </div>
                         <div className="text-[11px] font-medium text-slate-500 mt-0.5">
-                          {option.hindiTitle}
+                          {cat.hindiTitle}
                         </div>
                       </div>
 
                       <div className="text-[10.5px] text-slate-600 mt-2 line-clamp-2 leading-relaxed border-t border-slate-100 pt-1.5">
-                        {option.description}
+                        {cat.description}
                       </div>
                     </div>
                   );
@@ -600,15 +598,15 @@ export default function CitizenSubmissionWizard({
 
             {/* SECTION B: Issue Headline / Summary */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                 Issue Headline / Summary <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. High Fluoride in Handpumps of Bhandra Panchayat"
-                className="w-full px-3.5 py-2.5 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent outline-none transition"
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
+                placeholder="Select a category above or type custom headline..."
+                className="w-full px-3.5 py-2.5 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent outline-none font-medium transition"
                 required
               />
             </div>
@@ -906,7 +904,7 @@ export default function CitizenSubmissionWizard({
             <div className="flex justify-end pt-4 border-t border-slate-200">
               <button
                 type="button"
-                disabled={!selectedChallengeId || !title.trim() || description.trim().length < 10}
+                disabled={!selectedCategory || !headline.trim() || description.trim().length < 10}
                 onClick={() => {
                   if (isListening) toggleListening();
                   setStep(2);
@@ -1237,8 +1235,8 @@ export default function CitizenSubmissionWizard({
                 type="button"
                 onClick={() => {
                   setStep(1);
-                  setSelectedChallengeId(null);
-                  setTitle("");
+                  setSelectedCategory(null);
+                  setHeadline("");
                   setDescription("");
                   setFiles([]);
                   setMobileVerified(false);
