@@ -11,6 +11,8 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![SIH 2026](https://img.shields.io/badge/SIH%202026-PS%2026043-FFC49B?style=for-the-badge&logo=gov.uk&logoColor=001B2E)](https://sih.gov.in/)
 
+> 🌐 **Live Demo & Production Deployment:** [https://civic-ressolve.vercel.app/](https://civic-ressolve.vercel.app/)
+> 
 > **Intake Triage & Circuit Breaker · 4-Factor AI Decision Matrix · 5-Stage Contingency Escalation Ladder · Hierarchical L1/L2 ➔ L3 Subcontracting · Milestone-Based CSR Capital Escrow · Full-Stack GovTech Architecture**
 
 ---
@@ -265,6 +267,8 @@ SIH/
 ---
 
 ## ⚙️ Quick Start & Execution
+
+> 🚀 **Explore Live Demo Directly:** [https://civic-ressolve.vercel.app/](https://civic-ressolve.vercel.app/) (No local installation needed)
 
 ### Prerequisites
 
