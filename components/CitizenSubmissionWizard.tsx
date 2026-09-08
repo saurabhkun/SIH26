@@ -108,9 +108,9 @@ export default function CitizenSubmissionWizard({
   // Step state (1 = Challenge Selection & Description, 2 = Spatiotemporal, 3 = Identity & Verification, 4 = Success)
   const [step, setStep] = useState<number>(1);
 
-  // Selected Visual Challenge Option
-  const [selectedChallengeId, setSelectedChallengeId] = useState<string>(
-    "water-contamination",
+  // Selected Visual Challenge Option (Defaults to null to force intentional selection)
+  const [selectedChallengeId, setSelectedChallengeId] = useState<string | null>(
+    null,
   );
 
   // Step 1 Form State
@@ -548,15 +548,15 @@ export default function CitizenSubmissionWizard({
                       key={option.id}
                       type="button"
                       onClick={() => handleSelectChallenge(option)}
-                      className={`text-left p-3 border transition-all duration-150 flex flex-col justify-between rounded-xs relative group ${
+                      className={`text-left p-3 border transition-all duration-150 flex flex-col justify-between rounded-lg relative group cursor-pointer ${
                         isSelected
-                          ? "bg-navy/5 border-navy ring-1 ring-navy shadow-sm"
-                          : "bg-white border-slate-200 hover:border-slate-400 hover:bg-slate-50/70"
+                          ? "bg-navy/5 border-[#1E3A8A] ring-2 ring-[#1E3A8A] shadow-sm"
+                          : "bg-white border-slate-200 hover:border-[#1E3A8A]/60 hover:bg-slate-50/70"
                       }`}
                     >
                       {/* Active Checkmark Badge */}
                       {isSelected && (
-                        <div className="absolute top-2 right-2 w-4 h-4 bg-navy text-gold rounded-full flex items-center justify-center shadow-xs">
+                        <div className="absolute top-2 right-2 w-4 h-4 bg-[#1E3A8A] text-white rounded-full flex items-center justify-center shadow-xs">
                           <Check className="w-2.5 h-2.5 stroke-[3]" />
                         </div>
                       )}
@@ -908,12 +908,12 @@ export default function CitizenSubmissionWizard({
             <div className="flex justify-end pt-4 border-t border-slate-200">
               <button
                 type="button"
-                disabled={!title.trim() || description.trim().length < 10}
+                disabled={!selectedChallengeId || !title.trim() || description.trim().length < 10}
                 onClick={() => {
                   if (isListening) toggleListening();
                   setStep(2);
                 }}
-                className="inline-flex items-center px-6 py-2.5 bg-navy text-gold text-xs font-bold border border-gold/40 hover:bg-navyLight disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors"
+                className="px-5 py-2.5 rounded-lg font-semibold text-xs transition-all duration-150 ease-in-out bg-white text-[#1E3A8A] border border-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed cursor-pointer shadow-xs inline-flex items-center"
               >
                 Next: District & Location
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
@@ -1004,7 +1004,7 @@ export default function CitizenSubmissionWizard({
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="inline-flex items-center px-4 py-2 bg-white text-slate-700 text-xs font-medium border border-slate-300 hover:bg-slate-50"
+                className="inline-flex items-center px-4 py-2 bg-white text-slate-700 text-xs font-medium border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
                 Back
@@ -1012,7 +1012,7 @@ export default function CitizenSubmissionWizard({
               <button
                 type="button"
                 onClick={() => setStep(3)}
-                className="inline-flex items-center px-5 py-2 bg-navy text-gold text-xs font-semibold border border-gold/40 hover:bg-navyLight"
+                className="inline-flex items-center px-5 py-2.5 rounded-lg font-semibold text-xs transition-all duration-150 ease-in-out bg-white text-[#1E3A8A] border border-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed cursor-pointer shadow-xs"
               >
                 Next: Verification
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
@@ -1119,7 +1119,7 @@ export default function CitizenSubmissionWizard({
                   <button
                     type="button"
                     onClick={handleVerifyOtp}
-                    className="px-4 py-1.5 bg-navy text-gold text-xs font-semibold border border-gold/40 hover:bg-navyLight"
+                    className="px-4 py-1.5 rounded-lg font-semibold text-xs transition-all duration-150 ease-in-out bg-white text-[#1E3A8A] border border-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed cursor-pointer shadow-xs"
                   >
                     Verify OTP
                   </button>
@@ -1140,7 +1140,7 @@ export default function CitizenSubmissionWizard({
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="inline-flex items-center px-4 py-2 bg-white text-slate-700 text-xs font-medium border border-slate-300 hover:bg-slate-50"
+                className="inline-flex items-center px-4 py-2 bg-white text-slate-700 text-xs font-medium border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
                 Back
@@ -1150,7 +1150,7 @@ export default function CitizenSubmissionWizard({
                 disabled={
                   isSubmitting || !citizenName.trim() || !mobileVerified
                 }
-                className="inline-flex items-center px-6 py-2 bg-navy text-gold text-xs font-bold border border-gold hover:bg-navyLight disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-6 py-2.5 rounded-lg font-semibold text-xs transition-all duration-150 ease-in-out bg-white text-[#1E3A8A] border border-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed cursor-pointer shadow-xs"
               >
                 {isSubmitting
                   ? "Submitting Challenge..."
@@ -1231,7 +1231,7 @@ export default function CitizenSubmissionWizard({
               <Link
                 href={`/district/${encodeURIComponent(submissionResult.district)}`}
                 onClick={() => router.refresh()}
-                className="inline-flex items-center justify-center px-4 py-2 bg-navy text-gold text-xs font-semibold border border-gold/50 hover:bg-navyLight"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-semibold text-xs transition-all duration-150 ease-in-out bg-white text-[#1E3A8A] border border-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white shadow-xs cursor-pointer"
               >
                 View {submissionResult.district} Dashboard &rarr;
               </Link>
@@ -1239,6 +1239,7 @@ export default function CitizenSubmissionWizard({
                 type="button"
                 onClick={() => {
                   setStep(1);
+                  setSelectedChallengeId(null);
                   setTitle("");
                   setDescription("");
                   setFiles([]);
@@ -1247,7 +1248,7 @@ export default function CitizenSubmissionWizard({
                   setEnteredOtp("");
                   setSubmissionResult(null);
                 }}
-                className="inline-flex items-center justify-center px-4 py-2 bg-white text-slate-700 text-xs font-medium border border-slate-300 hover:bg-slate-50"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-medium text-xs bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 Report Another Challenge
               </button>
