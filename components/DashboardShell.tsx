@@ -179,11 +179,12 @@ export default function DashboardShell({
         </div>
       </header>
 
-      {/* Body Layout: Sidebar + Main Content */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 py-6 flex-1 flex flex-col md:flex-row gap-6">
-        {/* Sidebar Nav */}
-        <aside className="w-full md:w-64 flex-shrink-0">
-          <div className="bg-civic-surface border border-civic-border rounded-xl p-3 space-y-1 shadow-xs">
+      {/* Body Layout: Sticky Sidebar + Main Content Grid */}
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Sticky Left Sidebar Column */}
+        <aside className="lg:col-span-3 sticky top-6 space-y-4">
+          {/* Navigation Card */}
+          <div className="bg-civic-surface rounded-xl border border-civic-border p-4 shadow-xs space-y-1">
             <div className="px-3 py-2 text-[11px] font-bold text-civic-textMuted uppercase tracking-wider border-b border-civic-border mb-1">
               Navigation Menu
             </div>
@@ -219,7 +220,8 @@ export default function DashboardShell({
             })}
           </div>
 
-          <div className="mt-4 p-4 bg-civic-surface border border-civic-border rounded-xl text-xs text-civic-textMuted shadow-xs">
+          {/* Session Authenticated Card */}
+          <div className="bg-civic-surface rounded-xl border border-civic-border p-4 shadow-xs text-xs text-civic-textMuted">
             <div className="flex items-center space-x-1.5 font-bold text-civic-textDark mb-1">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Session Authenticated</span>
@@ -230,8 +232,8 @@ export default function DashboardShell({
           </div>
         </aside>
 
-        {/* Main Content Pane */}
-        <main className="flex-1 w-full bg-civic-surface border border-civic-border rounded-xl p-6 shadow-xs text-civic-textDark">
+        {/* Main Content Area */}
+        <main className="lg:col-span-9 min-w-0 bg-civic-surface border border-civic-border rounded-xl p-6 shadow-xs text-civic-textDark">
           {children}
         </main>
       </div>

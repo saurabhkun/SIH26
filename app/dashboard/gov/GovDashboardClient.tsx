@@ -1650,65 +1650,42 @@ export default function GovDashboardClient({ initialTab = "analytics" }: { initi
   return (
     <div>
       {/* Page header */}
-      <div style={{ marginBottom: 20 }}>
-        <h2
-          style={{
-            fontFamily: "Georgia, serif",
-            fontSize: 22,
-            fontWeight: 800,
-            color: "#1a2e4a",
-            margin: "0 0 4px",
-          }}
-        >
+      <div className="mb-5">
+        <h2 className="font-serif text-xl sm:text-2xl font-bold text-civic-textDark tracking-tight">
           Government Department Portal
         </h2>
-        <p style={{ fontSize: 13, color: "#64748b", margin: 0 }}>
+        <p className="text-xs sm:text-sm text-civic-textMuted mt-0.5">
           State Nodal Review Office — Jharkhand Higher &amp; Technical Education
         </p>
       </div>
 
       {/* Tab bar */}
-      <div
-        style={{
-          display: "flex",
-          gap: 4,
-          borderBottom: "2px solid #e2e8f0",
-          marginBottom: 20,
-          overflowX: "auto",
-        }}
-      >
-        {tabs.map((t) => (
+      <div className="flex items-center gap-2 border-b border-civic-border mb-6 overflow-x-auto pb-1 scrollbar-none">
+        {tabs.map((t) => {
+          const isActive = activeTab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all cursor-pointer ${
+                isActive
+                  ? "bg-civic-primary text-white shadow-xs"
+                  : "text-civic-textMuted hover:text-civic-textDark hover:bg-slate-100"
+              }`}
+            >
+              {t.icon}
+              <span>{t.label}</span>
+            </button>
+          );
+        })}
+        <div className="ml-auto flex items-center pl-2">
           <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "8px 14px",
-              fontSize: 12,
-              fontWeight: 700,
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-              color: activeTab === t.id ? "#1a2e4a" : "#64748b",
-              borderBottom: activeTab === t.id ? "2px solid #c9a84c" : "2px solid transparent",
-              marginBottom: -2,
-              whiteSpace: "nowrap",
-              transition: "color 0.15s",
-            }}
-          >
-            {t.icon}
-            {t.label}
-          </button>
-        ))}
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
-          <RefreshCw
-            size={14}
-            style={{ color: "#94a3b8", cursor: "pointer" }}
             onClick={() => window.location.reload()}
-            aria-label="Refresh page"
-          />
+            title="Refresh portal data"
+            className="p-1.5 text-civic-textMuted hover:text-civic-primary hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+          >
+            <RefreshCw size={14} />
+          </button>
         </div>
       </div>
 
