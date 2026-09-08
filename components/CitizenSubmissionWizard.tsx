@@ -259,11 +259,13 @@ export default function CitizenSubmissionWizard({
     }
   }, [description, title, isAiOverridden]);
 
-  // Handle Visual Challenge Card Selection (Do NOT touch description or title state)
+  // Handle Visual Challenge Card Selection (Dynamically populate headline, keep description untouched)
   const handleSelectChallenge = (option: VisualChallengeOption) => {
     setSelectedChallengeId(option.id);
     setSelectedDomain(option.domain);
     setSelectedSeverity(option.defaultSeverity);
+    // Automatically populate/override headline with the selected category title
+    setTitle(option.title);
   };
 
   // Handle File Upload & Convert to Data URL
@@ -543,10 +545,10 @@ export default function CitizenSubmissionWizard({
                     <div
                       key={option.id}
                       onClick={() => handleSelectChallenge(option)}
-                      className={`relative cursor-pointer rounded-xl border p-4 transition-all flex flex-col justify-between ${
+                      className={`cursor-pointer rounded-xl border p-4 transition-all flex flex-col justify-between relative ${
                         isSelected
-                          ? "border-[#1E3A8A] bg-blue-50/30 ring-1 ring-[#1E3A8A] shadow-xs"
-                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70"
+                          ? "border-[#1E3A8A] bg-blue-50/40 ring-1 ring-[#1E3A8A] shadow-xs"
+                          : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
                     >
                       {/* Active Checkmark Badge */}
@@ -596,17 +598,17 @@ export default function CitizenSubmissionWizard({
               </div>
             </div>
 
-            {/* SECTION B: Issue Title (Pre-seeded or Custom) */}
+            {/* SECTION B: Issue Headline / Summary */}
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1">
-                Issue Headline / Summary <span className="text-red-600">*</span>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Issue Headline / Summary <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
-                placeholder="e.g. High Fluoride in Handpumps of Bhandra Panchayat"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy rounded-xs"
+                placeholder="e.g. High Fluoride in Handpumps of Bhandra Panchayat"
+                className="w-full px-3.5 py-2.5 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent outline-none transition"
                 required
               />
             </div>
