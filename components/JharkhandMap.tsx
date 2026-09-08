@@ -216,22 +216,22 @@ export default function JharkhandMap({
     <div className="w-full flex flex-col items-center" ref={containerRef}>
       {/* Map Header & Legend (Shown if not in compact mode) */}
       {!compact && (
-        <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-3 border-b border-[#294C60]/60">
+        <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-3 border-b border-civic-border">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FFC49B] inline-block" />
-              <h2 className="text-base sm:text-lg font-serif font-bold text-white">
+              <span className="w-2.5 h-2.5 rounded-full bg-civic-primary inline-block" />
+              <h2 className="text-base sm:text-lg font-serif font-bold text-civic-textDark">
                 Jharkhand District Civic Problem Density
               </h2>
             </div>
-            <p className="text-xs text-[#ADB6C4] mt-0.5">
+            <p className="text-xs text-civic-textMuted mt-0.5">
               Geographic choropleth map of all 24 districts (Click any district to view logged issues)
             </p>
           </div>
 
           {/* 3-Stop Color Legend */}
-          <div className="flex items-center space-x-3 text-xs text-[#FFEFD3] bg-[#001422] border border-[#294C60] px-3 py-1.5 rounded-xs shadow-xs">
-            <span className="font-semibold text-[#ADB6C4] text-[11px] uppercase tracking-wider">
+          <div className="flex items-center space-x-3 text-xs text-civic-textDark bg-civic-canvas/70 border border-civic-border px-3 py-1.5 rounded-lg shadow-xs">
+            <span className="font-semibold text-civic-textMuted text-[11px] uppercase tracking-wider">
               Density:
             </span>
             <div className="flex items-center space-x-1">
@@ -244,9 +244,9 @@ export default function JharkhandMap({
             <div className="flex items-center space-x-1">
               <span
                 className="w-2.5 h-2.5 inline-block rounded-xs"
-                style={{ backgroundColor: "#FFC49B" }}
+                style={{ backgroundColor: "#6096BA" }}
               />
-              <span className="text-[10.5px] text-[#FFC49B]">Mod (35-70)</span>
+              <span className="text-[10.5px] text-civic-primary font-medium">Mod (35-70)</span>
             </div>
             <div className="flex items-center space-x-1">
               <span
@@ -260,7 +260,7 @@ export default function JharkhandMap({
       )}
 
       {/* SVG Geographic Choropleth Map Container */}
-      <div className="w-full relative bg-[#001422] border border-[#294C60] p-2 sm:p-3 rounded-xs overflow-hidden flex justify-center shadow-md">
+      <div className="w-full relative bg-slate-100/60 border border-civic-border p-2 sm:p-3 rounded-xl overflow-hidden flex justify-center shadow-xs">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${geoConfig.width} ${geoConfig.height}`}
@@ -280,9 +280,9 @@ export default function JharkhandMap({
               /* ONLY the hovered district changes without affecting siblings */
               .district-path:hover {
                 transform: scale(1.02);
-                stroke: #001B2E !important;
+                stroke: #274C77 !important;
                 stroke-width: 2.2px !important;
-                filter: drop-shadow(0 4px 10px rgba(0, 27, 46, 0.35));
+                filter: drop-shadow(0 4px 10px rgba(39, 76, 119, 0.25));
               }
 
               .district-text-label {
@@ -299,7 +299,7 @@ export default function JharkhandMap({
                 key={`bg-${district.name}`}
                 d={district.d}
                 fill="#E2E8F0"
-                stroke="#1e293b"
+                stroke="#64748B"
                 strokeWidth="1.2"
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -320,7 +320,7 @@ export default function JharkhandMap({
                   className="district-path focus:outline-none"
                   d={district.d}
                   fill={fillColor}
-                  stroke="#1e293b"
+                  stroke="#1E293B"
                   strokeWidth="1.2"
                   strokeLinejoin="round"
                   strokeLinecap="round"
@@ -393,28 +393,28 @@ export default function JharkhandMap({
         {/* Hover Tooltip */}
         {tooltip.visible && tooltip.district && (
           <div
-            className="absolute z-20 pointer-events-none bg-navy text-white text-xs p-2.5 rounded-xs shadow-md border border-gold/50"
+            className="absolute z-20 pointer-events-none bg-civic-primary text-white text-xs p-3 rounded-lg shadow-lg border border-civic-secondary"
             style={{
               left: `${tooltip.x + 14}px`,
               top: `${tooltip.y + 14}px`,
               transform: "translate(0, 0)",
             }}
           >
-            <div className="font-serif font-bold text-gold text-sm">
+            <div className="font-serif font-bold text-civic-accent text-sm">
               {tooltip.district.name}
             </div>
             {tooltip.district.division && (
-              <div className="text-slate-300 text-[11px] mb-1">
+              <div className="text-slate-200 text-[11px] mb-1">
                 Division: {tooltip.district.division}
               </div>
             )}
-            <div className="border-t border-slate-600 pt-1 mt-1 flex justify-between gap-4">
+            <div className="border-t border-white/20 pt-1 mt-1 flex justify-between gap-4">
               <span>Logged Issues:</span>
-              <span className="font-semibold text-white">{tooltip.count}</span>
+              <span className="font-bold text-white">{tooltip.count}</span>
             </div>
             <div className="flex justify-between gap-4">
               <span>Density Index:</span>
-              <span className="font-semibold text-white">{tooltip.density}/100</span>
+              <span className="font-bold text-white">{tooltip.density}/100</span>
             </div>
           </div>
         )}
@@ -422,7 +422,7 @@ export default function JharkhandMap({
 
       {/* Map Data Attribution & Note */}
       {!compact && (
-        <div className="w-full text-left mt-2 flex flex-col sm:flex-row justify-between text-[11px] text-slate-500">
+        <div className="w-full text-left mt-2 flex flex-col sm:flex-row justify-between text-[11px] text-civic-textMuted">
           <p>
             * Official district boundaries rendered from Survey/Census spatial data (CC BY 4.0).
           </p>
@@ -434,3 +434,4 @@ export default function JharkhandMap({
     </div>
   );
 }
+

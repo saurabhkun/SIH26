@@ -392,10 +392,10 @@ export default function CitizenSubmissionWizard({
       {/* Pinned Header */}
       <div className="sticky top-0 z-20 flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200 shrink-0">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+          <span className="text-xs font-bold uppercase tracking-wider text-civic-textMuted">
             Government of Jharkhand • Grievance Portal
           </span>
-          <h2 className="text-xl font-bold text-[#001B2E]">
+          <h2 className="text-xl font-bold text-civic-primary">
             Report a Grassroots Challenge / Grievance
           </h2>
         </div>
@@ -418,35 +418,35 @@ export default function CitizenSubmissionWizard({
             <div
               className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 1
-                  ? "border-[#001B2E] text-[#001B2E] font-bold"
+                  ? "border-civic-primary text-civic-primary font-bold"
                   : step > 1
                   ? "border-emerald-700 text-emerald-800"
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-[#001B2E]/10 text-[#001B2E] inline-flex items-center justify-center text-[10px] font-bold">1</span>
+              <span className="w-4 h-4 rounded-full bg-civic-accent/30 text-civic-primary inline-flex items-center justify-center text-[10px] font-bold">1</span>
               <span className="truncate">1. Problem &amp; Voice / Text</span>
             </div>
             <div
               className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 2
-                  ? "border-[#001B2E] text-[#001B2E] font-bold"
+                  ? "border-civic-primary text-civic-primary font-bold"
                   : step > 2
                   ? "border-emerald-700 text-emerald-800"
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-[#001B2E]/10 text-[#001B2E] inline-flex items-center justify-center text-[10px] font-bold">2</span>
+              <span className="w-4 h-4 rounded-full bg-civic-accent/30 text-civic-primary inline-flex items-center justify-center text-[10px] font-bold">2</span>
               <span className="truncate">2. District &amp; Duration</span>
             </div>
             <div
               className={`py-1.5 px-2 border-b-2 font-medium flex items-center gap-1.5 ${
                 step === 3
-                  ? "border-[#001B2E] text-[#001B2E] font-bold"
+                  ? "border-civic-primary text-civic-primary font-bold"
                   : "border-slate-200 text-slate-400"
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-[#001B2E]/10 text-[#001B2E] inline-flex items-center justify-center text-[10px] font-bold">3</span>
+              <span className="w-4 h-4 rounded-full bg-civic-accent/30 text-civic-primary inline-flex items-center justify-center text-[10px] font-bold">3</span>
               <span className="truncate">3. Verification &amp; Submit</span>
             </div>
           </div>

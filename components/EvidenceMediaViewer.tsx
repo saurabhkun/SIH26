@@ -40,7 +40,7 @@ export const EvidenceMediaViewer: React.FC<MediaProps> = ({
           <div
             key={idx}
             onClick={() => setActiveImage(url)}
-            className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200 cursor-pointer group shrink-0 bg-slate-100 hover:border-[#001B2E] transition shadow-xs"
+            className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200 cursor-pointer group shrink-0 bg-slate-100 hover:border-civic-primary transition shadow-xs"
             title="Click to enlarge citizen evidence photo"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -92,7 +92,7 @@ export const EvidenceMediaViewer: React.FC<MediaProps> = ({
                   href={activeImage}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline flex items-center gap-1"
+                  className="text-civic-primary hover:text-civic-primaryHover hover:underline flex items-center gap-1 font-medium"
                 >
                   Open full source <ExternalLink className="w-3 h-3" />
                 </a>

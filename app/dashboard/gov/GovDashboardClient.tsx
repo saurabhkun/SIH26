@@ -39,44 +39,22 @@ function StatCard({
 }) {
   return (
     <div
-      style={{
-        border: `1px solid ${accent ? "#FFC49B" : "#ADB6C4"}`,
-        borderTop: `3px solid ${accent ? "#FFC49B" : "#001B2E"}`,
-        background: "#fff",
-        padding: "16px 20px",
-        minWidth: 150,
-      }}
+      className={`bg-civic-surface border ${
+        accent ? "border-civic-secondary border-t-4 border-t-civic-secondary" : "border-civic-border border-t-4 border-t-civic-primary"
+      } rounded-xl shadow-xs p-5 min-w-[150px]`}
     >
-      <div
-        style={{
-          fontSize: 28,
-          fontWeight: 800,
-          fontFamily: "Georgia, serif",
-          color: accent ? "#294C60" : "#001B2E",
-          lineHeight: 1,
-        }}
-      >
+      <div className="text-3xl font-black font-serif text-civic-primary tracking-tight leading-none">
         {value}
       </div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: "#294C60", marginTop: 4 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{sub}</div>}
+      <div className="text-xs font-bold text-civic-textDark mt-1.5">{label}</div>
+      {sub && <div className="text-[11px] text-civic-textMuted mt-0.5">{sub}</div>}
     </div>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3
-      style={{
-        fontFamily: "Georgia, serif",
-        fontSize: 16,
-        fontWeight: 700,
-        color: "#001B2E",
-        borderBottom: "2px solid #FFC49B",
-        paddingBottom: 6,
-        marginBottom: 16,
-      }}
-    >
+    <h3 className="font-serif text-base font-bold text-civic-textDark border-b-2 border-civic-secondary pb-1.5 mb-4">
       {children}
     </h3>
   );

@@ -10,53 +10,53 @@ export default function Home() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-bg text-ink flex flex-col">
+    <div className="min-h-screen bg-civic-canvas text-civic-textDark flex flex-col font-sans">
       {/* Top Government Identifier Bar */}
-      <div className="bg-brand-prussian text-white text-xs py-1.5 px-4 sm:px-8 border-b border-brand-peach/40 flex justify-between items-center">
+      <div className="bg-civic-primary text-white text-xs py-1.5 px-4 sm:px-8 border-b border-civic-primaryHover flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <span className="font-semibold tracking-wider uppercase text-[11px]">
             Government of Jharkhand
           </span>
-          <span className="text-brand-peach">|</span>
-          <span className="text-brand-slate">
-            Higher & Technical Education Department
+          <span className="text-civic-accent">|</span>
+          <span className="text-slate-200">
+            Higher &amp; Technical Education Department
           </span>
         </div>
-        <div className="text-brand-slate text-[11px] hidden md:block">
+        <div className="text-slate-200 text-[11px] hidden md:block">
           Smart India Hackathon 2026 &bull; PS ID: 26043
         </div>
       </div>
 
       {/* Main Navbar */}
-      <header className="bg-[#001422] border-b border-[#294C60]/70 py-3.5 px-4 sm:px-8 shadow-sm">
+      <header className="bg-civic-surface border-b border-civic-border py-3.5 px-4 sm:px-8 shadow-xs">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
             <Link href="/" className="group block">
-              <span className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight block leading-tight">
+              <span className="text-2xl sm:text-3xl font-serif font-bold text-civic-textDark tracking-tight block leading-tight">
                 CivicResolve
               </span>
-              <span className="text-[11px] sm:text-xs text-[#ADB6C4] block mt-0.5 tracking-normal">
-                Government of Jharkhand &middot; Department of Higher & Technical Education
+              <span className="text-[11px] sm:text-xs text-civic-textMuted block mt-0.5 tracking-normal">
+                Government of Jharkhand &middot; Department of Higher &amp; Technical Education
               </span>
             </Link>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setIsWizardOpen(true)}
-              className="inline-flex items-center px-3.5 py-1.5 bg-[#FFC49B] text-[#001B2E] text-xs font-bold border border-[#FFC49B] hover:bg-[#FFC49B]/90 transition-colors rounded-xs shadow-xs cursor-pointer"
+              className="inline-flex items-center px-4 py-2 bg-civic-primary hover:bg-civic-primaryHover text-white text-xs font-medium rounded-lg transition-colors shadow-xs cursor-pointer"
             >
-              <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-[#001B2E]" />
+              <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-civic-accent" />
               Report an Issue
             </button>
             <Link
               href="/register"
-              className="inline-flex items-center px-3.5 py-1.5 bg-[#294C60]/60 text-[#FFEFD3] text-xs font-semibold border border-[#294C60] hover:bg-[#294C60] transition-colors rounded-xs"
+              className="inline-flex items-center px-4 py-2 bg-civic-surface text-civic-textDark hover:bg-civic-canvas text-xs font-medium border border-civic-border rounded-lg transition-colors shadow-xs"
             >
               Register
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center px-4 py-1.5 bg-[#001B2E] text-[#FFEFD3] text-xs font-semibold border border-[#ADB6C4]/40 hover:bg-[#294C60]/40 transition-colors rounded-xs"
+              className="inline-flex items-center px-4 py-2 border border-civic-secondary text-civic-secondary hover:bg-civic-accent/20 text-xs font-medium rounded-lg transition-colors"
             >
               Login
             </Link>
@@ -65,17 +65,17 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-[#001B2E] border-b border-[#294C60]/60 py-10 px-4 sm:px-8">
+      <section className="bg-civic-canvas border-b border-civic-border py-10 px-4 sm:px-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 text-[#FFC49B] bg-[#294C60]/40 border border-[#FFC49B]/30 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider mb-3 rounded-xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#FFC49B]" />
-              <span>State Problem Sourcing & HEI Solution Bridge</span>
+            <div className="inline-flex items-center gap-1.5 text-civic-primaryHover bg-civic-accent/25 border border-civic-accent px-2.5 py-0.5 text-xs font-medium uppercase tracking-wider mb-3 rounded-full">
+              <ShieldCheck className="w-3.5 h-3.5 text-civic-primary" />
+              <span>State Problem Sourcing &amp; HEI Solution Bridge</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white leading-tight mb-2">
+            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-civic-textDark leading-tight mb-2">
               Report a civic problem in your district
             </h1>
-            <p className="text-sm sm:text-base text-[#ADB6C4] leading-relaxed">
+            <p className="text-sm sm:text-base text-civic-textMuted leading-relaxed">
               A state platform enabling citizens to log grassroots challenges across all 24 districts of Jharkhand for collaborative resolution by university research teams and industry partners.
             </p>
           </div>
@@ -84,16 +84,16 @@ export default function Home() {
             <button
               id="report-issue-hero-btn"
               onClick={() => setIsWizardOpen(true)}
-              className="px-5 py-2.5 bg-[#FFC49B] text-[#001B2E] text-sm font-bold border border-[#FFC49B] hover:bg-[#FFC49B]/90 flex items-center justify-center gap-2 shadow-md cursor-pointer rounded-xs"
+              className="px-5 py-2.5 bg-civic-primary hover:bg-civic-primaryHover text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
             >
-              <PlusCircle className="w-4 h-4 text-[#001B2E]" />
+              <PlusCircle className="w-4 h-4 text-civic-accent" />
               Report an Issue
             </button>
             <a
               href="#heatmap-section"
-              className="px-4 py-2.5 bg-[#294C60]/40 text-[#FFEFD3] text-sm font-semibold border border-[#294C60] hover:bg-[#294C60] flex items-center justify-center gap-1.5 rounded-xs"
+              className="px-4 py-2.5 bg-civic-surface text-civic-textDark text-sm font-medium border border-civic-border hover:bg-civic-canvas rounded-lg flex items-center justify-center gap-1.5 transition-colors shadow-xs"
             >
-              <MapPin className="w-4 h-4 text-[#FFC49B]" />
+              <MapPin className="w-4 h-4 text-civic-secondary" />
               View District Map
             </a>
           </div>
@@ -102,7 +102,7 @@ export default function Home() {
 
       {/* Modal / Embedded Citizen Submission Wizard */}
       {isWizardOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-sm overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm overflow-hidden">
           <CitizenSubmissionWizard
             onClose={() => setIsWizardOpen(false)}
             onCancel={() => setIsWizardOpen(false)}
@@ -114,22 +114,22 @@ export default function Home() {
       )}
 
       {/* Schematic Map Section */}
-      <section className="py-8 px-4 sm:px-8 flex-1 bg-[#001625]">
+      <section className="py-8 px-4 sm:px-8 flex-1 bg-civic-canvas">
         <div className="max-w-6xl mx-auto">
-          <div id="heatmap-section" className="border border-[#294C60] bg-[#001B2E] p-4 sm:p-6 rounded-xs shadow-lg">
+          <div id="heatmap-section" className="border border-civic-border bg-civic-surface p-4 sm:p-6 rounded-xl shadow-xs">
             <JharkhandMap />
           </div>
         </div>
       </section>
 
       {/* Plain Official Footer */}
-      <footer className="bg-[#001422] border-t border-[#294C60]/70 py-4 px-4 sm:px-8 text-xs text-[#ADB6C4] mt-auto">
+      <footer className="bg-civic-surface border-t border-civic-border py-4 px-4 sm:px-8 text-xs text-civic-textMuted mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
-            &copy; 2026 Department of Higher & Technical Education, Government of Jharkhand.
+            &copy; 2026 Department of Higher &amp; Technical Education, Government of Jharkhand.
           </div>
-          <div className="text-[#ADB6C4]/80">
-            CivicResolve Platform &bull; Public Transparency Portal
+          <div className="text-civic-textMuted">
+            CivicResolve Platform &bull; Flutter Enterprise Synchronized
           </div>
         </div>
       </footer>

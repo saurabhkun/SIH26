@@ -217,8 +217,8 @@ export default function NotificationCenter({ compact = false }: NotificationCent
         aria-label="Open Operational Notifications"
         className={`relative p-2 rounded-lg transition-colors flex items-center justify-center ${
           isOpen
-            ? "bg-[#001B2E] text-[#FFEFD3]"
-            : "text-[#001B2E] hover:bg-[#294C60]/10 hover:text-[#294C60]"
+            ? "bg-civic-primary text-white"
+            : "text-civic-primary hover:bg-slate-100 hover:text-civic-primaryHover"
         }`}
       >
         <Bell className="w-5 h-5" />
@@ -242,16 +242,16 @@ export default function NotificationCenter({ compact = false }: NotificationCent
       {/* Slide-out / Dropdown Flyout Panel */}
       {isOpen && (
         <div
-          className={`absolute right-0 mt-2 z-50 bg-white border border-[#294C60]/20 rounded-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-200 ${
+          className={`absolute right-0 mt-2 z-50 bg-white border border-civic-border rounded-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-200 ${
             compact ? "w-80" : "w-88 sm:w-96"
           }`}
           style={{ maxHeight: "calc(100vh - 100px)" }}
         >
           {/* Header */}
-          <div className="bg-[#001B2E] text-[#FFEFD3] p-4 border-b border-[#FFC49B]/30 flex items-center justify-between">
+          <div className="bg-civic-primary text-white p-4 border-b border-civic-primaryHover flex items-center justify-between">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#FFC49B]">
+                <span className="text-xs font-bold uppercase tracking-wider text-civic-accent">
                   Live Alert Stream
                 </span>
                 {criticalCount > 0 && (
@@ -271,7 +271,7 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                 onClick={fetchNotifications}
                 disabled={loading}
                 title="Refresh notifications"
-                className="p-1.5 rounded text-[#ADB6C4] hover:text-white hover:bg-white/10 transition-colors"
+                className="p-1.5 rounded text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
               </button>
@@ -279,7 +279,7 @@ export default function NotificationCenter({ compact = false }: NotificationCent
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded text-[#ADB6C4] hover:text-white hover:bg-white/10 transition-colors"
+                className="p-1.5 rounded text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -287,15 +287,15 @@ export default function NotificationCenter({ compact = false }: NotificationCent
           </div>
 
           {/* Filter Tabs & Quick Action */}
-          <div className="bg-[#FFEFD3]/40 px-3 py-2 border-b border-[#294C60]/10 flex items-center justify-between text-xs">
+          <div className="bg-slate-50 px-3 py-2 border-b border-civic-border flex items-center justify-between text-xs">
             <div className="flex items-center space-x-1">
               <button
                 type="button"
                 onClick={() => setActiveTab("all")}
                 className={`px-2.5 py-1 rounded-md font-semibold transition-colors ${
                   activeTab === "all"
-                    ? "bg-[#001B2E] text-[#FFEFD3]"
-                    : "text-[#294C60] hover:bg-white/70"
+                    ? "bg-civic-primary text-white shadow-xs"
+                    : "text-civic-textDark hover:bg-white"
                 }`}
               >
                 All ({notifications.length})
@@ -305,8 +305,8 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                 onClick={() => setActiveTab("unread")}
                 className={`px-2.5 py-1 rounded-md font-semibold transition-colors ${
                   activeTab === "unread"
-                    ? "bg-[#001B2E] text-[#FFEFD3]"
-                    : "text-[#294C60] hover:bg-white/70"
+                    ? "bg-civic-primary text-white shadow-xs"
+                    : "text-civic-textDark hover:bg-white"
                 }`}
               >
                 Unread ({unreadCount})
@@ -331,7 +331,7 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                 type="button"
                 onClick={handleMarkAllAsRead}
                 disabled={isMarkingAll}
-                className="text-[11px] font-semibold text-[#294C60] hover:text-[#001B2E] hover:underline flex items-center gap-1"
+                className="text-[11px] font-semibold text-civic-primary hover:text-civic-primaryHover hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Mark all read</span>
@@ -342,15 +342,15 @@ export default function NotificationCenter({ compact = false }: NotificationCent
           {/* Scrollable Notifications List */}
           <div className="flex-1 overflow-y-auto divide-y divide-slate-100 max-h-[380px]">
             {loading && notifications.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-500">
-                <RefreshCw className="w-5 h-5 animate-spin mx-auto text-[#294C60] mb-2" />
+              <div className="p-8 text-center text-xs text-civic-textMuted">
+                <RefreshCw className="w-5 h-5 animate-spin mx-auto text-civic-primary mb-2" />
                 <span>Syncing live state alert feed...</span>
               </div>
             ) : filteredNotifications.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-500">
+              <div className="p-8 text-center text-xs text-civic-textMuted">
                 <ShieldCheck className="w-7 h-7 mx-auto text-emerald-600 mb-2 opacity-80" />
-                <p className="font-semibold text-slate-700">All caught up!</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="font-semibold text-civic-textDark">All caught up!</p>
+                <p className="text-[11px] text-civic-textMuted mt-0.5">
                   {activeTab === "unread"
                     ? "No unread operational notifications."
                     : activeTab === "critical"
@@ -374,8 +374,8 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                         : item.priority === "HIGH"
                         ? "bg-amber-50/40 border-l-4 border-amber-500"
                         : item.read
-                        ? "bg-white hover:bg-slate-50 text-slate-700"
-                        : "bg-blue-50/50 hover:bg-blue-50/80 text-slate-900 border-l-4 border-[#294C60]"
+                        ? "bg-white hover:bg-slate-50 text-civic-textDark"
+                        : "bg-blue-50/50 hover:bg-blue-50/80 text-civic-textDark border-l-4 border-civic-primary"
                     }`}
                   >
                     {renderTypeIcon(item.type, item.priority)}
@@ -384,19 +384,19 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                       <div className="flex items-start justify-between gap-1 mb-0.5">
                         <span
                           className={`font-semibold leading-tight line-clamp-1 ${
-                            isCritical ? "text-rose-950 font-bold" : "text-[#001B2E]"
+                            isCritical ? "text-rose-950 font-bold" : "text-civic-textDark"
                           }`}
                         >
                           {item.title}
                         </span>
-                        <span className="text-[10px] text-slate-400 whitespace-nowrap ml-1 flex-shrink-0">
+                        <span className="text-[10px] text-civic-textMuted whitespace-nowrap ml-1 flex-shrink-0">
                           {formatTimeAgo(item.createdAt)}
                         </span>
                       </div>
 
                       <p
                         className={`text-[11.5px] leading-relaxed line-clamp-2 ${
-                          isCritical ? "text-rose-900" : "text-slate-600"
+                          isCritical ? "text-rose-900" : "text-civic-textMuted"
                         }`}
                       >
                         {item.message}
@@ -411,13 +411,13 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                               handleMarkAsRead(item._id);
                               setIsOpen(false);
                             }}
-                            className="inline-flex items-center gap-1 text-[11px] font-bold text-[#001B2E] hover:text-[#294C60] hover:underline"
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-civic-primary hover:text-civic-primaryHover hover:underline"
                           >
                             <span>Open Task</span>
                             <ExternalLink className="w-3 h-3" />
                           </Link>
                         ) : (
-                          <span className="text-[10px] font-mono text-slate-400">
+                          <span className="text-[10px] font-mono text-civic-textMuted">
                             {item.recipientRole} • {item.type}
                           </span>
                         )}
@@ -429,7 +429,7 @@ export default function NotificationCenter({ compact = false }: NotificationCent
                               e.stopPropagation();
                               handleMarkAsRead(item._id);
                             }}
-                            className="text-[10px] font-semibold text-slate-400 hover:text-slate-700"
+                            className="text-[10px] font-semibold text-civic-textMuted hover:text-civic-textDark cursor-pointer"
                           >
                             Mark read
                           </button>
@@ -443,7 +443,7 @@ export default function NotificationCenter({ compact = false }: NotificationCent
           </div>
 
           {/* Footer */}
-          <div className="p-2.5 bg-slate-50 border-t border-slate-200 text-center text-[10.5px] text-slate-500">
+          <div className="p-2.5 bg-slate-50 border-t border-civic-border text-center text-[10.5px] text-civic-textMuted">
             <span>Operational State Machine Alerts • Governed under SIH PS 26043</span>
           </div>
         </div>
