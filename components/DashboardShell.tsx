@@ -21,6 +21,8 @@ import {
   Award,
   Receipt,
   Users,
+  FlaskConical,
+  Building2,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 
@@ -36,7 +38,9 @@ export type IconName =
   | "teams"
   | "award"
   | "receipt"
-  | "users";
+  | "users"
+  | "flask"
+  | "building";
 
 export interface NavItem {
   label: string;
@@ -47,7 +51,7 @@ export interface NavItem {
 }
 
 interface DashboardShellProps {
-  role: "gov" | "college" | "industry";
+  role: "gov" | "college" | "industry" | "consultancy";
   roleTitle: string;
   userName: string;
   userEmail: string;
@@ -83,6 +87,10 @@ function renderNavIcon(name: IconName) {
       return <Receipt className="w-4 h-4" />;
     case "users":
       return <Users className="w-4 h-4" />;
+    case "flask":
+      return <FlaskConical className="w-4 h-4" />;
+    case "building":
+      return <Building2 className="w-4 h-4" />;
     default:
       return <LayoutDashboard className="w-4 h-4" />;
   }
@@ -102,7 +110,13 @@ export default function DashboardShell({
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const RoleIcon =
-    role === "gov" ? Landmark : role === "college" ? GraduationCap : Briefcase;
+    role === "gov"
+      ? Landmark
+      : role === "college"
+      ? GraduationCap
+      : role === "consultancy"
+      ? Building2
+      : Briefcase;
 
   const handleLogout = async () => {
     setIsLoggingOut(true);

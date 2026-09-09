@@ -17,6 +17,7 @@ import {
   getAllUnifiedIssues,
   syncIssueToReport,
 } from "@/lib/utils/reportsAdapter";
+import { analyzeIssueCriticality } from "@/lib/aiTriage";
 
 /**
  * GET /api/issues?district=X&status=Y&domain=Z
@@ -219,15 +220,32 @@ export async function POST(request: NextRequest) {
         ? directMediaUrls
         : sanitizedAttachments.map((a) => a.url);
 
-    // 7. Save Issue Document
+    // 7. Run AI Criticality Detection & Star Triage
+    const aiTriage = await analyzeIssueCriticality(
+      title.trim(),
+      description.trim(),
+      domain,
+      district.trim(),
+    );
+
+    const calculatedSeverity =
+      aiTriage.severityScore ||
+      Math.min(5, Math.max(1, Number(severityScore) || 3));
+
+    // 8. Save Issue Document with AI Star Triage fields
     const newIssue = await Issue.create({
       title: title.trim(),
       description: description.trim(),
       attachments: sanitizedAttachments,
       mediaUrls: finalMediaUrls,
       domain,
-      severityScore: Math.min(5, Math.max(1, Number(severityScore) || 3)),
-      aiTags,
+      severityScore: calculatedSeverity,
+      isStarred: Boolean(aiTriage.isStarred),
+      priority: aiTriage.priority || "MEDIUM",
+      aiAnalysisReason: aiTriage.aiAnalysisReason || "",
+      suggestedDepartment: aiTriage.suggestedDepartment || "Higher & Technical Education",
+      triageRationale: aiTriage.aiAnalysisReason,
+      aiTags: Array.from(new Set([...(aiTags || []), ...(aiTriage.isStarred ? ["AI_CRITICAL_STAR", "URGENT_TRIAGE"] : [])])),
       district: district.trim(),
       pincode: pincode?.trim(),
       address: address?.trim(),

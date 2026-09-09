@@ -11,6 +11,11 @@ export default function GovAllocationsPage() {
   const navItems: NavItem[] = [
     { label: "State Overview", href: "/dashboard/gov", iconName: "dashboard" },
     {
+      label: "RO Research Desk",
+      href: "/dashboard/gov/ro",
+      iconName: "flask",
+    },
+    {
       label: "Sourced Issues Review",
       href: "/dashboard/gov/triage",
       iconName: "shield",

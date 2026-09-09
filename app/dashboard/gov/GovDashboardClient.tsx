@@ -34,6 +34,7 @@ import {
   Zap,
   ArrowRight,
   X,
+  Star,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
@@ -117,6 +118,11 @@ function ReviewQueue() {
     district: string;
     status: string;
     description: string;
+    isStarred?: boolean;
+    priority?: string;
+    severityScore?: number;
+    aiAnalysisReason?: string;
+    suggestedDepartment?: string;
     citizenName?: string;
     address?: string;
     mediaUrls?: string[];
@@ -251,13 +257,26 @@ function ReviewQueue() {
                   <td
                     style={{
                       padding: "6px 8px",
-                      maxWidth: 180,
+                      maxWidth: 220,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {issue.title}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      {(issue.isStarred || issue.priority === "CRITICAL") && (
+                        <span
+                          title={issue.aiAnalysisReason || "★ AI Criticality Star Flag"}
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-300 shrink-0 shadow-xs"
+                        >
+                          <Star className="w-3 h-3 fill-amber-500 text-amber-600" />
+                          AI Star Flag
+                        </span>
+                      )}
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {issue.title}
+                      </span>
+                    </div>
                   </td>
                   <td style={{ padding: "6px 8px", color: "#374151" }}>
                     {issue.domain}
@@ -401,6 +420,33 @@ function ReviewQueue() {
                 &ldquo;{selected.description || "No description provided."}
                 &rdquo;
               </p>
+
+              {/* AI Criticality & Star Triage Banner */}
+              {(selected.isStarred || selected.priority === "CRITICAL" || selected.aiAnalysisReason) && (
+                <div className="my-2.5 p-2.5 bg-amber-50 border border-amber-300 rounded-lg flex items-start gap-2 text-xs text-amber-900 shadow-xs">
+                  <Star className="w-4 h-4 fill-amber-500 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="font-bold flex items-center gap-1.5 text-amber-950 flex-wrap">
+                      <span>★ AI Priority Flag ({selected.priority || (selected.isStarred ? "CRITICAL" : "STANDARD")})</span>
+                      {selected.severityScore && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-amber-200/80 rounded font-semibold text-amber-900 border border-amber-300/60">
+                          Severity: {selected.severityScore}/5
+                        </span>
+                      )}
+                    </div>
+                    {selected.aiAnalysisReason && (
+                      <p className="mt-1 text-[11.5px] leading-relaxed text-amber-900">
+                        {selected.aiAnalysisReason}
+                      </p>
+                    )}
+                    {selected.suggestedDepartment && (
+                      <div className="mt-1 text-[10.5px] font-medium text-amber-800">
+                        Target Dept: <strong>{selected.suggestedDepartment}</strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div style={{ margin: "8px 0" }}>
                 <span
@@ -621,6 +667,9 @@ interface OverrideIssueOption {
   domain: string;
   district: string;
   status: string;
+  isStarred?: boolean;
+  priority?: string;
+  aiAnalysisReason?: string;
   severityScore?: number;
   escalationStage?: number;
   urgencyTrack?: string;
@@ -1048,6 +1097,15 @@ function AllocationOverride() {
                                 <span className="text-[11px] font-semibold text-civic-textDark">
                                   {issue.district}
                                 </span>
+                                {(issue.isStarred || issue.priority === "CRITICAL") && (
+                                  <span
+                                    title={issue.aiAnalysisReason || "AI Criticality Star Flag"}
+                                    className="text-[9.5px] font-bold bg-amber-50 text-amber-800 border border-amber-300 px-1.5 py-0.5 rounded inline-flex items-center gap-1 shadow-xs"
+                                  >
+                                    <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
+                                    AI Star Flag
+                                  </span>
+                                )}
                                 {isDisaster && (
                                   <span className="text-[9.5px] font-bold bg-rose-100 text-rose-700 border border-rose-300 px-1.5 py-0.5 rounded uppercase">
                                     Disaster Urgent

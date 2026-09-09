@@ -34,6 +34,7 @@ export interface IOutcomes {
   startupCreated: boolean;
   deployed: boolean;
   impactSummary?: string;
+  thirdPartyAudit?: any;
 }
 
 export interface IProposal extends Document {
@@ -70,6 +71,7 @@ export interface IProposal extends Document {
     startupCreated?: boolean;
     deployed?: boolean;
     impactSummary?: string;
+    thirdPartyAudit?: any;
   };
 
   status: string;

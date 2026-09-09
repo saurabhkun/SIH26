@@ -25,6 +25,16 @@ export async function POST(request: NextRequest) {
       companyName,
       csrRegistrationNo,
       csrDomainFocus,
+      // Gov RO specific
+      fullName,
+      designation,
+      employeeId,
+      // Consultancy specific
+      firmName,
+      domainExpertise,
+      accreditation,
+      address,
+      contactPerson,
     } = body;
 
     if (!role || !email || !password) {
@@ -39,7 +49,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error:
-            "Government departmental nodal accounts are invitation-only by State Administration.",
+            "State Department Nodal accounts are created by State Headquarters administrative mandate.",
         },
         { status: 403 },
       );
@@ -51,7 +61,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error:
-            "Please provide a valid institutional or corporate email address.",
+            "Please provide a valid institutional, corporate, or official email address.",
         },
         { status: 400 },
       );
@@ -85,6 +95,7 @@ export async function POST(request: NextRequest) {
     // Hash password with bcrypt
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // 1. College / HEI Registration
     if (role === "college") {
       if (!institutionName || !district) {
         return NextResponse.json(
@@ -188,7 +199,10 @@ export async function POST(request: NextRequest) {
       });
 
       return response;
-    } else if (role === "industry") {
+    }
+
+    // 2. Industry Partner Registration
+    if (role === "industry") {
       if (!companyName || !csrRegistrationNo) {
         return NextResponse.json(
           {
@@ -199,7 +213,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Create User doc for industry partner
       const newUser = await User.create({
         name: companyName.trim(),
         email: normalizedEmail,
@@ -241,8 +254,136 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
+    // 3. Government Research Officer (Gov RO) Registration
+    if (role === "gov_ro" || role === "GOV_RO") {
+      if (!fullName || !designation) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Full Name and Official Designation are required for Research Officers.",
+          },
+          { status: 400 },
+        );
+      }
+
+      const officerDistrict = district || "State Headquarters";
+      const officerEmpId = employeeId?.trim() || `JH-RO-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const newUser = await User.create({
+        name: fullName.trim(),
+        email: normalizedEmail,
+        passwordHash,
+        role: "gov_ro",
+        designation: designation.trim(),
+        district: officerDistrict.trim(),
+        employeeId: officerEmpId,
+        organizationName: "Dept. of Higher & Technical Education (Govt of Jharkhand)",
+      });
+
+      const sessionPayload = {
+        id: newUser._id.toString(),
+        name: newUser.name,
+        email: newUser.email,
+        role: "gov_ro" as const,
+        designation: newUser.designation,
+        district: newUser.district,
+        employeeId: newUser.employeeId,
+        organizationName: newUser.organizationName,
+      };
+
+      const token = signSessionToken(sessionPayload);
+      const response = NextResponse.json({
+        success: true,
+        message: "Research Officer account successfully created and authorized!",
+        redirectUrl: "/dashboard/gov/ro",
+        user: sessionPayload,
+      });
+
+      response.cookies.set({
+        name: SESSION_COOKIE_NAME,
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60,
+      });
+
+      return response;
+    }
+
+    // 4. Technical Consultancy Firm Registration
+    if (role === "consultancy" || role === "CONSULTANCY") {
+      const legalFirmName = firmName || companyName;
+      if (!legalFirmName) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Firm Legal Name is required for Technical Consultancy registration.",
+          },
+          { status: 400 },
+        );
+      }
+
+      const domainsList = Array.isArray(domainExpertise)
+        ? domainExpertise
+        : typeof domainExpertise === "string"
+          ? domainExpertise
+              .split(",")
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+          : ["Water Effluent & Hydrology", "Geotechnical & Mine Reclamation"];
+
+      const newUser = await User.create({
+        name: contactPerson?.trim() || legalFirmName.trim(),
+        email: normalizedEmail,
+        passwordHash,
+        role: "consultancy",
+        designation: "Lead Technical Auditor & Partner",
+        organizationName: legalFirmName.trim(),
+        district: district?.trim() || "Ranchi",
+        address: address?.trim(),
+        contactPerson: contactPerson?.trim(),
+        accreditation: accreditation?.trim() || "NABET / QCI / NABL Accredited",
+        domainExpertise: domainsList,
+        operatingDistricts: [district?.trim() || "All 24 Districts"],
+      });
+
+      const sessionPayload = {
+        id: newUser._id.toString(),
+        name: newUser.name,
+        email: newUser.email,
+        role: "consultancy" as const,
+        designation: newUser.designation,
+        district: newUser.district,
+        organizationName: newUser.organizationName,
+        accreditation: newUser.accreditation,
+        domainExpertise: newUser.domainExpertise,
+      };
+
+      const token = signSessionToken(sessionPayload);
+      const response = NextResponse.json({
+        success: true,
+        message: "Technical Consultancy Firm registered and empanelled!",
+        redirectUrl: "/dashboard/consultancy",
+        user: sessionPayload,
+      });
+
+      response.cookies.set({
+        name: SESSION_COOKIE_NAME,
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60,
+      });
+
+      return response;
+    }
+
     return NextResponse.json(
-      { success: false, error: "Invalid role specified." },
+      { success: false, error: "Invalid registration role specified." },
       { status: 400 },
     );
   } catch (error: unknown) {

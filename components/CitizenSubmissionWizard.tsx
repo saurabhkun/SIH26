@@ -13,7 +13,6 @@ import {
   Baby,
   Tractor,
   Mic,
-  MicOff,
   Plus,
   Languages,
   CheckCircle2,
@@ -741,10 +740,10 @@ export default function CitizenSubmissionWizard({
                     <button
                       type="button"
                       onClick={toggleListening}
-                      className={`inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xs transition-all ${
+                      className={`inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border transition-all duration-150 ease-in-out cursor-pointer shadow-xs ${
                         isListening
-                          ? "bg-red-600 text-white shadow-md hover:bg-red-700 animate-bounce"
-                          : "bg-navy text-gold border border-gold/40 hover:bg-navyLight"
+                          ? "bg-rose-50 text-rose-600 border-rose-500 animate-pulse"
+                          : "bg-white text-[#274C77] border-[#274C77] hover:bg-[#1E3A8A] hover:text-white"
                       }`}
                       title={
                         isListening
@@ -752,17 +751,12 @@ export default function CitizenSubmissionWizard({
                           : "Speak to Type Description (Speech to Text)"
                       }
                     >
-                      {isListening ? (
-                        <>
-                          <MicOff className="w-3.5 h-3.5" />
-                          <span>Stop Mic</span>
-                        </>
-                      ) : (
-                        <>
-                          <Mic className="w-3.5 h-3.5 text-gold" />
-                          <span>Voice Input (बोलकर लिखें)</span>
-                        </>
-                      )}
+                      <Mic className="w-4 h-4 transition-colors" />
+                      <span>
+                        {isListening
+                          ? "Listening... (सुन रहे हैं)"
+                          : "Voice Input (बोलकर लिखें)"}
+                      </span>
                     </button>
                   </div>
                 </div>

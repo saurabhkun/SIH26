@@ -9,6 +9,7 @@ import {
   Filter,
   DollarSign,
   Building,
+  Building2,
   CreditCard,
   Send,
   Award,
@@ -19,10 +20,17 @@ import {
   ChevronUp,
   FileText,
   Camera,
+  Mail,
+  MapPin,
+  X,
 } from "lucide-react";
 import { ISSUE_DOMAINS } from "@/lib/constants/domains";
 import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
 import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
+import {
+  EMPANELLED_CONSULTANCIES,
+  ConsultancyFirm,
+} from "@/lib/data/consultancies";
 
 interface Milestone {
   title: string;
@@ -103,16 +111,29 @@ interface PledgeItem {
 export default function IndustryDashboardPage({
   initialTab = "curated",
 }: {
-  initialTab?: "curated" | "portfolio" | "releases";
+  initialTab?: "curated" | "portfolio" | "releases" | "consultancies";
 }) {
   const [activeTab, setActiveTab] = useState<
-    "curated" | "portfolio" | "releases"
+    "curated" | "portfolio" | "releases" | "consultancies"
   >(initialTab);
   const [loading, setLoading] = useState(true);
   const [proposals, setProposals] = useState<ProposalItem[]>([]);
   const [myPledges, setMyPledges] = useState<PledgeItem[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Empanelled Consultancies state
+  const [consultancies, setConsultancies] = useState<ConsultancyFirm[]>(EMPANELLED_CONSULTANCIES);
+  const [consultancyDomainFilter, setConsultancyDomainFilter] = useState("all");
+  const [consultancyDistrictFilter, setConsultancyDistrictFilter] = useState("all");
+  const [consultancySearchQuery, setConsultancySearchQuery] = useState("");
+  const [selectedConsultancyForAudit, setSelectedConsultancyForAudit] = useState<ConsultancyFirm | null>(null);
+  const [selectedProposalIdForAudit, setSelectedProposalIdForAudit] = useState("");
+  const [auditScope, setAuditScope] = useState("Field Pilot Compliance & Technical Quality Audit");
+  const [auditTargetDate, setAuditTargetDate] = useState("");
+  const [auditRemarks, setAuditRemarks] = useState("");
+  const [auditEngaging, setAuditEngaging] = useState(false);
+  const [auditFeedbackMessage, setAuditFeedbackMessage] = useState<string | null>(null);
 
   const [expandedIssueIds, setExpandedIssueIds] = useState<
     Record<string, boolean>
@@ -153,7 +174,7 @@ export default function IndustryDashboardPage({
   );
   const [releaseFeedback, setReleaseFeedback] = useState<string | null>(null);
 
-  // Fetch proposals and pledges
+  // Fetch proposals, pledges and consultancies
   const loadData = async () => {
     setLoading(true);
     try {
@@ -169,6 +190,13 @@ export default function IndustryDashboardPage({
       const pledgesData = await resPledges.json();
       if (pledgesData.success) {
         setMyPledges(pledgesData.data || []);
+      }
+
+      // 3. Empanelled Consultancies
+      const resConsult = await fetch("/api/industry/consultancies");
+      const consultData = await resConsult.json();
+      if (consultData.success && consultData.data) {
+        setConsultancies(consultData.data);
       }
     } catch (err) {
       console.error("Failed to load industry dashboard data:", err);
@@ -346,6 +374,63 @@ export default function IndustryDashboardPage({
     return domainMatch && searchMatch;
   });
 
+  // Filter consultancies
+  const filteredConsultancies = consultancies.filter((f) => {
+    const domainMatch =
+      consultancyDomainFilter === "all" ||
+      f.domainExpertise.some((d) =>
+        d.toLowerCase().includes(consultancyDomainFilter.toLowerCase()),
+      );
+    const districtMatch =
+      consultancyDistrictFilter === "all" ||
+      f.operatingDistricts.includes("All 24 Districts") ||
+      f.operatingDistricts.some((d) =>
+        d.toLowerCase().includes(consultancyDistrictFilter.toLowerCase()),
+      );
+    const searchMatch =
+      consultancySearchQuery === "" ||
+      f.name.toLowerCase().includes(consultancySearchQuery.toLowerCase()) ||
+      f.shortName.toLowerCase().includes(consultancySearchQuery.toLowerCase()) ||
+      f.category.toLowerCase().includes(consultancySearchQuery.toLowerCase()) ||
+      f.domainExpertise.some((d) =>
+        d.toLowerCase().includes(consultancySearchQuery.toLowerCase()),
+      );
+    return domainMatch && districtMatch && searchMatch;
+  });
+
+  const handleEngageAudit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedConsultancyForAudit || !selectedProposalIdForAudit) return;
+    setAuditEngaging(true);
+    try {
+      const res = await fetch("/api/industry/consultancies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          consultancyId: selectedConsultancyForAudit.id,
+          proposalId: selectedProposalIdForAudit,
+          auditScope,
+          auditTargetDate,
+          auditRemarks,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAuditFeedbackMessage(data.message);
+        setSelectedConsultancyForAudit(null);
+        setSelectedProposalIdForAudit("");
+        loadData();
+        setTimeout(() => setAuditFeedbackMessage(null), 6000);
+      } else {
+        alert(data.error || "Failed to engage consultancy for audit.");
+      }
+    } catch (err) {
+      console.error("Engage consultancy error:", err);
+    } finally {
+      setAuditEngaging(false);
+    }
+  };
+
   const navItems: NavItem[] = [
     {
       label: "Curated Innovation Feed",
@@ -367,6 +452,13 @@ export default function IndustryDashboardPage({
       iconName: "award",
       active: activeTab === "releases",
       onClick: () => setActiveTab("releases"),
+    },
+    {
+      label: "Empanelled Consultancies",
+      href: "/dashboard/industry/consultancies",
+      iconName: "building",
+      active: activeTab === "consultancies",
+      onClick: () => setActiveTab("consultancies"),
     },
   ];
 
@@ -416,6 +508,17 @@ export default function IndustryDashboardPage({
             >
               <Award className="w-4 h-4 inline mr-2 text-[#C9A227]" />
               Milestone Release Desk
+            </button>
+            <button
+              onClick={() => setActiveTab("consultancies")}
+              className={`px-4 py-2 text-sm font-semibold rounded-md transition-all ${
+                activeTab === "consultancies"
+                  ? "bg-[#1A365D] text-white shadow-sm"
+                  : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+              }`}
+            >
+              <Building2 className="w-4 h-4 inline mr-2 text-[#C9A227]" />
+              Empanelled Technical Consultancies ({consultancies.length})
             </button>
           </div>
 
@@ -1303,7 +1406,361 @@ export default function IndustryDashboardPage({
             </div>
           </div>
         )}
+
+        {/* ══════════════════════════════════════════════════════════════
+            TAB 4: EMPANELLED TECHNICAL CONSULTANCIES DIRECTORY
+           ══════════════════════════════════════════════════════════════ */}
+        {activeTab === "consultancies" && (
+          <div className="space-y-6">
+            {/* Feedback Alert Banner */}
+            {auditFeedbackMessage && (
+              <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center justify-between text-xs font-semibold text-emerald-900 animate-fadeIn shadow-xs">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-emerald-600" />
+                  <span>{auditFeedbackMessage}</span>
+                </div>
+                <button
+                  onClick={() => setAuditFeedbackMessage(null)}
+                  className="text-slate-500 hover:text-slate-800"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Header / Intro Card */}
+            <div className="bg-gradient-to-r from-[#0F172A] via-[#1E293B] to-[#1A365D] text-white p-6 rounded-2xl shadow-md border border-slate-700">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold uppercase tracking-wider mb-2">
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Accredited Advisory & Technical Audit Firms</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold font-serif text-white">
+                    Empanelled Technical Consultancies Directory
+                  </h2>
+                  <p className="text-slate-300 text-xs sm:text-sm max-w-3xl mt-1 leading-relaxed">
+                    Pair CSR-funded student and faculty projects with certified environmental, geotechnical, and public health consultancy firms for independent third-party quality audits, lab verification, and statutory field compliance before public handover.
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs text-slate-400 block font-medium">Statewide Empanelled</span>
+                  <strong className="text-2xl font-bold text-amber-400 font-serif">
+                    {consultancies.length} Certified Firms
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Search & Filters Bar */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Domain Filter */}
+                <div className="flex items-center space-x-1.5 text-xs">
+                  <Filter className="w-3.5 h-3.5 text-slate-500" />
+                  <span className="font-semibold text-slate-700">Domain:</span>
+                  <select
+                    value={consultancyDomainFilter}
+                    onChange={(e) => setConsultancyDomainFilter(e.target.value)}
+                    className="text-xs bg-slate-50 border border-slate-300 rounded-md px-2.5 py-1.5 outline-hidden"
+                  >
+                    <option value="all">All Domains</option>
+                    <option value="mining">Mining & Reclamation</option>
+                    <option value="water">Water & Effluent Testing</option>
+                    <option value="infrastructure">Infrastructure & Structural</option>
+                    <option value="air">Air Quality & Gas Telemetry</option>
+                    <option value="soil">Soil Remediation & Bio-Assays</option>
+                  </select>
+                </div>
+
+                {/* District Filter */}
+                <div className="flex items-center space-x-1.5 text-xs">
+                  <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                  <span className="font-semibold text-slate-700">Coverage:</span>
+                  <select
+                    value={consultancyDistrictFilter}
+                    onChange={(e) => setConsultancyDistrictFilter(e.target.value)}
+                    className="text-xs bg-slate-50 border border-slate-300 rounded-md px-2.5 py-1.5 outline-hidden"
+                  >
+                    <option value="all">All Districts / Statewide</option>
+                    <option value="Ranchi">Ranchi</option>
+                    <option value="Dhanbad">Dhanbad</option>
+                    <option value="Bokaro">Bokaro</option>
+                    <option value="Ramgarh">Ramgarh</option>
+                    <option value="East Singhbhum">East Singhbhum</option>
+                    <option value="Hazaribagh">Hazaribagh</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Keyword Search */}
+              <div className="relative min-w-[260px]">
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search firms, certifications, or tests..."
+                  value={consultancySearchQuery}
+                  onChange={(e) => setConsultancySearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-hidden"
+                />
+              </div>
+            </div>
+
+            {/* Consultancies Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredConsultancies.map((firm) => (
+                <div
+                  key={firm.id}
+                  className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md hover:border-blue-300 transition-all space-y-4"
+                >
+                  <div className="space-y-3">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-900 border border-blue-200 rounded-md text-[10px] font-bold uppercase tracking-wider block w-fit mb-1">
+                          {firm.category}
+                        </span>
+                        <h3 className="text-base font-bold font-serif text-slate-900 leading-tight">
+                          {firm.name}
+                        </h3>
+                      </div>
+                      <div className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-[#1A365D] shrink-0">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                      {firm.description}
+                    </p>
+
+                    {/* Certifications Badges */}
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        Accreditations & Certifications
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {firm.certifications.map((cert, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center space-x-1 px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-md text-[10px] font-semibold"
+                          >
+                            <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" />
+                            <span>{cert}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Domain Expertise Tags */}
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        Domain Expertise
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {firm.domainExpertise.map((domain, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md text-[10px] font-medium"
+                          >
+                            {domain}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Operating Districts & Equipment */}
+                    <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-[11px] space-y-1.5">
+                      <div className="flex items-start space-x-1.5 text-slate-600">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                        <span className="line-clamp-1">
+                          <strong>Districts:</strong> {firm.operatingDistricts.join(", ")}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-200/60">
+                        <span>Completed State Audits: <strong>{firm.auditsCompleted}</strong></span>
+                        <span className="text-emerald-700 font-bold">★ {firm.complianceRating}/5.0</span>
+                      </div>
+                    </div>
+
+                    {/* Contact POC */}
+                    <div className="text-[11px] text-slate-600 space-y-0.5 pt-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 block">Technical POC</span>
+                      <strong className="text-slate-800 block">{firm.contactPOC.name}</strong>
+                      <span className="text-slate-500 text-[10px] block">{firm.contactPOC.designation}</span>
+                      <div className="flex items-center space-x-3 text-[10px] text-slate-500 pt-0.5">
+                        <span className="flex items-center space-x-1">
+                          <Mail className="w-3 h-3 text-slate-400" />
+                          <span>{firm.contactPOC.email}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Button: Engage for Third-Party Audit */}
+                  <button
+                    onClick={() => {
+                      setSelectedConsultancyForAudit(firm);
+                      if (myPledges.length > 0) {
+                        const firstPropId = (myPledges[0].proposal?._id || myPledges[0]._id).toString();
+                        setSelectedProposalIdForAudit(firstPropId);
+                      } else if (proposals.length > 0) {
+                        setSelectedProposalIdForAudit(proposals[0]._id);
+                      }
+                    }}
+                    className="w-full py-2.5 bg-[#1A365D] hover:bg-[#132845] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center space-x-1.5"
+                  >
+                    <Award className="w-4 h-4 text-[#C9A227]" />
+                    <span>Engage for Third-Party Audit</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════
+            MODAL: ENGAGE CONSULTANCY FOR THIRD-PARTY AUDIT
+           ══════════════════════════════════════════════════════════════ */}
+        {selectedConsultancyForAudit && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-5 animate-scaleUp">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="p-2 bg-blue-100 rounded-lg text-[#1A365D]">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-slate-900 font-serif">
+                      Engage Third-Party Audit
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Commission {selectedConsultancyForAudit.shortName} for compliance certification
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedConsultancyForAudit(null)}
+                  className="text-slate-400 hover:text-slate-700 p-1 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEngageAudit} className="space-y-4 text-xs">
+                {/* Firm Info Strip */}
+                <div className="bg-blue-50/70 p-3 rounded-xl border border-blue-200 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-blue-900 font-bold">{selectedConsultancyForAudit.name}</strong>
+                    <span className="text-emerald-700 font-bold text-[11px]">★ {selectedConsultancyForAudit.complianceRating} Rating</span>
+                  </div>
+                  <span className="text-slate-600 block text-[11px]">
+                    POC: {selectedConsultancyForAudit.contactPOC.name} ({selectedConsultancyForAudit.contactPOC.phone})
+                  </span>
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {selectedConsultancyForAudit.certifications.slice(0, 2).map((c, i) => (
+                      <span key={i} className="px-1.5 py-0.2 bg-white text-blue-800 rounded text-[9px] font-semibold border border-blue-200">
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step 1: Select Project from CSR Portfolio */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Select Funded HEI Project to Audit:
+                  </label>
+                  <select
+                    value={selectedProposalIdForAudit}
+                    onChange={(e) => setSelectedProposalIdForAudit(e.target.value)}
+                    required
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-600 outline-hidden"
+                  >
+                    <option value="">-- Choose from Active Proposals / Portfolio --</option>
+                    {proposals.map((prop) => (
+                      <option key={prop._id} value={prop._id}>
+                        {prop.title} — {prop.college?.name} (₹{(prop.budgetRequested || 150000).toLocaleString("en-IN")})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Step 2: Audit Scope */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Audit Phase & Compliance Scope:
+                  </label>
+                  <select
+                    value={auditScope}
+                    onChange={(e) => setAuditScope(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-600 outline-hidden"
+                  >
+                    <option value="Pre-Deployment Lab Quality & Sensor Audit">
+                      Pre-Deployment Lab Quality & Sensor Calibration Audit
+                    </option>
+                    <option value="Field Pilot Compliance & Technical Quality Audit">
+                      Field Pilot Compliance, Soil/Water Assays & Quality Audit
+                    </option>
+                    <option value="Final Milestone Statutory Handover Certification">
+                      Final Milestone Statutory Handover & Environmental Certification
+                    </option>
+                    <option value="Comprehensive Structural & Durability Audit">
+                      Comprehensive Structural Stability & Load Durability Audit
+                    </option>
+                  </select>
+                </div>
+
+                {/* Step 3: Target Date */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Target Audit Completion Date (Optional):
+                  </label>
+                  <input
+                    type="date"
+                    value={auditTargetDate}
+                    onChange={(e) => setAuditTargetDate(e.target.value)}
+                    className="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-hidden"
+                  />
+                </div>
+
+                {/* Step 4: Remarks */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Special Audit Terms / Directives:
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={auditRemarks}
+                    onChange={(e) => setAuditRemarks(e.target.value)}
+                    placeholder="E.g., Conduct NABL spectrometry on outlet water samples; verify bridge load sensor calibration..."
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-hidden"
+                  />
+                </div>
+
+                {/* Submit & Cancel */}
+                <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedConsultancyForAudit(null)}
+                    className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={auditEngaging || !selectedProposalIdForAudit}
+                    className="px-4 py-2 bg-[#1A365D] hover:bg-[#132845] text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center space-x-1.5 disabled:opacity-50"
+                  >
+                    <Award className="w-4 h-4 text-[#C9A227]" />
+                    <span>{auditEngaging ? "Confirming..." : "Confirm Audit Engagement"}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardShell>
   );
 }
+

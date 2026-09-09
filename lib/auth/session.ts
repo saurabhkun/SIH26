@@ -16,6 +16,9 @@ export interface SessionUser {
   district?: string;
   organizationName?: string;
   collegeId?: string;
+  employeeId?: string;
+  accreditation?: string;
+  domainExpertise?: string[];
 }
 
 /**
@@ -71,6 +74,9 @@ export function verifySessionToken(token: string): SessionUser | null {
       district: payload.district,
       organizationName: payload.organizationName,
       collegeId: payload.collegeId,
+      employeeId: payload.employeeId,
+      accreditation: payload.accreditation,
+      domainExpertise: payload.domainExpertise,
     };
   } catch {
     return null;

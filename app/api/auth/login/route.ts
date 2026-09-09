@@ -16,6 +16,9 @@ const DEMO_ACCOUNTS: Record<
     designation: string;
     district?: string;
     organizationName?: string;
+    employeeId?: string;
+    accreditation?: string;
+    domainExpertise?: string[];
   }
 > = {
   "officer@jharkhand.gov.in": {
@@ -26,6 +29,15 @@ const DEMO_ACCOUNTS: Record<
     designation: "State Nodal Review Officer",
     district: "Ranchi",
   },
+  "ro.evaluator@jharkhand.gov.in": {
+    name: "Dr. Birendra Mahato",
+    email: "ro.evaluator@jharkhand.gov.in",
+    passwordHash: "Ro@1234",
+    role: "gov_ro",
+    designation: "District Research Officer & State Evaluator",
+    district: "Ranchi",
+    employeeId: "JH-RO-8842",
+  },
   "director.rnd@bitmesra.ac.in": {
     name: "Dr. Ananya Sen",
     email: "director.rnd@bitmesra.ac.in",
@@ -33,6 +45,7 @@ const DEMO_ACCOUNTS: Record<
     role: "college",
     designation: "Dean of Research & Innovation",
     district: "Ranchi",
+    organizationName: "BIT Mesra, Ranchi",
   },
   "csr.head@tatasteel.com": {
     name: "Sanjay Chatterjee",
@@ -41,6 +54,22 @@ const DEMO_ACCOUNTS: Record<
     role: "industry",
     designation: "Head of CSR & Sustainability",
     organizationName: "Tata Steel Foundation",
+  },
+  "audit.lead@cmpdi.co.in": {
+    name: "Dr. Alok K. Mishra",
+    email: "audit.lead@cmpdi.co.in",
+    passwordHash: "Consultancy@1234",
+    role: "consultancy",
+    designation: "Chief Technical Auditor & Environmental Assayer",
+    organizationName: "Central Mine Planning & Design Institute (CMPDI)",
+    district: "Ranchi",
+    accreditation: "NABET / QCI Accredited (Category A)",
+    domainExpertise: [
+      "Mining Reclamation",
+      "Air Quality Monitoring",
+      "Water Contamination Assays",
+      "Structural Stability Audits",
+    ],
   },
 };
 
@@ -54,6 +83,9 @@ interface AuthenticatedUserDoc {
   district?: string;
   college?: string | { toString: () => string };
   organizationName?: string;
+  employeeId?: string;
+  accreditation?: string;
+  domainExpertise?: string[];
 }
 
 export async function POST(request: NextRequest) {
@@ -72,13 +104,31 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const normalizedRole = role.toLowerCase().trim();
+
+    // Map role aliases
+    const targetRole: UserRole =
+      normalizedRole === "gov_ro" || normalizedRole === "ro"
+        ? "gov_ro"
+        : normalizedRole === "consultancy"
+        ? "consultancy"
+        : normalizedRole === "gov"
+        ? "gov"
+        : normalizedRole === "college"
+        ? "college"
+        : normalizedRole === "industry"
+        ? "industry"
+        : "citizen";
 
     let user: AuthenticatedUserDoc | null = null;
 
     // 1. Try to find user in MongoDB
     try {
       await connectDB();
-      user = await User.findOne({ email: normalizedEmail, role }).lean();
+      user = await User.findOne({
+        email: normalizedEmail,
+        role: targetRole,
+      }).lean();
     } catch (dbErr) {
       console.warn("DB lookup bypassed, checking demo fallback:", dbErr);
     }
@@ -86,7 +136,7 @@ export async function POST(request: NextRequest) {
     // 2. Fallback to demo accounts for prototype resilience
     if (!user) {
       const demo = DEMO_ACCOUNTS[normalizedEmail];
-      if (demo && demo.role === role && demo.passwordHash === password) {
+      if (demo && (demo.role === targetRole || demo.role.toLowerCase() === normalizedRole) && demo.passwordHash === password) {
         user = {
           _id: `demo_${demo.role}_id`,
           ...demo,
@@ -118,7 +168,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error:
-            "Account not found for this portal role. Please use demo credentials.",
+            "Account not found for this portal role. Please check credentials or use demo login.",
         },
         { status: 401 },
       );
@@ -134,17 +184,26 @@ export async function POST(request: NextRequest) {
       district: user.district,
       organizationName: user.organizationName,
       collegeId: user.college?.toString(),
+      employeeId: user.employeeId,
+      accreditation: user.accreditation,
+      domainExpertise: user.domainExpertise,
     };
 
     const token = signSessionToken(sessionPayload);
 
     // Determine role dashboard redirect
     const redirectUrl =
-      user.role === "gov"
+      user.role === "gov_ro"
+        ? "/dashboard/gov/ro"
+        : user.role === "consultancy"
+        ? "/dashboard/consultancy"
+        : user.role === "gov"
         ? "/dashboard/gov"
         : user.role === "college"
-          ? "/dashboard/college"
-          : "/dashboard/industry";
+        ? "/dashboard/college"
+        : user.role === "industry"
+        ? "/dashboard/industry"
+        : "/";
 
     const response = NextResponse.json({
       success: true,

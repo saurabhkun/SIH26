@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Calendar,
   AlertCircle,
+  Star,
 } from "lucide-react";
 import { ISSUE_DOMAINS } from "@/lib/constants/domains";
 
@@ -23,6 +24,10 @@ interface IssueItem {
   description: string;
   domain: string;
   severityScore: number;
+  isStarred?: boolean;
+  priority?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  aiAnalysisReason?: string;
+  suggestedDepartment?: string;
   district: string;
   status: string;
   facingSince: string;
@@ -389,7 +394,21 @@ export default function DistrictDashboardView({
                           className="hover:bg-slate-50/80 transition-colors"
                         >
                           <td className="py-3 px-3 font-mono font-semibold text-civic-primary whitespace-nowrap">
-                            {issue.trackingCode}
+                            <div className="flex flex-col gap-1">
+                              <span>{issue.trackingCode}</span>
+                              {issue.isStarred && (
+                                <span
+                                  title={
+                                    issue.aiAnalysisReason ||
+                                    "Flagged by automated AI Criticality Triage"
+                                  }
+                                  className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs text-[10px] font-bold w-fit"
+                                >
+                                  <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
+                                  <span>★ AI Star Flag</span>
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3 px-3 max-w-md">
                             <div className="font-semibold text-civic-textDark leading-snug">
@@ -398,6 +417,15 @@ export default function DistrictDashboardView({
                             <p className="text-civic-textMuted text-[11px] line-clamp-2 mt-0.5">
                               {issue.description}
                             </p>
+                            {issue.aiAnalysisReason && (
+                              <div className="mt-1.5 p-1.5 bg-amber-50/80 border border-amber-200 rounded-md text-[10.5px] text-amber-900 font-medium flex items-start gap-1.5">
+                                <Star className="w-3 h-3 fill-amber-500 text-amber-600 shrink-0 mt-0.5" />
+                                <span>
+                                  <strong>AI Triage Rationale:</strong>{" "}
+                                  {issue.aiAnalysisReason}
+                                </span>
+                              </div>
+                            )}
                             {issue.assignedColleges &&
                               issue.assignedColleges.length > 0 && (
                                 <div className="mt-1 text-[10.5px] text-civic-textDark font-medium flex items-center gap-1">

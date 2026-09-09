@@ -1,6 +1,14 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export const USER_ROLES = ["gov", "college", "industry"] as const;
+export const USER_ROLES = [
+  "gov",
+  "college",
+  "industry",
+  "gov_ro",
+  "consultancy",
+  "citizen",
+] as const;
+
 export type UserRole = (typeof USER_ROLES)[number];
 
 export interface IUser extends Document {
@@ -12,6 +20,13 @@ export interface IUser extends Document {
   district?: string;
   college?: mongoose.Types.ObjectId;
   organizationName?: string;
+  employeeId?: string;
+  domainExpertise?: string[];
+  certifications?: string[];
+  accreditation?: string;
+  address?: string;
+  contactPerson?: string;
+  operatingDistricts?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,6 +55,13 @@ const UserSchema = new Schema<IUser>(
       default: null,
     },
     organizationName: { type: String, trim: true },
+    employeeId: { type: String, trim: true },
+    domainExpertise: [{ type: String, trim: true }],
+    certifications: [{ type: String, trim: true }],
+    accreditation: { type: String, trim: true },
+    address: { type: String, trim: true },
+    contactPerson: { type: String, trim: true },
+    operatingDistricts: [{ type: String, trim: true }],
   },
   {
     timestamps: true,

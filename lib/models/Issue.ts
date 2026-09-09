@@ -56,6 +56,12 @@ export interface IIssue extends Document {
   duplicateOf?: Types.ObjectId | null;
   similarIssueIds?: Types.ObjectId[];
 
+  // AI Criticality Detection & Star Triage
+  isStarred: boolean;
+  priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  aiAnalysisReason?: string;
+  suggestedDepartment?: string;
+
   // Triage & Circuit-Breaker Engine
   urgencyTrack: UrgencyTrack;
   triageRationale?: string;
@@ -178,6 +184,17 @@ const IssueSchema = new Schema<IIssue>(
     dedupFingerprint: { type: String, index: true },
     duplicateOf: { type: Schema.Types.ObjectId, ref: "Issue", default: null },
     similarIssueIds: [{ type: Schema.Types.ObjectId, ref: "Issue" }],
+
+    // AI Criticality Detection & Star Triage
+    isStarred: { type: Boolean, default: false, index: true },
+    priority: {
+      type: String,
+      enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+      default: "MEDIUM",
+      index: true,
+    },
+    aiAnalysisReason: { type: String, default: "" },
+    suggestedDepartment: { type: String, default: "Higher & Technical Education" },
 
     // Triage & Circuit Breaker
     urgencyTrack: {
