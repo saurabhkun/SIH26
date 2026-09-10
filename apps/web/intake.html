@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>नागरिक शिकायत दर्ज करें | CivicResolve Jharkhand</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/auth.js"></script>
+  <script src="js/database.js"></script>
+  <style>
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .challenge-card {
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      background: var(--bg-surface);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .challenge-card:hover {
+      border-color: var(--brand-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .challenge-card.selected {
+      border-color: var(--brand-primary);
+      background: rgba(30, 58, 138, 0.05);
+      outline: 2px solid var(--brand-primary);
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .community-pill {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .speaker-btn {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.25rem 0.45rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .speaker-btn:hover {
+      background: #fef3c7;
+      transform: scale(1.1);
+    }
+    .card-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+    .card-content-header {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+    .card-title-hi {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin: 0;
+    }
+    .card-title-en {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+    .card-helper {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.6rem;
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+    .mic-banner {
+      background: var(--bg-surface);
+      border: 2px dashed var(--brand-primary);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    .mic-button {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #ffffff;
+      border: none;
+      padding: 0.85rem 1.8rem;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+      transition: all 0.2s ease;
+    }
+    .mic-button:hover {
+      background: linear-gradient(135deg, #172554, #1d4ed8);
+      transform: translateY(-2px);
+    }
+    .mic-button.listening {
+      background: #e11d48;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.03); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Gov Bar -->
+  <div style="background:var(--brand-primary); color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <span>झारखंड सरकार &bull; जन शिकायत एवं ग्रामीण समाधान पोर्टल (CIVICRESOLVE)</span>
+    <button onclick="CivicAuth.toggleTheme()" class="theme-toggle-btn">🌓 थीम बदलें (Dark/Light)</button>
+  </div>
+
+  <header style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:1rem 1.5rem;">
+    <div style="max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>
+        <h1 style="font-size:1.4rem; color:var(--brand-primary); margin:0;">ग्रामीण व नागरिक शिकायत निवारण</h1>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.2rem;">सरल हिंदी में समस्या चुनें या सीधे बोलकर अपनी बात दर्ज करें</p>
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <a href="reports.html" class="btn btn-secondary">सार्वजनिक सूची</a>
+        <a href="index.html" class="btn btn-secondary">लॉगिन पोर्टल</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1100px; margin:1.5rem auto; padding:0 1rem;">
+    <div class="card" style="margin-bottom:1rem;">
+      <h2 style="font-size:1.2rem; color:var(--text-primary); margin-bottom:0.3rem;">चरण 1: अपनी समस्या की श्रेणी चुनें (Tap to Select)</h2>
+      <p style="font-size:0.85rem; color:var(--text-secondary);">
+        अपनी पंचायत, गांव या वार्ड की समस्या का कार्ड दबाएं। आवाज़ में सुनने के लिए लाउडस्पीकर <strong>🔊</strong> पर क्लिक करें:
+      </p>
+
+      <!-- 8 Rural & Grassroots Category Cards -->
+      <div class="category-grid" id="categories-container"></div>
+    </div>
+
+    <!-- Prominent Voice Input Section -->
+    <div class="mic-banner">
+      <h3 style="font-size:1.15rem; color:var(--text-primary); margin-bottom:0.5rem;">लिखना नहीं आता? सीधे बोलकर दर्ज करें</h3>
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">
+        नीचे दिए गए माइक बटन पर दबाएं और अपनी समस्या, गांव का नाम और पता साफ-साफ बोलें:
+      </p>
+
+      <button id="mic-btn" type="button" class="mic-button" onclick="toggleSpeechRecording()">
+        <span id="mic-icon">🎙️</span>
+        <span id="mic-text">बोलकर बताएं (Tap to Speak 🎙️)</span>
+      </button>
+
+      <div id="listening-status" style="display:none; margin-top:0.75rem; color:#e11d48; font-weight:700; font-size:0.85rem;">
+        🔴 सुन रहे हैं... बोलिए (Recording in Hindi...)
+      </div>
+
+      <div style="margin-top:1rem; text-align:left;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.4rem; color:var(--text-primary);">
+          समस्या का विवरण (बोले गए शब्द यहाँ दिखेंगे):
+        </label>
+        <textarea id="issue-text" rows="4" placeholder="यहाँ अपनी समस्या का विवरण लिखें या माइक दबाकर बोलें..."
+                  style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.9rem; resize:vertical;"></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;">
+        <button type="button" onclick="submitGrievance()" class="btn btn-primary" style="padding:0.75rem 1.5rem; font-size:0.95rem;">
+          शिकायत जमा करें (Submit Grievance) &rarr;
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 8 Grassroots Spoken Hindi Categories
+    const CATEGORIES = [
+      {
+        id: "water",
+        icon: "🚰",
+        title: "पीने का पानी / नल / चापाकल",
+        subtitle: "Drinking Water & Handpumps",
+        tag: "बुनियादी ज़रूरत",
+        color: "#0284c7",
+        bgLight: "#f0f9ff",
+        borderColor: "#38bdf8",
+        helper: "चापाकल खराब, नलों में गंदा/पीला पानी, पाइपलाइन टूटी",
+        audioPrompt: "पीने का पानी, चापाकल या पाइपलाइन की समस्या के लिए यहाँ दबाएँ"
+      },
+      {
+        id: "farming",
+        icon: "🌾",
+        title: "खेत की सिंचाई / सूखा",
+        subtitle: "Farm Water & Irrigation",
+        tag: "खेती-बाड़ी",
+        color: "#15803d",
+        bgLight: "#f0fdf4",
+        borderColor: "#4ade80",
+        helper: "नहर टूटी, कुआं सूखा, फसल को पानी नहीं मिल रहा",
+        audioPrompt: "खेत की सिंचाई, टूटी नहर या सूखे की समस्या के लिए यहाँ दबाएँ"
+      },
+      {
+        id: "mining",
+        icon: "⛏️",
+        title: "खदान का धुआं और काला कचरा",
+        subtitle: "Mine Dust & Pollution",
+        tag: "स्वास्थ्य खतरा",
+        color: "#b45309",
+        bgLight: "#fffbeb",
+        borderColor: "#fbbf24",
+        helper: "कोयले की धूल, उड़ती राख, ज़हरीला धुआं, खुला गड्ढा",
+        audioPrompt: "खदान की धूल, काले धुएं या प्रदूषण की शिकायत के लिए यहाँ दबाएँ"
+      },
+      {
+        id: "health",
+        icon: "🏥",
+        title: "दवाखाना / डॉक्टर / इलाज",
+        subtitle: "Hospital, Clinic & Medicine",
+        tag: "इलाज & दवा",
+        color: "#e11d48",
+        bgLight: "#fff1f2",
+        borderColor: "#fb7185",
+        helper: "डॉक्टर नहीं हैं, अस्पताल बंद है, दवा या टीका नहीं मिल रहा",
+        audioPrompt: "अस्पताल, डॉक्टर या दवा न मिलने की शिकायत के लिए यहाँ दबाएँ"
+      },
+      {
+        id: "education",
+        icon: "🏫",
+        title: "स्कूल की छत, बिजली व शौचालय",
+        subtitle: "School & Classroom Needs",
+        tag: "बच्चों की पढ़ाई",
+        color: "#4f46e5",
+        bgLight: "#eef2ff",
+        borderColor: "#818cf8",
+        helper: "टूटी छत, पीने का पानी नहीं, बालिकाओं का शौचालय बंद",
+        audioPrompt: "स्कूल की टूटी छत, बिजली या शौचालय की समस्या के लिए यहाँ दबाएँ"
+      },
+      {
+        id: "environment",
+        icon: "🌲",
+        title: "जंगल कटाई और नाला सूखना",
+        subtitle: "Forest, Trees & Streams",
+        tag: "पर्यावरण",
+        color: "#047857",
+        bgLight: "#ecfdf5",
+        borderColor: "#34d399",
+        helper: "पेड़ काटे जा रहे हैं, मिट्टी बह रही है, बरसाती नाला सूखा",
+        audioPrompt: "जंगल कटाई, मिट्टी कटाव या सूखे नाले की शिकायत के लिए यहाँ दबाएँ"
+      },
+      {
+        id: "anganwadi",
+        icon: "👶",
+        title: "आंगनवाड़ी / बच्चों का राशन",
+        subtitle: "Anganwadi & Child Nutrition",
+        tag: "आंगनवाड़ी",
+        color: "#c026d3",
+        bgLight: "#fdf4ff",
+        borderColor: "#e879f9",
+        helper: "राशन नहीं मिला, बच्चों का पौष्टिक आहार बंद है",
+        audioPrompt: "आंगनवाड़ी केंद्र बंद होने या बच्चों का राशन न मिलने पर यहाँ दबाएँ"
+      },
+      {
+        id: "livelihood",
+        icon: "🚜",
+        title: "मजदूरी, बीज और पशुपालन",
+        subtitle: "Work, Seeds & Income",
+        tag: "रोज़गार",
+        color: "#d97706",
+        bgLight: "#fffdf0",
+        borderColor: "#fcd34d",
+        helper: "काम के पैसे नहीं मिले, बीज नहीं मिला, पशु दवा की ज़रूरत",
+        audioPrompt: "मजदूरी भुगतान, बीज या पशुओं की समस्या के लिए यहाँ दबाएँ"
+      }
+    ];
+
+    let selectedCategoryId = "water";
+    let isRecording = false;
+    let recognition = null;
+
+    // Web Speech API Read-Aloud for Illiterate / Low-Literacy Citizens
+    function speakPrompt(event, text) {
+      event.stopPropagation();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("आपका ब्राउज़र ऑडियो प्लेबैक का समर्थन नहीं करता है।");
+      }
+    }
+
+    function selectCategory(id) {
+      selectedCategoryId = id;
+      renderCards();
+      const cat = CATEGORIES.find(c => c.id === id);
+      if (cat) {
+        const txt = document.getElementById('issue-text');
+        if (!txt.value.trim()) {
+          txt.value = cat.title + " - ";
+        }
+      }
+    }
+
+    function renderCards() {
+      const container = document.getElementById('categories-container');
+      container.innerHTML = CATEGORIES.map(cat => {
+        const isSelected = selectedCategoryId === cat.id;
+        return `
+          <div class="challenge-card ${isSelected ? 'selected' : ''}" onclick="selectCategory('${cat.id}')">
+            <div class="card-top">
+              <span class="community-pill" style="background:${cat.color}15; color:${cat.color}; border:1px solid ${cat.color}33;">
+                ${cat.tag}
+              </span>
+              <button class="speaker-btn" type="button" title="सुनें (Tap to Listen Audio)" onclick="speakPrompt(event, '${cat.audioPrompt}')">
+                🔊
+              </button>
+            </div>
+
+            <div class="card-content-header">
+              <div class="card-icon-box" style="background:${cat.bgLight}; border:1px solid ${cat.borderColor};">
+                ${cat.icon}
+              </div>
+              <div>
+                <h4 class="card-title-hi">${cat.title}</h4>
+                <div class="card-title-en">${cat.subtitle}</div>
+              </div>
+            </div>
+
+            <div class="card-helper">
+              ${cat.helper}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Web Speech Recognition for Voice Input
+    function toggleSpeechRecording() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("आपका ब्राउज़र बोलकर लिखने (Voice Input) का समर्थन नहीं करता है। कृपया विवरण टाइप करें।");
+        return;
+      }
+
+      const micBtn = document.getElementById('mic-btn');
+      const micText = document.getElementById('mic-text');
+      const listeningStatus = document.getElementById('listening-status');
+      const txt = document.getElementById('issue-text');
+
+      if (isRecording && recognition) {
+        recognition.stop();
+        isRecording = false;
+        micBtn.classList.remove('listening');
+        micText.textContent = "बोलकर बताएं (Tap to Speak 🎙️)";
+        listeningStatus.style.display = "none";
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.add('listening');
+        micText.textContent = "सुन रहे हैं... (Tap to Stop)";
+        listeningStatus.style.display = "block";
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript.trim()) {
+          txt.value = transcript.trim();
+        }
+      };
+
+      recognition.onerror = (err) => {
+        console.warn("Speech error:", err);
+        isRecording = false;
+        micBtn.classList.remove('listening');
+        micText.textContent = "बोलकर बताएं (Tap to Speak 🎙️)";
+        listeningStatus.style.display = "none";
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove('listening');
+        micText.textContent = "बोलकर बताएं (Tap to Speak 🎙️)";
+        listeningStatus.style.display = "none";
+      };
+
+      recognition.start();
+    }
+
+    function submitGrievance() {
+      const text = document.getElementById('issue-text').value.trim();
+      if (!text) {
+        alert("कृपया समस्या का विवरण दर्ज करें या माइक से बोलें।");
+        return;
+      }
+
+      const cat = CATEGORIES.find(c => c.id === selectedCategoryId) || CATEGORIES[0];
+      const tracking = "JH-2026-CIT-" + Math.floor(1000 + Math.random() * 9000);
+
+      CivicDB.addIssue({
+        trackingCode: tracking,
+        title: cat.title,
+        description: text,
+        category: cat.id,
+        district: "Ranchi",
+        status: "pending_super_admin_review",
+        priority: "HIGH",
+        severityScore: 4,
+        createdAt: new Date().toISOString()
+      });
+
+      alert("आपकी शिकायत सफलतापूर्वक दर्ज हो गई है!\nट्रैकिंग नंबर: " + tracking + "\nस्थिति: सुपर एडमिन समीक्षा हेतु लंबित।");
+      window.location.href = "reports.html";
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCards();
+    });
+  </script>
+</body>
+</html>

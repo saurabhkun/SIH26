@@ -15,6 +15,7 @@ import {
   Mic,
   Plus,
   Languages,
+  Volume2,
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
@@ -256,13 +257,25 @@ export default function CitizenSubmissionWizard({
     }
   }, [description, headline, isAiOverridden, selectedCategory]);
 
+  // Web Speech API Read-Aloud for Illiterate / Low-Literacy Citizens
+  const speakPrompt = (event: React.MouseEvent, text: string) => {
+    event.stopPropagation();
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "hi-IN";
+      utterance.rate = 0.95;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   // Handle Category Card Selection (Directly wire category title to headline input)
   const handleCategorySelect = (cat: VisualChallengeOption) => {
     setSelectedCategory(cat.id);
     setSelectedDomain(cat.domain);
     setSelectedSeverity(cat.defaultSeverity);
     // Overwrite headline with the selected category title
-    setHeadline(cat.title);
+    setHeadline(cat.hindiTitle || cat.title);
   };
 
   // Handle File Upload & Convert to Data URL
@@ -535,58 +548,79 @@ export default function CitizenSubmissionWizard({
               </div>
 
               {/* 8 Visual Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {VISUAL_CHALLENGES.map((cat) => {
                   const isSelected = selectedCategory === cat.id;
                   return (
                     <div
                       key={cat.id}
                       onClick={() => handleCategorySelect(cat)}
-                      className={`cursor-pointer rounded-xl border p-4 transition-all flex flex-col justify-between relative ${
+                      className={`cursor-pointer rounded-xl border-2 p-3.5 transition-all flex flex-col justify-between relative shadow-xs hover:shadow-md ${
                         isSelected
-                          ? "border-[#1E3A8A] bg-blue-50/40 ring-1 ring-[#1E3A8A] shadow-xs"
-                          : "border-slate-200 bg-white hover:border-slate-300"
+                          ? "border-[#1E3A8A] bg-blue-50/60 ring-2 ring-[#1E3A8A]/30"
+                          : "border-slate-200 bg-white hover:border-slate-300 dark:bg-slate-800 dark:border-slate-700"
                       }`}
                     >
-                      {/* Active Checkmark Badge */}
-                      {isSelected && (
-                        <div className="absolute top-2.5 right-2.5 w-5 h-5 bg-[#1E3A8A] text-white rounded-full flex items-center justify-center text-xs shadow-xs font-bold">
-                          ✓
-                        </div>
-                      )}
+                      {/* Top Action Row: Audio Speaker Button & Checkmark */}
+                      <div className="flex items-center justify-between mb-2">
+                        <span
+                          className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: `${cat.color}15`,
+                            color: cat.color,
+                            border: `1px solid ${cat.color}33`,
+                          }}
+                        >
+                          {cat.badge}
+                        </span>
 
+                        <div className="flex items-center space-x-1">
+                          {/* Audio Speaker Read-Aloud for Illiterate Citizens */}
+                          <button
+                            type="button"
+                            onClick={(e) => speakPrompt(e, cat.audioPrompt)}
+                            className="p-1 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-slate-700 dark:text-slate-200 hover:text-amber-800 transition-colors"
+                            title="सुनें (Tap to Listen Audio)"
+                            aria-label={`Listen prompt for ${cat.hindiTitle}`}
+                          >
+                            <Volume2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+                          </button>
+
+                          {/* Selected Checkmark */}
+                          {isSelected && (
+                            <div className="w-4 h-4 bg-[#1E3A8A] text-white rounded-full flex items-center justify-center text-[10px] font-bold">
+                              ✓
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Icon + Title Section */}
                       <div>
-                        <div className="flex items-center space-x-2.5 mb-1.5">
+                        <div className="flex items-start space-x-2.5 mb-1.5">
                           <div
-                            className="p-2 rounded-lg flex items-center justify-center"
+                            className="p-2.5 rounded-xl flex items-center justify-center shrink-0 shadow-xs"
                             style={{
                               backgroundColor: cat.bgLight,
-                              border: `1px solid ${cat.borderColor}55`,
+                              border: `1px solid ${cat.borderColor}77`,
                             }}
                           >
                             {renderChallengeIcon(cat.iconName, cat.color)}
                           </div>
-                          <span
-                            className="text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                            style={{
-                              backgroundColor: `${cat.color}15`,
-                              color: cat.color,
-                              border: `1px solid ${cat.color}33`,
-                            }}
-                          >
-                            {cat.badge}
-                          </span>
-                        </div>
 
-                        <div className="font-bold text-xs text-navy leading-snug line-clamp-2">
-                          {cat.title}
-                        </div>
-                        <div className="text-[11px] font-medium text-slate-500 mt-0.5">
-                          {cat.hindiTitle}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                              {cat.hindiTitle}
+                            </h4>
+                            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                              {cat.englishSubtitle}
+                            </p>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="text-[10.5px] text-slate-600 mt-2 line-clamp-2 leading-relaxed border-t border-slate-100 pt-1.5">
+                      {/* Everyday Reality Spoken Helper Text */}
+                      <div className="text-[11px] text-slate-600 dark:text-slate-300 mt-2 line-clamp-2 leading-relaxed border-t border-slate-100 dark:border-slate-700/60 pt-2 font-medium">
                         {cat.description}
                       </div>
                     </div>
@@ -740,22 +774,22 @@ export default function CitizenSubmissionWizard({
                     <button
                       type="button"
                       onClick={toggleListening}
-                      className={`inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border transition-all duration-150 ease-in-out cursor-pointer shadow-xs ${
+                      className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl border-2 transition-all duration-150 ease-in-out cursor-pointer shadow-md ${
                         isListening
-                          ? "bg-rose-50 text-rose-600 border-rose-500 animate-pulse"
-                          : "bg-white text-[#274C77] border-[#274C77] hover:bg-[#1E3A8A] hover:text-white"
+                          ? "bg-rose-600 text-white border-rose-700 animate-pulse ring-4 ring-rose-200"
+                          : "bg-white text-[#1E3A8A] border-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white dark:bg-slate-800 dark:text-blue-300 dark:border-blue-400 dark:hover:bg-blue-600 dark:hover:text-white"
                       }`}
                       title={
                         isListening
-                          ? "Stop Recording"
-                          : "Speak to Type Description (Speech to Text)"
+                          ? "Stop Recording (रोकें)"
+                          : "Tap to Speak Description (बोलकर बताएं)"
                       }
                     >
-                      <Mic className="w-4 h-4 transition-colors" />
+                      <Mic className={`w-4 h-4 transition-colors ${isListening ? "animate-bounce" : ""}`} />
                       <span>
                         {isListening
-                          ? "Listening... (सुन रहे हैं)"
-                          : "Voice Input (बोलकर लिखें)"}
+                          ? "सुन रहे हैं... (Tap to Stop)"
+                          : "बोलकर बताएं (Tap to Speak 🎙️)"}
                       </span>
                     </button>
                   </div>
