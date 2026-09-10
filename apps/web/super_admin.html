@@ -3,75 +3,189 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Super Admin Portal | CivicResolve Jharkhand</title>
+  <title>Chief Super Admin Portal | CivicResolve Jharkhand</title>
   <link rel="stylesheet" href="css/theme.css">
   <script src="js/auth.js"></script>
   <script src="js/database.js"></script>
   <script src="js/super_admin.js" defer></script>
 </head>
-<body>
-  <!-- Top Gov Bar -->
-  <div style="background:var(--brand-primary); color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-    <span>GOVERNMENT OF JHARKHAND &bull; CABINET SECRETARIAT &bull; SUPER ADMIN APEX OVERSIGHT</span>
+<body style="display:flex; flex-direction:column; min-height:100vh; background-color:#f8fafc; color:#0f172a;">
+  <!-- Top Government Identifier Bar -->
+  <div style="background:#274c77; color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <span style="font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Government of Jharkhand</span>
+      <span style="color:#a3cef1;">|</span>
+      <span style="color:#e2e8f0;">Chief Super Admin Apex Oversight</span>
+    </div>
     <div style="display:flex; align-items:center; gap:1rem;">
-      <button onclick="CivicAuth.toggleTheme()" class="theme-toggle-btn">🌓 Toggle Dark Mode</button>
-      <button onclick="CivicAuth.logout()" class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem;">Sign Out</button>
+      <button onclick="CivicAuth?.toggleTheme()" class="theme-toggle-btn" style="padding:0.2rem 0.6rem; font-size:0.75rem; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">🌓 Toggle Theme</button>
+      <button onclick="CivicAuth?.logout()" class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">Sign Out</button>
     </div>
   </div>
 
-  <!-- Header -->
-  <header style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:0.8rem 1.5rem;">
-    <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+  <!-- Header with Role-Specific Navigation Bar -->
+  <header style="background:#ffffff; border-bottom:1px solid #e2e8f0; padding:0.8rem 1.5rem;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
       <div>
-        <h1 style="font-size:1.4rem; color:var(--brand-primary);">CivicResolve &bull; Chief Super Admin Portal</h1>
-        <p style="font-size:0.8rem; color:var(--text-secondary);" id="user-display">Loading Administrator Profile...</p>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <h1 style="font-size:1.35rem; color:#274c77; font-family:'Source Serif 4', Georgia, serif; font-weight:700; margin:0;">
+            CivicResolve &bull; Chief Super Admin Portal
+          </h1>
+          <span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:9999px; border:1px solid #bae6fd;">
+            State Apex Triage
+          </span>
+        </div>
+        <p style="font-size:0.8rem; color:#64748b; margin-top:0.15rem;" id="user-display">
+          Sri Sunil Kumar, IAS (Principal Secretary &bull; Chief Super Administrator)
+        </p>
       </div>
-      <div style="display:flex; gap:0.5rem;">
-        <a href="dashboard.html" class="btn btn-secondary">Research Org &amp; CSR View</a>
-        <a href="reports.html" class="btn btn-secondary">Public Reports Directory</a>
-      </div>
+
+      <!-- Role-Specific Distinct Navigation Bar: Chief Super Admin -->
+      <!-- Overview | Master Triage Pipeline | Directory | Project Tracking | Audit Logs -->
+      <nav style="display:flex; gap:0.4rem; flex-wrap:wrap;" id="super-admin-nav">
+        <button class="nav-tab" onclick="switchSuperTab('overview')" id="tab-overview" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; cursor:pointer;">
+          📊 Overview
+        </button>
+        <button class="nav-tab active" onclick="switchSuperTab('triage')" id="tab-triage" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #274c77; background:#274c77; color:#ffffff; cursor:pointer;">
+          🏛️ Master Triage Pipeline
+        </button>
+        <button class="nav-tab" onclick="switchSuperTab('directory')" id="tab-directory" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; cursor:pointer;">
+          📁 Directory
+        </button>
+        <button class="nav-tab" onclick="switchSuperTab('tracking')" id="tab-tracking" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; cursor:pointer;">
+          🚀 Project Tracking
+        </button>
+        <button class="nav-tab" onclick="switchSuperTab('audit')" id="tab-audit" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; cursor:pointer;">
+          📜 Audit Logs
+        </button>
+      </nav>
     </div>
   </header>
 
   <!-- Main Container -->
-  <main style="max-width:1200px; margin:1.5rem auto; padding:0 1rem;">
+  <main style="max-width:1280px; width:100%; margin:1.5rem auto; padding:0 1.5rem; flex:1;">
+    
     <!-- Stats Row -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
-      <div class="card">
-        <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Global Pipeline</span>
-        <div style="font-size:1.8rem; font-weight:900; color:var(--text-primary);" id="stat-total">0</div>
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <span style="font-size:0.75rem; color:#64748b; text-transform:uppercase; font-weight:700;">Global Pipeline</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#0f172a;" id="stat-total">0</div>
+        <div style="font-size:0.75rem; color:#64748b; margin-top:0.2rem;">Total active grievances</div>
       </div>
-      <div class="card" style="border-top:3px solid var(--status-pending);">
-        <span style="font-size:0.75rem; color:var(--status-pending); text-transform:uppercase; font-weight:700;">Pending Super Admin</span>
-        <div style="font-size:1.8rem; font-weight:900; color:var(--status-pending);" id="stat-pending">0</div>
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; border-top:3px solid #d97706; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <span style="font-size:0.75rem; color:#d97706; text-transform:uppercase; font-weight:700;">Reported / In Triage</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#d97706;" id="stat-pending">0</div>
+        <div style="font-size:0.75rem; color:#64748b; margin-top:0.2rem;">Pending review</div>
       </div>
-      <div class="card" style="border-top:3px solid var(--status-accepted);">
-        <span style="font-size:0.75rem; color:var(--status-accepted); text-transform:uppercase; font-weight:700;">Accepted (Research Org)</span>
-        <div style="font-size:1.8rem; font-weight:900; color:var(--status-accepted);" id="stat-accepted">0</div>
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; border-top:3px solid #059669; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <span style="font-size:0.75rem; color:#059669; text-transform:uppercase; font-weight:700;">Accepted (Research Org)</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#059669;" id="stat-accepted">0</div>
+        <div style="font-size:0.75rem; color:#64748b; margin-top:0.2rem;">State &amp; Univ Labs</div>
       </div>
-      <div class="card" style="border-top:3px solid var(--status-dept);">
-        <span style="font-size:0.75rem; color:var(--status-dept); text-transform:uppercase; font-weight:700;">Assigned to Depts</span>
-        <div style="font-size:1.8rem; font-weight:900; color:var(--status-dept);" id="stat-dept">0</div>
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; border-top:3px solid #2563eb; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <span style="font-size:0.75rem; color:#2563eb; text-transform:uppercase; font-weight:700;">Allocated to Depts</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#2563eb;" id="stat-dept">0</div>
+        <div style="font-size:0.75rem; color:#64748b; margin-top:0.2rem;">Municipal &amp; PWD queues</div>
       </div>
-      <div class="card" style="border-top:3px solid var(--status-rejected);">
-        <span style="font-size:0.75rem; color:var(--status-rejected); text-transform:uppercase; font-weight:700;">Rejected / Filtered</span>
-        <div style="font-size:1.8rem; font-weight:900; color:var(--status-rejected);" id="stat-rejected">0</div>
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; border-top:3px solid #dc2626; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <span style="font-size:0.75rem; color:#dc2626; text-transform:uppercase; font-weight:700;">Resolved / Closed</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#dc2626;" id="stat-resolved">0</div>
+        <div style="font-size:0.75rem; color:#64748b; margin-top:0.2rem;">Verified solutions</div>
       </div>
     </div>
 
-    <!-- Filter Buttons -->
-    <div style="display:flex; gap:0.5rem; margin-bottom:1.2rem; flex-wrap:wrap;">
-      <button class="btn btn-secondary" onclick="filterStatus('all')">All Grievances</button>
-      <button class="btn btn-secondary" onclick="filterStatus('pending_super_admin_review')">⏳ Pending Review</button>
-      <button class="btn btn-secondary" onclick="filterStatus('accepted')">✓ Accepted (Research Org)</button>
-      <button class="btn btn-secondary" onclick="filterStatus('assigned_to_govt_dept')">🏢 Govt Dept Maintenance</button>
-      <button class="btn btn-secondary" onclick="filterStatus('rejected')">✕ Rejected</button>
+    <!-- Section 1: Master Triage View -->
+    <div id="section-triage" class="super-section">
+      <!-- Filter Buttons -->
+      <div style="display:flex; gap:0.5rem; margin-bottom:1.2rem; flex-wrap:wrap;">
+        <button class="btn btn-secondary filter-btn active" onclick="filterStatus('all')">All Grievances</button>
+        <button class="btn btn-secondary filter-btn" onclick="filterStatus('Reported')">⏳ Reported / New</button>
+        <button class="btn btn-secondary filter-btn" onclick="filterStatus('Under Review / Triage')">🔍 In Triage</button>
+        <button class="btn btn-secondary filter-btn" onclick="filterStatus('Allocated')">🏢 Allocated Maintenance</button>
+        <button class="btn btn-secondary filter-btn" onclick="filterStatus('In Progress')">⚙️ In Progress</button>
+        <button class="btn btn-secondary filter-btn" onclick="filterStatus('Resolved')">✓ Resolved</button>
+      </div>
+
+      <!-- Master Triage List Container -->
+      <div id="triage-list">
+        <div class="card" style="text-align:center; padding:2rem; background:#ffffff;">Loading master complaints pipeline...</div>
+      </div>
     </div>
 
-    <!-- Master Triage List Container -->
-    <div id="triage-list">
-      <div class="card" style="text-align:center; padding:2rem;">Loading master complaints pipeline...</div>
+    <!-- Section 2: Universal Project Tracking Module -->
+    <div id="section-tracking" class="super-section" style="display:none;">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.75rem;">
+          <div>
+            <h2 style="font-size:1.2rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin:0;">
+              Universal Project Tracking &amp; Status Timeline
+            </h2>
+            <p style="font-size:0.8rem; color:#64748b; margin-top:0.2rem;">
+              Status flow: <strong>Reported &rarr; Under Review / Triage &rarr; Allocated &rarr; In Progress &rarr; Resolved</strong>
+            </p>
+          </div>
+          <span style="font-size:0.75rem; font-weight:700; color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; padding:0.2rem 0.6rem; border-radius:9999px;">
+            ● Live Synchronized
+          </span>
+        </div>
+
+        <div id="project-tracking-list" style="display:flex; flex-direction:column; gap:1rem;">
+          <!-- Dynamically Rendered -->
+        </div>
+      </div>
     </div>
+
+    <!-- Section 3: Official Directory Tab -->
+    <div id="section-directory" class="super-section" style="display:none;">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; border-bottom:1px solid #e2e8f0; padding-bottom:1rem;">
+          <div>
+            <h2 style="font-size:1.2rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin:0;">
+              Government of Jharkhand Institutional Directory
+            </h2>
+            <p style="font-size:0.8rem; color:#64748b; margin-top:0.2rem;">
+              Official list of State Departments &amp; Empaneled Research Organizations.
+            </p>
+          </div>
+          <input type="text" id="directory-search" placeholder="🔍 Search department, org or district..." oninput="filterDirectory()" style="padding:0.45rem 0.8rem; font-size:0.8rem; border:1px solid #cbd5e1; border-radius:6px; min-width:260px;">
+        </div>
+
+        <div id="directory-content" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1rem;">
+          <!-- Dynamically Rendered -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Overview & Audit Logs -->
+    <div id="section-overview" class="super-section" style="display:none;">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px;">
+        <h2 style="font-size:1.2rem; color:#0f172a; margin-bottom:0.5rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700;">Statewide Governance Overview</h2>
+        <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">
+          Centralized governance dashboard for the Chief Super Administrator. Review statewide grievance SLA compliance, AI-assisted department dispatch rates, and research innovation workflows across all 24 administrative districts of Jharkhand.
+        </p>
+      </div>
+    </div>
+
+    <div id="section-audit" class="super-section" style="display:none;">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px;">
+        <h2 style="font-size:1.2rem; color:#0f172a; margin-bottom:0.5rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700;">Immutable Audit Logs</h2>
+        <div style="font-family:monospace; font-size:0.78rem; color:#334155; line-height:1.6; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;">
+          <div>[2026-09-10T14:30:00Z] AUTH_OK: Sri Sunil Kumar, IAS authenticated with apex governance permissions.</div>
+          <div>[2026-09-10T12:00:00Z] TRIAGE_DISPATCH: CR-JH-5512D4 allocated to Birsa Agricultural University (BAU).</div>
+          <div>[2026-09-10T09:15:00Z] ROUTING_EVAL: CR-JH-8841A1 assigned to BIT Mesra Environmental Lab.</div>
+          <div>[2026-09-10T08:00:00Z] CITIZEN_SUBMIT: CR-JH-3920C3 logged from Ranchi district (Status: Reported).</div>
+        </div>
+      </div>
+    </div>
+
   </main>
+
+  <!-- Official Standardized Footer -->
+  <footer style="text-align:center; padding:1rem 1.5rem; font-size:0.75rem; color:#64748b; border-top:1px solid #e2e8f0; background:#ffffff;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>&copy; 2026 <strong>Government of Jharkhand</strong>. All Rights Reserved.</div>
+      <div>CivicResolve Platform &bull; Chief Super Administrator Governance Desk</div>
+    </div>
+  </footer>
 </body>
 </html>

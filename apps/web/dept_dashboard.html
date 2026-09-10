@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gov Nodal &amp; Depts Portal | CivicResolve Jharkhand</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/auth.js"></script>
+  <script src="js/database.js"></script>
+</head>
+<body style="display:flex; flex-direction:column; min-height:100vh; background-color:#f8fafc; color:#0f172a;">
+  <!-- Top Government Identifier Bar -->
+  <div style="background:#274c77; color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <span style="font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Government of Jharkhand</span>
+      <span style="color:#a3cef1;">|</span>
+      <span style="color:#e2e8f0;">Departmental Maintenance &amp; Public Works Desk</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <button onclick="CivicAuth?.toggleTheme()" class="theme-toggle-btn" style="padding:0.2rem 0.6rem; font-size:0.75rem; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">🌓 Toggle Theme</button>
+      <button onclick="CivicAuth?.logout()" class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Header with Role-Specific Navigation Bar -->
+  <header style="background:#ffffff; border-bottom:1px solid #e2e8f0; padding:0.8rem 1.5rem;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <h1 style="font-size:1.35rem; color:#274c77; font-family:'Source Serif 4', Georgia, serif; font-weight:700; margin:0;">
+            CivicResolve &bull; Gov Nodal &amp; Depts
+          </h1>
+          <span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:9999px; border:1px solid #bae6fd;">
+            PWD &amp; Municipal Queue
+          </span>
+        </div>
+        <p style="font-size:0.8rem; color:#64748b; margin-top:0.15rem;" id="user-display">
+          Dr. Arvind Kumar (State Review Desk &bull; PWD &amp; Urban Works)
+        </p>
+      </div>
+
+      <!-- Role-Specific Navigation Bar: Gov Nodal & Depts -->
+      <!-- Department Queue | Field Maintenance | Analytics & Heatmap | Resolution Proofs -->
+      <nav style="display:flex; gap:0.4rem; flex-wrap:wrap;" id="dept-nav">
+        <button class="nav-tab active" onclick="switchDeptTab('queue')" id="tab-queue" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #274c77; background:#274c77; color:#ffffff; cursor:pointer;">
+          📋 Department Queue
+        </button>
+        <button class="nav-tab" onclick="switchDeptTab('maintenance')" id="tab-maintenance" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; cursor:pointer;">
+          🚜 Field Maintenance
+        </button>
+        <button class="nav-tab" onclick="switchDeptTab('analytics')" id="tab-analytics" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; cursor:pointer;">
+          📊 Analytics &amp; Heatmap
+        </button>
+        <button class="nav-tab" onclick="switchDeptTab('proofs')" id="tab-proofs" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; cursor:pointer;">
+          📸 Resolution Proofs
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main style="max-width:1280px; width:100%; margin:1.5rem auto; padding:0 1.5rem; flex:1;">
+    
+    <!-- Analytics Card Grid with Key KPIs -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); border-top:3px solid #274c77;">
+        <span style="font-size:0.75rem; color:#64748b; text-transform:uppercase; font-weight:700;">Total Maintenance Tickets</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#0f172a; margin-top:0.2rem;">1,248</div>
+        <div style="font-size:0.72rem; color:#059669; font-weight:600; margin-top:0.2rem;">Across 24 districts</div>
+      </div>
+
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); border-top:3px solid #10b981;">
+        <span style="font-size:0.75rem; color:#059669; text-transform:uppercase; font-weight:700;">Resolved (SLA Compliant)</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#059669; margin-top:0.2rem;">91.4%</div>
+        <div style="font-size:0.72rem; color:#64748b; margin-top:0.2rem;">State target: 90.0%</div>
+      </div>
+
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); border-top:3px solid #0284c7;">
+        <span style="font-size:0.75rem; color:#0284c7; text-transform:uppercase; font-weight:700;">Active Work Orders</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#0284c7; margin-top:0.2rem;">107</div>
+        <div style="font-size:0.72rem; color:#64748b; margin-top:0.2rem;">Currently deployed in field</div>
+      </div>
+
+      <div class="card" style="padding:1.2rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); border-top:3px solid #d97706;">
+        <span style="font-size:0.75rem; color:#d97706; text-transform:uppercase; font-weight:700;">Average Resolution Time</span>
+        <div style="font-size:1.8rem; font-weight:900; color:#d97706; margin-top:0.2rem;">3.8 Days</div>
+        <div style="font-size:0.72rem; color:#64748b; margin-top:0.2rem;">MTTR statutory benchmark</div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Department Queue -->
+    <div id="section-queue" class="dept-section">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.75rem;">
+          <div>
+            <h3 style="font-size:1.15rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin:0;">
+              Active Maintenance Dispatch Queue
+            </h3>
+            <p style="font-size:0.78rem; color:#64748b; margin-top:0.2rem;">
+              Field repair tickets assigned to PWD, DWSD, JUVNL, and Municipal taskforces.
+            </p>
+          </div>
+          <span style="font-size:0.72rem; font-weight:700; color:#0284c7; background:#e0f2fe; padding:0.2rem 0.6rem; border-radius:9999px;">
+            Live SLA Monitored
+          </span>
+        </div>
+
+        <div id="dept-queue-list">
+          <!-- Dynamically Rendered -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Field Maintenance & 24 Districts Summary Table -->
+    <div id="section-maintenance" class="dept-section" style="display:none;">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:1.5rem;">
+        <h3 style="font-size:1.15rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
+          24-District Maintenance &amp; SLA Breakdown
+        </h3>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:1.25rem;">
+          Regional infrastructure health and active resolution rates across all 24 administrative districts of Jharkhand.
+        </p>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.8rem; text-align:left;">
+            <thead>
+              <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; color:#334155; font-weight:700;">
+                <th style="padding:0.75rem 1rem;">District Name</th>
+                <th style="padding:0.75rem 1rem;">Division</th>
+                <th style="padding:0.75rem 1rem;">Total Logged</th>
+                <th style="padding:0.75rem 1rem;">Resolved</th>
+                <th style="padding:0.75rem 1rem;">In Progress</th>
+                <th style="padding:0.75rem 1rem;">SLA Rate</th>
+              </tr>
+            </thead>
+            <tbody id="districts-table-body">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Analytics & Heatmap -->
+    <div id="section-analytics" class="dept-section" style="display:none;">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:1.5rem;">
+        <h3 style="font-size:1.15rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
+          State Infrastructure Heatmap &amp; Category Breakdown
+        </h3>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:1.25rem;">
+          Primary infrastructure recurring issue clusters: Drinking water pipelines, road potholes, solid waste, and electrical outages.
+        </p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
+          <div style="padding:1rem; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+            <strong style="color:#0284c7; font-size:0.9rem;">🚰 Drinking Water &amp; Sanitation (DWSD)</strong>
+            <div style="font-size:1.4rem; font-weight:800; color:#0f172a; margin:0.4rem 0;">412 Tickets</div>
+            <div style="font-size:0.75rem; color:#64748b;">SLA Compliance: 93.8% (Avg 2.9 Days)</div>
+          </div>
+          <div style="padding:1rem; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+            <strong style="color:#15803d; font-size:0.9rem;">🛣️ PWD Roads &amp; Rural Bridges</strong>
+            <div style="font-size:1.4rem; font-weight:800; color:#0f172a; margin:0.4rem 0;">348 Tickets</div>
+            <div style="font-size:0.75rem; color:#64748b;">SLA Compliance: 89.2% (Avg 4.1 Days)</div>
+          </div>
+          <div style="padding:1rem; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+            <strong style="color:#b45309; font-size:0.9rem;">⛏️ Mining Dust &amp; Environmental Safety</strong>
+            <div style="font-size:1.4rem; font-weight:800; color:#0f172a; margin:0.4rem 0;">264 Tickets</div>
+            <div style="font-size:0.75rem; color:#64748b;">SLA Compliance: 90.5% (Avg 3.6 Days)</div>
+          </div>
+          <div style="padding:1rem; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+            <strong style="color:#7e22ce; font-size:0.9rem;">🏫 Schools &amp; Anganwadi Facilities</strong>
+            <div style="font-size:1.4rem; font-weight:800; color:#0f172a; margin:0.4rem 0;">224 Tickets</div>
+            <div style="font-size:0.75rem; color:#64748b;">SLA Compliance: 92.1% (Avg 3.2 Days)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Resolution Proofs -->
+    <div id="section-proofs" class="dept-section" style="display:none;">
+      <div class="card" style="padding:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:1.5rem;">
+        <h3 style="font-size:1.15rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
+          Verified Field Resolution Proofs &amp; Geotagged Audits
+        </h3>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:1.25rem;">
+          Before/After completion evidence uploaded by on-ground department engineers.
+        </p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
+          <div style="border:1px solid #e2e8f0; border-radius:8px; padding:1rem; background:#ffffff;">
+            <span style="font-family:monospace; font-weight:700; color:#274c77; font-size:0.85rem;">CR-JH-6721E5</span>
+            <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a; margin:0.25rem 0;">Dumka Nutrition Hub Supply Chain Restored</h4>
+            <p style="font-size:0.75rem; color:#64748b;">Cold-storage verified &amp; supplementary ration delivery dispatched to 8 rural centers.</p>
+            <div style="font-size:0.72rem; color:#059669; font-weight:700; margin-top:0.5rem;">✓ Geotagged &bull; Signed by District Nodal Officer</div>
+          </div>
+          <div style="border:1px solid #e2e8f0; border-radius:8px; padding:1rem; background:#ffffff;">
+            <span style="font-family:monospace; font-weight:700; color:#274c77; font-size:0.85rem;">CR-JH-8841A1</span>
+            <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a; margin:0.25rem 0;">Garhwa Fluoride Nano-Filter Unit</h4>
+            <p style="font-size:0.75rem; color:#64748b;">Pilot solar filtration unit installed supplying 450 households clean potable water.</p>
+            <div style="font-size:0.72rem; color:#059669; font-weight:700; margin-top:0.5rem;">✓ NABL Lab Assay Certified &bull; BIT Mesra Verified</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Official Standardized Footer -->
+  <footer style="text-align:center; padding:1rem 1.5rem; font-size:0.75rem; color:#64748b; border-top:1px solid #e2e8f0; background:#ffffff;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>&copy; 2026 <strong>Government of Jharkhand</strong>. All Rights Reserved.</div>
+      <div>CivicResolve Platform &bull; Departmental Infrastructure Taskforce</div>
+    </div>
+  </footer>
+
+  <script>
+    const JHARKHAND_24_DISTRICTS = [
+      { name: 'Ranchi', div: 'South Chotanagpur', total: 142, resolved: 132, active: 10, sla: '93.0%' },
+      { name: 'Dhanbad', div: 'North Chotanagpur', total: 118, resolved: 108, active: 10, sla: '91.5%' },
+      { name: 'East Singhbhum', div: 'Kolhan', total: 98, resolved: 90, active: 8, sla: '91.8%' },
+      { name: 'Bokaro', div: 'North Chotanagpur', total: 84, resolved: 78, active: 6, sla: '92.8%' },
+      { name: 'Hazaribagh', div: 'North Chotanagpur', total: 72, resolved: 66, active: 6, sla: '91.6%' },
+      { name: 'Palamu', div: 'Palamu', total: 68, resolved: 61, active: 7, sla: '89.7%' },
+      { name: 'Deoghar', div: 'Santhal Pargana', total: 64, resolved: 59, active: 5, sla: '92.2%' },
+      { name: 'Giridih', div: 'North Chotanagpur', total: 58, resolved: 52, active: 6, sla: '89.6%' },
+      { name: 'Dumka', div: 'Santhal Pargana', total: 54, resolved: 50, active: 4, sla: '92.5%' },
+      { name: 'West Singhbhum', div: 'Kolhan', total: 52, resolved: 47, active: 5, sla: '90.3%' },
+      { name: 'Ramgarh', div: 'North Chotanagpur', total: 46, resolved: 43, active: 3, sla: '93.5%' },
+      { name: 'Garhwa', div: 'Palamu', total: 42, resolved: 38, active: 4, sla: '90.4%' },
+      { name: 'Saraikela-Kharsawan', div: 'Kolhan', total: 38, resolved: 35, active: 3, sla: '92.1%' },
+      { name: 'Chatra', div: 'North Chotanagpur', total: 36, resolved: 32, active: 4, sla: '88.8%' },
+      { name: 'Godda', div: 'Santhal Pargana', total: 34, resolved: 31, active: 3, sla: '91.2%' },
+      { name: 'Gumla', div: 'South Chotanagpur', total: 32, resolved: 29, active: 3, sla: '90.6%' },
+      { name: 'Koderma', div: 'North Chotanagpur', total: 30, resolved: 28, active: 2, sla: '93.3%' },
+      { name: 'Latehar', div: 'Palamu', total: 28, resolved: 25, active: 3, sla: '89.3%' },
+      { name: 'Sahibganj', div: 'Santhal Pargana', total: 26, resolved: 23, active: 3, sla: '88.5%' },
+      { name: 'Simdega', div: 'South Chotanagpur', total: 24, resolved: 22, active: 2, sla: '91.7%' },
+      { name: 'Pakur', div: 'Santhal Pargana', total: 22, resolved: 19, active: 3, sla: '86.4%' },
+      { name: 'Jamtara', div: 'Santhal Pargana', total: 20, resolved: 18, active: 2, sla: '90.0%' },
+      { name: 'Khunti', div: 'South Chotanagpur', total: 18, resolved: 17, active: 1, sla: '94.4%' },
+      { name: 'Lohardaga', div: 'South Chotanagpur', total: 14, resolved: 13, active: 1, sla: '92.8%' }
+    ];
+
+    function renderDeptQueue() {
+      const container = document.getElementById('dept-queue-list');
+      if (!container) return;
+
+      const issues = CivicDB?.getIssues() || [];
+      container.innerHTML = issues.map(i => `
+        <div style="padding:1.2rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.75rem; background:#ffffff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.3rem;">
+              <span style="font-family:monospace; font-weight:700; color:#274c77;">${i.trackingCode}</span>
+              <span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:9999px; font-weight:700;">${i.district}</span>
+              <span style="background:#f1f5f9; color:#334155; font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:9999px; font-weight:600;">${i.status}</span>
+            </div>
+            <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a; margin:0;">${i.title}</h4>
+            <p style="font-size:0.8rem; color:#64748b; margin-top:0.25rem;">${i.description}</p>
+          </div>
+          <div style="display:flex; gap:0.4rem;">
+            <button class="btn btn-secondary" onclick="alert('Viewing dispatch order for ${i.trackingCode}')" style="padding:0.4rem 0.75rem; font-size:0.75rem;">
+              Dispatch Order &rarr;
+            </button>
+            <button class="btn btn-primary" onclick="alert('Resolving ${i.trackingCode} with SLA verification.')" style="padding:0.4rem 0.75rem; font-size:0.75rem; background:#059669; color:#ffffff; border:none; border-radius:6px; font-weight:700;">
+              ✓ Mark SLA Resolved
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDistrictsTable() {
+      const tbody = document.getElementById('districts-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = JHARKHAND_24_DISTRICTS.map(d => `
+        <tr style="border-bottom:1px solid #f1f5f9;">
+          <td style="padding:0.65rem 1rem; font-weight:700; color:#0f172a;">${d.name}</td>
+          <td style="padding:0.65rem 1rem; color:#64748b;">${d.div}</td>
+          <td style="padding:0.65rem 1rem; font-weight:600;">${d.total}</td>
+          <td style="padding:0.65rem 1rem; color:#059669; font-weight:700;">${d.resolved}</td>
+          <td style="padding:0.65rem 1rem; color:#0284c7; font-weight:700;">${d.active}</td>
+          <td style="padding:0.65rem 1rem; font-weight:700; color:#0f172a;">
+            <span style="background:#ecfdf5; color:#047857; padding:0.15rem 0.45rem; border-radius:4px; border:1px solid #a7f3d0;">
+              ${d.sla}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.switchDeptTab = function(tabName) {
+      document.querySelectorAll('.dept-section').forEach(s => s.style.display = 'none');
+      document.querySelectorAll('#dept-nav .nav-tab').forEach(b => {
+        b.style.background = '#ffffff';
+        b.style.color = '#334155';
+        b.style.borderColor = '#e2e8f0';
+      });
+
+      const target = document.getElementById(`section-${tabName}`);
+      if (target) target.style.display = 'block';
+
+      const activeBtn = document.getElementById(`tab-${tabName}`);
+      if (activeBtn) {
+        activeBtn.style.background = '#274c77';
+        activeBtn.style.color = '#ffffff';
+        activeBtn.style.borderColor = '#274c77';
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDeptQueue();
+      renderDistrictsTable();
+    });
+  </script>
+</body>
+</html>

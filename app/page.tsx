@@ -19,11 +19,11 @@ export default function Home() {
           </span>
           <span className="text-civic-accent">|</span>
           <span className="text-slate-200">
-            Higher &amp; Technical Education Department
+            CivicResolve Citizen Gateway
           </span>
         </div>
         <div className="text-slate-200 text-[11px] hidden md:block">
-          Smart India Hackathon 2026 &bull; PS ID: 26043
+          State Grievance Resolution &amp; Collaborative Innovation Portal
         </div>
       </div>
 
@@ -31,13 +31,12 @@ export default function Home() {
       <header className="bg-civic-surface border-b border-civic-border py-3.5 px-4 sm:px-8 shadow-xs">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
-            <Link href="/" className="group block">
+            <Link href="/" suppressHydrationWarning={true} className="group block">
               <span className="text-2xl sm:text-3xl font-serif font-bold text-civic-textDark tracking-tight block leading-tight">
                 CivicResolve
               </span>
               <span className="text-[11px] sm:text-xs text-civic-textMuted block mt-0.5 tracking-normal">
-                Government of Jharkhand &middot; Department of Higher &amp;
-                Technical Education
+                Government of Jharkhand &middot; Citizen Grievance &amp; Public Action System
               </span>
             </Link>
           </div>
@@ -51,12 +50,14 @@ export default function Home() {
             </button>
             <Link
               href="/register"
+              suppressHydrationWarning={true}
               className="inline-flex items-center px-4 py-2 bg-civic-surface text-civic-textDark hover:bg-civic-canvas text-xs font-medium border border-civic-border rounded-lg transition-colors shadow-xs"
             >
               Register
             </Link>
             <Link
               href="/login"
+              suppressHydrationWarning={true}
               className="inline-flex items-center px-4 py-2 border border-civic-secondary text-civic-secondary hover:bg-civic-accent/20 text-xs font-medium rounded-lg transition-colors"
             >
               Login

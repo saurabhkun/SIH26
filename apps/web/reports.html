@@ -3,57 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Public Reports Directory | CivicResolve</title>
+  <title>Public Grievance Directory | CivicResolve Jharkhand</title>
   <link rel="stylesheet" href="css/theme.css">
   <script src="js/auth.js"></script>
   <script src="js/database.js"></script>
 </head>
-<body>
-  <!-- Top Gov Bar -->
-  <div style="background:var(--brand-primary); color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-    <span>GOVERNMENT OF JHARKHAND &bull; PUBLIC VERIFIED COMPLAINTS DIRECTORY</span>
-    <button onclick="CivicAuth.toggleTheme()" class="theme-toggle-btn">🌓 Toggle Theme</button>
+<body style="display:flex; flex-direction:column; min-height:100vh; background-color:#f8fafc; color:#0f172a;">
+  <!-- Top Government Identifier Bar -->
+  <div style="background:#274c77; color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <span style="font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Government of Jharkhand</span>
+      <span style="color:#a3cef1;">|</span>
+      <span style="color:#e2e8f0;">Public Verified Directory</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <button onclick="CivicAuth?.toggleTheme()" class="theme-toggle-btn" style="padding:0.2rem 0.6rem; font-size:0.75rem; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">🌓 Toggle Theme</button>
+      <a href="index.html" style="color:#ffffff; text-decoration:none; font-size:0.75rem;">Login Portal &rarr;</a>
+    </div>
   </div>
 
-  <header style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:0.8rem 1.5rem;">
-    <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-      <h1 style="font-size:1.4rem; color:var(--brand-primary);">Global Verified Issues Directory</h1>
+  <header style="background:#ffffff; border-bottom:1px solid #e2e8f0; padding:0.8rem 1.5rem;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>
+        <h1 style="font-size:1.35rem; color:#274c77; font-family:'Source Serif 4', Georgia, serif; font-weight:700; margin:0;">
+          CivicResolve &bull; Public Grievance Directory
+        </h1>
+        <p style="font-size:0.8rem; color:#64748b; margin-top:0.15rem;">
+          Transparent tracking across all 24 administrative districts of Jharkhand.
+        </p>
+      </div>
       <div style="display:flex; gap:0.5rem;">
-        <a href="intake.html" class="btn btn-primary">+ शिकायत दर्ज करें (File Grievance)</a>
-        <a href="super_admin.html" class="btn btn-secondary">Super Admin</a>
-        <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+        <a href="intake.html" class="btn btn-primary" style="padding:0.45rem 0.9rem; font-size:0.8rem; background:#059669; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:700;">+ शिकायत दर्ज करें (File Grievance)</a>
+        <a href="dashboard.html" class="btn btn-secondary" style="padding:0.45rem 0.85rem; font-size:0.8rem; background:#ffffff; border:1px solid #cbd5e1; text-decoration:none; border-radius:6px; color:#334155;">Stakeholder Workspace</a>
       </div>
     </div>
   </header>
 
-  <main style="max-width:1200px; margin:1.5rem auto; padding:0 1rem;">
-    <div class="card" style="margin-bottom:1.5rem;">
-      <h2 style="font-size:1.2rem; margin-bottom:0.25rem;">Verified Public Directory</h2>
-      <p style="font-size:0.85rem; color:var(--text-secondary);">Browse active, accepted, and department-assigned civic grievances with transparent resolution tracking.</p>
+  <main style="max-width:1280px; width:100%; margin:1.5rem auto; padding:0 1.5rem; flex:1;">
+    <div class="card" style="margin-bottom:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+      <h2 style="font-size:1.15rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin-bottom:0.25rem;">
+        Verified Public Directory &amp; Solution Milestones
+      </h2>
+      <p style="font-size:0.8rem; color:#64748b;">
+        Browse active citizen reports, department maintenance dispatches, and university innovation challenge allocations.
+      </p>
     </div>
 
     <div id="public-list"></div>
   </main>
 
+  <footer style="text-align:center; padding:1rem 1.5rem; font-size:0.75rem; color:#64748b; border-top:1px solid #e2e8f0; background:#ffffff;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>&copy; 2026 <strong>Government of Jharkhand</strong>. All Rights Reserved.</div>
+      <div>CivicResolve Platform &bull; Public Transparency Initiative</div>
+    </div>
+  </footer>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const issues = CivicDB.getIssues().filter(i => i.status === 'accepted' || i.status === 'assigned_to_govt_dept');
-      const container = document.getElementById('public-list');
+      try {
+        const issues = CivicDB?.getIssues() || [];
+        const container = document.getElementById('public-list');
+        if (!container) return;
 
-      if (issues.length === 0) {
-        container.innerHTML = '<div class="card" style="text-align:center; padding:2rem; color:var(--text-secondary);">No accepted public issues at this time.</div>';
-      } else {
+        if (issues.length === 0) {
+          container.innerHTML = '<div class="card" style="text-align:center; padding:2rem; color:#64748b; background:#ffffff;">No grievances logged at this time.</div>';
+          return;
+        }
+
         container.innerHTML = issues.map(i => `
-          <div class="card" style="margin-bottom:1rem; border-left:4px solid ${i.status === 'accepted' ? 'var(--status-accepted)' : 'var(--status-dept)'};">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-              <span style="font-family:monospace; font-weight:bold; color:var(--brand-primary);">${i.trackingCode}</span>
-              <span class="badge ${i.status === 'accepted' ? 'badge-accepted' : 'badge-dept'}">${i.status.replace(/_/g, ' ')}</span>
+          <div class="card" style="margin-bottom:1rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:1.25rem; border-left:4px solid ${
+            i.status === 'Resolved' ? '#10b981' : i.status === 'In Progress' ? '#0284c7' : i.status === 'Allocated' ? '#6366f1' : '#d97706'
+          };">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.5rem;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span style="font-family:monospace; font-weight:700; color:#274c77; font-size:0.95rem;">${i.trackingCode}</span>
+                <span style="background:#f1f5f9; color:#334155; font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:4px; font-weight:700; border:1px solid #cbd5e1;">${i.status}</span>
+              </div>
+              <span style="font-size:0.75rem; color:#64748b; font-weight:600;">📍 ${i.district} &bull; ${i.categoryEnglish || i.category}</span>
             </div>
-            <h3 style="font-size:1.1rem; margin-bottom:0.3rem;">${i.title}</h3>
-            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem;">${i.description}</p>
-            <div style="font-size:0.75rem; color:var(--text-secondary);">District: ${i.district} &bull; Category: ${i.category}</div>
+            <h3 style="font-size:1.05rem; font-weight:700; color:#0f172a; margin-bottom:0.3rem; font-family:'Source Serif 4', Georgia, serif;">${i.title}</h3>
+            <p style="font-size:0.85rem; color:#475569; margin-bottom:0.6rem; line-height:1.4;">${i.description}</p>
+            <div style="font-size:0.75rem; color:#64748b; background:#f8fafc; padding:0.4rem 0.6rem; border-radius:6px; display:inline-block;">
+              🏛️ <strong>Assigned Lead:</strong> ${i.assignedOrg || 'State Triage Pool'} &bull; <strong>Nodal:</strong> ${i.responsibleNodalLead || 'State Desk'}
+            </div>
           </div>
         `).join('');
+      } catch (err) {
+        console.error("Public directory error:", err);
       }
     });
   </script>

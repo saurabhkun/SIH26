@@ -56,8 +56,8 @@ const ROLES: RoleOption[] = [
   },
   {
     id: "gov_ro",
-    title: "Research Organization",
-    badge: "State & District Lab",
+    title: "Govt Research Organizations",
+    badge: "State & District Central Labs",
     description: "Urban planning analysis, research feasibility & R&D milestone certification.",
     icon: FlaskConical,
     demoEmail: "ro.evaluator@jharkhand.gov.in",
@@ -67,9 +67,9 @@ const ROLES: RoleOption[] = [
   },
   {
     id: "college",
-    title: "University / College",
-    badge: "HEI Faculty & Labs",
-    description: "Faculty PIs and student innovators developing civic prototypes.",
+    title: "Research Organizations",
+    badge: "Empaneled Labs, HEIs & Institutions",
+    description: "Empaneled labs, faculty PIs and student innovators developing civic prototypes.",
     icon: GraduationCap,
     demoEmail: "director.rnd@bitmesra.ac.in",
     demoPass: "College@1234",
@@ -91,11 +91,22 @@ const ROLES: RoleOption[] = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [selectedRole, setSelectedRole] = useState<PortalRole>("auto");
   const [email, setEmail] = useState("superadmin@jharkhand.gov.in");
   const [password, setPassword] = useState("SuperAdmin@1234");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Explicitly enforce light mode on component mount
+  useEffect(() => {
+    setMounted(true);
+    try {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      localStorage.setItem("civic_theme", "light");
+    } catch (_) {}
+  }, []);
 
   // Instant fast-session hydration check
   useEffect(() => {
@@ -186,13 +197,14 @@ export default function LoginPage() {
           </span>
           <span className="text-civic-accent">|</span>
           <span className="text-slate-200">
-            Cabinet Secretariat &amp; Higher Education Department
+            CivicResolve Enterprise Gateway
           </span>
         </div>
         <div className="flex items-center space-x-3">
           <ThemeToggle />
           <Link
             href="/"
+            suppressHydrationWarning={true}
             className="text-civic-accent hover:text-white transition-colors text-[11px] font-medium"
           >
             &larr; Public Portal
@@ -203,7 +215,7 @@ export default function LoginPage() {
       {/* Main Navbar */}
       <header className="bg-civic-surface dark:bg-[#1E293B] border-b border-civic-border dark:border-[#334155] py-3.5 px-4 sm:px-8 shadow-xs">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="group block">
+          <Link href="/" suppressHydrationWarning={true} className="group block">
             <span className="text-2xl font-serif font-bold text-civic-primary dark:text-[#A3CEF1] tracking-tight block leading-tight">
               CivicResolve
             </span>
@@ -213,6 +225,7 @@ export default function LoginPage() {
           </Link>
           <Link
             href="/"
+            suppressHydrationWarning={true}
             className="inline-flex items-center text-xs text-civic-primary dark:text-[#A3CEF1] font-semibold px-3 py-1.5 border border-civic-border dark:border-[#334155] bg-civic-canvas dark:bg-[#0B0F17] hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5 mr-1 text-civic-secondary" />

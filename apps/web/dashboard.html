@@ -3,66 +3,364 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stakeholder Dashboard | CivicResolve Jharkhand</title>
+  <title>Stakeholder Workspace | CivicResolve Jharkhand</title>
   <link rel="stylesheet" href="css/theme.css">
   <script src="js/auth.js"></script>
   <script src="js/database.js"></script>
 </head>
-<body>
-  <!-- Top Gov Bar -->
-  <div style="background:var(--brand-primary); color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-    <span>GOVERNMENT OF JHARKHAND &bull; RESEARCH ORGANIZATION &amp; CSR PORTAL</span>
+<body style="display:flex; flex-direction:column; min-height:100vh; background-color:#f8fafc; color:#0f172a;">
+  <!-- Top Government Identifier Bar -->
+  <div style="background:#274c77; color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <span style="font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Government of Jharkhand</span>
+      <span style="color:#a3cef1;">|</span>
+      <span style="color:#e2e8f0;">CivicResolve Enterprise Workspace</span>
+    </div>
     <div style="display:flex; align-items:center; gap:1rem;">
-      <button onclick="CivicAuth.toggleTheme()" class="theme-toggle-btn">🌓 Toggle Dark Mode</button>
-      <button onclick="CivicAuth.logout()" class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem;">Sign Out</button>
+      <button onclick="CivicAuth?.toggleTheme()" class="theme-toggle-btn" style="padding:0.2rem 0.6rem; font-size:0.75rem; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">🌓 Toggle Theme</button>
+      <button onclick="CivicAuth?.logout()" class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">Sign Out</button>
     </div>
   </div>
 
-  <header style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:0.8rem 1.5rem;">
-    <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+  <!-- Header with Role-Specific Dynamic Navigation Bar -->
+  <header style="background:#ffffff; border-bottom:1px solid #e2e8f0; padding:0.8rem 1.5rem;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
       <div>
-        <h1 style="font-size:1.4rem; color:var(--brand-primary);">Research Organization &amp; CSR Workspace</h1>
-        <p style="font-size:0.8rem; color:var(--text-secondary);" id="user-info">Loading session...</p>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <h1 style="font-size:1.35rem; color:#274c77; font-family:'Source Serif 4', Georgia, serif; font-weight:700; margin:0;" id="portal-title">
+            CivicResolve Workspace
+          </h1>
+          <span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:9999px; border:1px solid #bae6fd;" id="role-badge">
+            Authorized Stakeholder
+          </span>
+        </div>
+        <p style="font-size:0.8rem; color:#64748b; margin-top:0.15rem;" id="user-info">
+          Loading authenticated session...
+        </p>
       </div>
-      <div style="display:flex; gap:0.5rem;">
-        <a href="reports.html" class="btn btn-secondary">Global Verified Directory</a>
-        <a href="super_admin.html" class="btn btn-secondary">Super Admin Portal</a>
-      </div>
+
+      <!-- Role-Specific Navigation Bar -->
+      <nav id="role-nav-bar" style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        <!-- Dynamically injected based on role -->
+      </nav>
     </div>
   </header>
 
-  <main style="max-width:1200px; margin:1.5rem auto; padding:0 1rem;">
-    <div class="card" style="margin-bottom:1.5rem; background:linear-gradient(135deg, var(--brand-primary), var(--brand-hover)); color:#ffffff;">
-      <h2 style="color:#ffffff; font-size:1.3rem; margin-bottom:0.25rem;">Accepted Research Organization Pipeline</h2>
-      <p style="font-size:0.85rem; color:#e2e8f0;">Explore accepted civic challenges for pattern analysis, university R&amp;D bidding, and CSR co-funding escrow.</p>
+  <main style="max-width:1280px; width:100%; margin:1.5rem auto; padding:0 1.5rem; flex:1;">
+    
+    <!-- Hero Banner -->
+    <div class="card" style="margin-bottom:1.5rem; background:linear-gradient(135deg, #274c77, #1e3a8a); color:#ffffff; border-radius:12px; padding:1.5rem; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+      <h2 style="color:#ffffff; font-size:1.3rem; margin-bottom:0.3rem; font-family:'Source Serif 4', Georgia, serif;" id="hero-title">
+        Collaborative Innovation &amp; Project Workspace
+      </h2>
+      <p style="font-size:0.85rem; color:#e2e8f0; line-height:1.4;" id="hero-desc">
+        Explore assigned challenges, progress milestones, scientific laboratory audits, and CSR co-funding allocations.
+      </p>
     </div>
 
-    <div id="accepted-list"></div>
+    <!-- Universal Project Tracking Module Section -->
+    <div id="project-tracking-container" class="card" style="margin-bottom:1.5rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.75rem;">
+        <div>
+          <h3 style="font-size:1.15rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin:0;">
+            🚀 Universal Project Tracking &amp; Status Timeline
+          </h3>
+          <p style="font-size:0.78rem; color:#64748b; margin-top:0.2rem;">
+            Status flow: <strong>Reported &rarr; Under Review / Triage &rarr; Allocated &rarr; In Progress &rarr; Resolved</strong>
+          </p>
+        </div>
+        <span style="font-size:0.72rem; font-weight:700; color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; padding:0.2rem 0.55rem; border-radius:9999px;">
+          ● Live State Synchronized
+        </span>
+      </div>
+
+      <div id="project-tracking-cards" style="display:flex; flex-direction:column; gap:1rem;">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Active Feed / Workorder Challenges View -->
+    <div id="active-feed-container" class="card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.75rem;">
+        <h3 style="font-size:1.15rem; font-family:'Source Serif 4', Georgia, serif; font-weight:700; color:#0f172a; margin:0;" id="feed-title">
+          Assigned Challenges &amp; Action Pipeline
+        </h3>
+        <span style="font-size:0.75rem; color:#64748b;" id="feed-count"></span>
+      </div>
+
+      <div id="feed-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
   </main>
 
+  <!-- Official Standardized Footer -->
+  <footer style="text-align:center; padding:1rem 1.5rem; font-size:0.75rem; color:#64748b; border-top:1px solid #e2e8f0; background:#ffffff;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>&copy; 2026 <strong>Government of Jharkhand</strong>. All Rights Reserved.</div>
+      <div>CivicResolve Platform &bull; Research &amp; Industry Partnership Ecosystem</div>
+    </div>
+  </footer>
+
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const session = CivicAuth.getSession();
-      if (session) {
-        document.getElementById('user-info').textContent = session.name + ' (' + session.designation + ')';
+    const STAGES = ['Reported', 'Under Review / Triage', 'Allocated', 'In Progress', 'Resolved'];
+
+    function renderNavForRole(role) {
+      const navContainer = document.getElementById('role-nav-bar');
+      const portalTitle = document.getElementById('portal-title');
+      const roleBadge = document.getElementById('role-badge');
+      const heroTitle = document.getElementById('hero-title');
+      const heroDesc = document.getElementById('hero-desc');
+      const feedTitle = document.getElementById('feed-title');
+
+      let navButtons = [];
+
+      if (role === 'gov_ro') {
+        // Govt Research Organizations: State Lab Pipeline | Scientific Audits | Project Tracking | Testing Reports
+        portalTitle.textContent = "CivicResolve \u2022 Govt Research Organizations";
+        roleBadge.textContent = "State & District Central Labs";
+        heroTitle.textContent = "State Central Laboratories & Scientific Testing Pipeline";
+        heroDesc.textContent = "Accredited spectroscopic testing, toxicological assay validation, and statutory environmental certification.";
+        feedTitle.textContent = "State Laboratory Testing Queue";
+
+        navButtons = [
+          { label: "🔬 State Lab Pipeline", id: "btn-pipeline", active: true },
+          { label: "🧪 Scientific Audits", id: "btn-audits", active: false },
+          { label: "🚀 Project Tracking", id: "btn-tracking", active: false },
+          { label: "📋 Testing Reports", id: "btn-reports", active: false }
+        ];
+      } else if (role === 'industry_tech' || role === 'industry') {
+        // Industry & Tech Partners: CSR Funding Queue | Technical Audits | Project Tracking | Grant Disbursals
+        portalTitle.textContent = "CivicResolve \u2022 Industry & Tech Partners";
+        roleBadge.textContent = "CSR & Technical Audits";
+        heroTitle.textContent = "CSR Co-Funding, Escrow & Technical Audit Portal";
+        heroDesc.textContent = "Pledge CSR matching grants, review NABL testing audits, and track milestone disbursements.";
+        feedTitle.textContent = "CSR Co-Funding & Technical Audit Portfolio";
+
+        navButtons = [
+          { label: "💰 CSR Funding Queue", id: "btn-funding", active: true },
+          { label: "🔍 Technical Audits", id: "btn-audits", active: false },
+          { label: "🚀 Project Tracking", id: "btn-tracking", active: false },
+          { label: "📜 Grant Disbursals", id: "btn-grants", active: false }
+        ];
+      } else {
+        // Research Organizations (HEIs / Colleges): Assigned Challenges | R&D Workflows | Project Tracking | Student Allocations
+        portalTitle.textContent = "CivicResolve \u2022 Research Organizations";
+        roleBadge.textContent = "Empaneled Labs, HEIs & Institutions";
+        heroTitle.textContent = "Empaneled University & Institution R&D Workspace";
+        heroDesc.textContent = "Submit technical research proposals, deploy student/faculty innovators, and execute grassroots pilot testing.";
+        feedTitle.textContent = "Empaneled R&D Challenge Pipeline";
+
+        navButtons = [
+          { label: "🎓 Assigned Challenges", id: "btn-challenges", active: true },
+          { label: "⚙️ R&D Workflows", id: "btn-workflows", active: false },
+          { label: "🚀 Project Tracking", id: "btn-tracking", active: false },
+          { label: "👥 Student Allocations", id: "btn-allocations", active: false }
+        ];
       }
 
-      const issues = CivicDB.getIssues().filter(i => i.status === 'accepted');
-      const container = document.getElementById('accepted-list');
-      if (issues.length === 0) {
-        container.innerHTML = '<div class="card" style="text-align:center; padding:2rem; color:var(--text-secondary);">No accepted research organization issues yet. Accepted issues from Super Admin appear here automatically.</div>';
-      } else {
-        container.innerHTML = issues.map(i => `
-          <div class="card" style="margin-bottom:1rem; border-left:4px solid var(--status-accepted);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-              <span style="font-family:monospace; font-weight:bold; color:var(--brand-primary);">${i.trackingCode}</span>
-              <span class="badge badge-accepted">Accepted For Research</span>
+      navContainer.innerHTML = navButtons.map(b => `
+        <button onclick="handleStakeholderNav('${b.id}')" id="${b.id}" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid ${b.active ? '#274c77' : '#e2e8f0'}; background:${b.active ? '#274c77' : '#ffffff'}; color:${b.active ? '#ffffff' : '#334155'}; cursor:pointer;">
+          ${b.label}
+        </button>
+      `).join('') + `
+        <a href="reports.html" style="padding:0.45rem 0.85rem; font-size:0.8rem; font-weight:600; border-radius:6px; border:1px solid #e2e8f0; background:#ffffff; color:#334155; text-decoration:none; display:inline-flex; align-items:center;">
+          📁 Directory
+        </a>
+      `;
+    }
+
+    function handleStakeholderNav(btnId) {
+      document.querySelectorAll('#role-nav-bar button').forEach(b => {
+        b.style.background = '#ffffff';
+        b.style.color = '#334155';
+        b.style.borderColor = '#e2e8f0';
+      });
+      const active = document.getElementById(btnId);
+      if (active) {
+        active.style.background = '#274c77';
+        active.style.color = '#ffffff';
+        active.style.borderColor = '#274c77';
+      }
+
+      if (btnId === 'btn-tracking') {
+        document.getElementById('project-tracking-container')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function renderProjectTracking() {
+      const container = document.getElementById('project-tracking-cards');
+      if (!container) return;
+
+      const issues = CivicDB?.getIssues() || [];
+      container.innerHTML = issues.map(item => {
+        const curStage = item.stage || item.status || 'Reported';
+        const progressPct = item.progress || (
+          curStage === 'Resolved' ? 100 :
+          curStage === 'In Progress' ? 80 :
+          curStage === 'Allocated' ? 60 :
+          curStage === 'Under Review / Triage' ? 40 : 20
+        );
+
+        return `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1.2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+              <div>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span style="font-family:monospace; font-weight:700; color:#274c77; font-size:0.95rem;">${item.trackingCode}</span>
+                  <span style="font-size:0.72rem; background:#e0f2fe; color:#0369a1; padding:0.15rem 0.5rem; border-radius:9999px; font-weight:700;">${item.district}</span>
+                </div>
+                <h4 style="font-size:1rem; font-weight:700; color:#0f172a; margin-top:0.25rem;">${item.title}</h4>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:0.8rem; font-weight:800; color:#0284c7;">${progressPct}% Progress</span>
+                <div style="font-size:0.72rem; color:#64748b;">Timestamp: ${new Date(item.updatedTimestamp || item.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short' })}</div>
+              </div>
             </div>
-            <h3 style="font-size:1.1rem; margin-bottom:0.3rem;">${i.title}</h3>
-            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem;">${i.description}</p>
-            <div style="font-size:0.75rem; color:var(--text-secondary);">District: ${i.district} &bull; Category: ${i.category}</div>
+
+            <!-- Progress Bar -->
+            <div style="width:100%; height:8px; background:#e2e8f0; border-radius:9999px; overflow:hidden; margin-bottom:1rem;">
+              <div style="height:100%; width:${progressPct}%; background:linear-gradient(90deg, #274c77, #10b981); border-radius:9999px;"></div>
+            </div>
+
+            <!-- 5 Stages Badges -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.4rem; font-size:0.72rem; margin-bottom:0.8rem;">
+              ${STAGES.map((stg, sIdx) => {
+                const stageIdx = STAGES.indexOf(curStage);
+                const isPastOrCurrent = sIdx <= stageIdx;
+                const isCurrent = stg === curStage;
+                return `
+                  <div style="padding:0.35rem 0.5rem; border-radius:6px; border:1px solid ${isCurrent ? '#274c77' : isPastOrCurrent ? '#10b981' : '#cbd5e1'}; background:${isCurrent ? '#274c77' : isPastOrCurrent ? '#ecfdf5' : '#ffffff'}; color:${isCurrent ? '#ffffff' : isPastOrCurrent ? '#047857' : '#94a3b8'}; font-weight:${isCurrent ? '700' : '600'}; text-align:center;">
+                    ${isPastOrCurrent ? '✓ ' : ''}${stg}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Responsible Lead & Assigned Entity -->
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.75rem; background:#ffffff; padding:0.6rem 0.8rem; border-radius:6px; border:1px solid #e2e8f0;">
+              <div>
+                <span style="color:#64748b;">Nodal Lead:</span>
+                <strong style="color:#0f172a; margin-left:0.3rem;">${item.responsibleNodalLead || 'State Nodal Desk'}</strong>
+              </div>
+              <div>
+                <span style="color:#64748b;">Assigned Entity:</span>
+                <strong style="color:#274c77; margin-left:0.3rem;">${item.assignedOrg || 'Pending Allocation'}</strong>
+              </div>
+            </div>
           </div>
-        `).join('');
+        `;
+      }).join('');
+    }
+
+    function renderFeedList() {
+      const container = document.getElementById('feed-list');
+      const countEl = document.getElementById('feed-count');
+      const session = CivicAuth?.getSession() || { role: 'research_org' };
+      const role = session.role;
+      const issues = (CivicDB?.getIssues() || []).filter(i => i.status !== 'rejected' && i.status !== 'Rejected');
+
+      if (countEl) countEl.textContent = `${issues.length} active workorders`;
+
+      if (issues.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:2rem; color:#64748b;">No challenges assigned yet.</div>';
+        return;
+      }
+
+      container.innerHTML = issues.map(i => {
+        const isGovRO = role === 'gov_ro';
+        const isIndustry = role === 'industry_tech' || role === 'industry';
+        const isAcademia = !isGovRO && !isIndustry;
+
+        return `
+        <div style="padding:1.25rem; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:1rem; background:#ffffff; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.3rem;">
+                <span style="font-family:monospace; font-weight:700; color:#274c77; font-size:0.9rem;">${i.trackingCode}</span>
+                <span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:9999px; font-weight:700;">${i.district}</span>
+                <span style="background:#f1f5f9; color:#334155; font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:9999px; font-weight:700; border:1px solid #cbd5e1;">${i.status}</span>
+              </div>
+              <h4 style="font-size:1.05rem; font-weight:700; color:#0f172a; margin:0; font-family:'Source Serif 4', Georgia, serif;">${i.title}</h4>
+            </div>
+            <span style="font-size:0.75rem; color:#64748b;">${i.categoryEnglish || i.category || 'Civic Issue'}</span>
+          </div>
+          
+          <p style="font-size:0.85rem; color:#475569; margin:0.5rem 0 0.85rem 0; line-height:1.4;">${i.description}</p>
+
+          ${i.assignedOrg ? `
+            <div style="font-size:0.75rem; color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; padding:0.3rem 0.6rem; border-radius:4px; margin-bottom:0.75rem; display:inline-block;">
+              🏛️ <strong>Assigned Lead:</strong> ${i.assignedOrg}
+            </div>
+          ` : ''}
+
+          <!-- Action Buttons -->
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap; border-top:1px dashed #cbd5e1; padding-top:0.75rem;">
+            ${isGovRO ? `
+              <button onclick="handleStakeholderAction('${i.id}', 'In Progress', 'CSIR-CIMFR Central Laboratory')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700; background:#059669; color:#ffffff; border:none; border-radius:6px; cursor:pointer;">
+                ✓ Accept into State Central Lab
+              </button>
+              <button onclick="handleStakeholderAction('${i.id}', 'Allocated', 'Empaneled HEI Innovation Consortium')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700; background:#d97706; color:#ffffff; border:none; border-radius:6px; cursor:pointer;">
+                ✕ Delegate to University R&amp;D Pool
+              </button>
+            ` : ''}
+
+            ${isAcademia ? `
+              <button onclick="handleStakeholderAction('${i.id}', 'In Progress', 'BIT Mesra R&D Innovation Team')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700; background:#7e22ce; color:#ffffff; border:none; border-radius:6px; cursor:pointer;">
+                🎓 Claim Problem for R&amp;D Project
+              </button>
+              <button onclick="alert('Viewing technical specifications and baseline data for ${i.trackingCode}')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:600; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+                📄 View Project Specs &rarr;
+              </button>
+            ` : ''}
+
+            ${isIndustry ? `
+              <button onclick="handleCSRGrant('${i.id}')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700; background:#0284c7; color:#ffffff; border:none; border-radius:6px; cursor:pointer;">
+                💰 Pledge CSR Co-Funding Grant
+              </button>
+              <button onclick="handleStakeholderAction('${i.id}', 'In Progress', 'CMPDI Technical Audit Wing')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700; background:#0f766e; color:#ffffff; border:none; border-radius:6px; cursor:pointer;">
+                🔍 Initiate NABL Technical Audit
+              </button>
+            ` : ''}
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    window.handleStakeholderAction = function(issueId, newStatus, assignedOrg) {
+      CivicDB?.updateIssueStatus(issueId, newStatus, { assignedOrg });
+      renderProjectTracking();
+      renderFeedList();
+      alert(`✓ Action recorded: Updated to "${newStatus}" assigned to ${assignedOrg}.`);
+    };
+
+    window.handleCSRGrant = function(issueId) {
+      const amount = prompt("Enter CSR Co-Funding Grant Amount (in INR):", "500000");
+      if (!amount) return;
+      CivicDB?.updateIssueStatus(issueId, 'Allocated', { assignedOrg: 'Tata Steel CSR Co-Funded Project' });
+      renderProjectTracking();
+      renderFeedList();
+      alert(`✓ CSR Matching Grant of ₹${parseInt(amount, 10).toLocaleString('en-IN')} successfully pledged!`);
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const session = CivicAuth?.getSession() || {
+          role: 'research_org',
+          name: 'Dr. Ananya Sen',
+          designation: 'Dean of Research & Innovation (BIT Mesra)'
+        };
+
+        const uEl = document.getElementById('user-info');
+        if (uEl) uEl.textContent = `${session.name} (${session.designation})`;
+
+        renderNavForRole(session.role);
+        renderProjectTracking();
+        renderFeedList();
+      } catch (e) {
+        console.error("Dashboard initialization error:", e);
       }
     });
   </script>

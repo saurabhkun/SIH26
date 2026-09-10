@@ -120,11 +120,11 @@ export default function DistrictDashboardView({
           </span>
           <span className="text-civic-accent">|</span>
           <span className="text-slate-200">
-            Department of Higher &amp; Technical Education
+            CivicResolve Public Transparency Portal
           </span>
         </div>
         <div className="text-civic-accent text-[11px] font-medium">
-          Public Transparency Dashboard &bull; PS 26043
+          District Problem Sourcing &amp; Resolution Framework
         </div>
       </div>
 
@@ -132,7 +132,7 @@ export default function DistrictDashboardView({
       <header className="bg-civic-surface border-b border-civic-border py-3.5 px-4 sm:px-8 shadow-xs">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
-            <Link href="/" className="group block">
+            <Link href="/" suppressHydrationWarning={true} className="group block">
               <span className="text-2xl sm:text-3xl font-serif font-bold text-civic-primary tracking-tight block leading-tight">
                 CivicResolve
               </span>
@@ -144,6 +144,7 @@ export default function DistrictDashboardView({
           <div className="flex items-center space-x-3">
             <Link
               href="/"
+              suppressHydrationWarning={true}
               className="inline-flex items-center text-xs text-civic-primary font-semibold px-3 py-1.5 border border-civic-border bg-civic-canvas hover:bg-slate-200/70 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5 mr-1 text-civic-secondary" />

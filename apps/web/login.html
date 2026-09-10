@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CivicResolve | Government of Jharkhand Enterprise Login</title>
   <link rel="stylesheet" href="css/theme.css">
+  <script>
+    try {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+      localStorage.setItem('civic_theme', 'light');
+    } catch (_) {}
+  </script>
   <script src="js/auth.js"></script>
 </head>
 <body style="display:flex; flex-direction:column; min-height:100vh; justify-content:space-between; background-color:#f8fafc; color:#0f172a;">

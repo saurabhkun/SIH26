@@ -434,6 +434,7 @@ export default function NotificationCenter({
                         {item.actionUrl ? (
                           <Link
                             href={item.actionUrl}
+                            suppressHydrationWarning={true}
                             onClick={() => {
                               handleMarkAsRead(item._id);
                               setIsOpen(false);

@@ -36,11 +36,13 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const theme = localStorage.getItem('civic_theme');
-                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                const theme = localStorage.getItem('civic_theme') || localStorage.getItem('theme');
+                if (theme === 'dark') {
                   document.documentElement.classList.add('dark');
                 } else {
                   document.documentElement.classList.remove('dark');
+                  localStorage.setItem('theme', 'light');
+                  localStorage.setItem('civic_theme', 'light');
                 }
               } catch (_) {}
             `,

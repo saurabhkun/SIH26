@@ -144,7 +144,7 @@ export default function DashboardShell({
           </span>
           <span className="text-civic-accent">|</span>
           <span className="text-slate-200">
-            Higher &amp; Technical Education Department
+            CivicResolve Enterprise Dashboard
           </span>
         </div>
         <div className="text-slate-200 text-[11px] hidden sm:block">
@@ -164,6 +164,7 @@ export default function DashboardShell({
               <div className="flex items-center space-x-2">
                 <Link
                   href="/"
+                  suppressHydrationWarning={true}
                   className="font-serif font-bold text-civic-textDark text-lg leading-tight hover:text-civic-primary transition-colors"
                 >
                   CivicResolve
@@ -222,6 +223,7 @@ export default function DashboardShell({
                 <Link
                   key={idx}
                   href={item.href}
+                  suppressHydrationWarning={true}
                   onClick={item.onClick}
                   className={`flex items-center justify-between px-3.5 py-2.5 text-xs rounded-lg transition-colors cursor-pointer ${
                     isCurrent

@@ -183,11 +183,12 @@ export default function RegisterPage() {
           </span>
           <span className="text-civic-accent">|</span>
           <span className="text-slate-200">
-            Higher &amp; Technical Education Department
+            CivicResolve Enterprise Gateway
           </span>
         </div>
         <Link
           href="/"
+          suppressHydrationWarning={true}
           className="text-civic-accent hover:text-white transition-colors text-[11px] font-medium"
         >
           &larr; Return to Public Portal
@@ -197,7 +198,7 @@ export default function RegisterPage() {
       {/* Main Navbar */}
       <header className="bg-civic-surface border-b border-civic-border py-3.5 px-4 sm:px-8 shadow-xs">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="group block">
+          <Link href="/" suppressHydrationWarning={true} className="group block">
             <span className="text-2xl font-serif font-bold text-civic-primary tracking-tight block leading-tight">
               CivicResolve
             </span>
@@ -208,12 +209,14 @@ export default function RegisterPage() {
           <div className="flex items-center space-x-3">
             <Link
               href="/login"
+              suppressHydrationWarning={true}
               className="text-xs text-civic-primary hover:text-civic-primaryHover font-bold"
             >
               Sign In Instead
             </Link>
             <Link
               href="/"
+              suppressHydrationWarning={true}
               className="inline-flex items-center text-xs text-civic-primary font-semibold px-3 py-1.5 border border-civic-border bg-civic-canvas hover:bg-slate-200/70 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5 mr-1 text-civic-secondary" />
