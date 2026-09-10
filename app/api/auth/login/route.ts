@@ -21,6 +21,15 @@ const DEMO_ACCOUNTS: Record<
     domainExpertise?: string[];
   }
 > = {
+  "superadmin@jharkhand.gov.in": {
+    name: "Sri Sunil Kumar, IAS",
+    email: "superadmin@jharkhand.gov.in",
+    passwordHash: "SuperAdmin@1234",
+    role: "super_admin",
+    designation: "Principal Secretary & Chief Super Administrator",
+    district: "State Headquarters (All 24 Districts)",
+    organizationName: "Cabinet Secretariat & Higher Education Dept.",
+  },
   "officer@jharkhand.gov.in": {
     name: "Dr. Arvind Kumar",
     email: "officer@jharkhand.gov.in",
@@ -34,9 +43,10 @@ const DEMO_ACCOUNTS: Record<
     email: "ro.evaluator@jharkhand.gov.in",
     passwordHash: "Ro@1234",
     role: "gov_ro",
-    designation: "District Research Officer & State Evaluator",
+    designation: "State Research Organization Evaluator",
     district: "Ranchi",
     employeeId: "JH-RO-8842",
+    organizationName: "Jharkhand State Council for Science & Tech",
   },
   "director.rnd@bitmesra.ac.in": {
     name: "Dr. Ananya Sen",
@@ -93,42 +103,43 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password, role } = body;
 
-    if (!email || !password || !role) {
+    if (!email || !password) {
       return NextResponse.json(
         {
           success: false,
-          error: "Please provide email, password, and target portal role.",
+          error: "Please provide both email and password.",
         },
         { status: 400 },
       );
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const normalizedRole = role.toLowerCase().trim();
-
-    // Map role aliases
-    const targetRole: UserRole =
-      normalizedRole === "gov_ro" || normalizedRole === "ro"
-        ? "gov_ro"
-        : normalizedRole === "consultancy"
-        ? "consultancy"
-        : normalizedRole === "gov"
-        ? "gov"
-        : normalizedRole === "college"
-        ? "college"
-        : normalizedRole === "industry"
-        ? "industry"
-        : "citizen";
+    const normalizedRole = role ? role.toLowerCase().trim() : "auto";
 
     let user: AuthenticatedUserDoc | null = null;
 
     // 1. Try to find user in MongoDB
     try {
       await connectDB();
-      user = await User.findOne({
-        email: normalizedEmail,
-        role: targetRole,
-      }).lean();
+      const query: Record<string, unknown> = { email: normalizedEmail };
+      if (normalizedRole !== "auto" && normalizedRole !== "all") {
+        const targetRole: UserRole =
+          normalizedRole === "super_admin" || normalizedRole === "superadmin"
+            ? "super_admin"
+            : normalizedRole === "gov_ro" || normalizedRole === "ro" || normalizedRole === "research_org"
+            ? "gov_ro"
+            : normalizedRole === "consultancy"
+            ? "consultancy"
+            : normalizedRole === "gov"
+            ? "gov"
+            : normalizedRole === "college"
+            ? "college"
+            : normalizedRole === "industry" || normalizedRole === "csr_partner"
+            ? "industry"
+            : "citizen";
+        query.role = targetRole;
+      }
+      user = await User.findOne(query).lean();
     } catch (dbErr) {
       console.warn("DB lookup bypassed, checking demo fallback:", dbErr);
     }
@@ -136,14 +147,14 @@ export async function POST(request: NextRequest) {
     // 2. Fallback to demo accounts for prototype resilience
     if (!user) {
       const demo = DEMO_ACCOUNTS[normalizedEmail];
-      if (demo && (demo.role === targetRole || demo.role.toLowerCase() === normalizedRole) && demo.passwordHash === password) {
+      if (demo && demo.passwordHash === password) {
         user = {
           _id: `demo_${demo.role}_id`,
           ...demo,
         };
       }
     } else {
-      // Validate password (supports bcrypt hash and plaintext demo passwords)
+      // Validate password
       let isMatch = user.passwordHash === password;
       if (!isMatch) {
         try {
@@ -168,7 +179,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error:
-            "Account not found for this portal role. Please check credentials or use demo login.",
+            "Account not found. Please verify email and password or use demo credentials.",
         },
         { status: 401 },
       );
@@ -193,7 +204,9 @@ export async function POST(request: NextRequest) {
 
     // Determine role dashboard redirect
     const redirectUrl =
-      user.role === "gov_ro"
+      user.role === "super_admin"
+        ? "/dashboard/gov/super-admin"
+        : user.role === "gov_ro"
         ? "/dashboard/gov/ro"
         : user.role === "consultancy"
         ? "/dashboard/consultancy"
@@ -209,6 +222,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: `Authenticated as ${user.name} (${user.role.toUpperCase()})`,
       user: sessionPayload,
+      token,
       redirectUrl,
     });
 

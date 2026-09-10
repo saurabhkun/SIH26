@@ -323,13 +323,13 @@ export default function RODashboardClient() {
           <div>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold uppercase tracking-wider mb-2">
               <FlaskConical className="w-3.5 h-3.5" />
-              <span>State Research Officer (RO) Decision Workspace</span>
+              <span>State Research Organization (RO) Decision Workspace</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold font-serif tracking-tight text-white">
-              R&D Technical Feasibility & Milestone Desk
+              Urban Planning &amp; R&amp;D Feasibility Desk
             </h1>
             <p className="text-slate-300 text-sm max-w-2xl mt-1">
-              Review citizen civic submissions for academic innovation potential, audit university prototype milestones, and issue official Nodal Verification Badges for Industry CSR co-funding.
+              Review accepted civic intelligence reports for pattern study, urban planning analysis, and academic innovation. Audit university prototype milestones and endorse for Industry CSR co-funding.
             </p>
           </div>
 

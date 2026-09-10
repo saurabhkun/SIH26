@@ -25,6 +25,7 @@ import {
   Building2,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export type IconName =
   | "dashboard"
@@ -179,7 +180,7 @@ export default function DashboardShell({
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <div className="hidden md:block text-right text-xs">
               <div className="font-bold text-civic-textDark">{userName}</div>
               <div className="text-civic-textMuted text-[11px]">
@@ -187,12 +188,13 @@ export default function DashboardShell({
               </div>
             </div>
 
+            <ThemeToggle />
             <NotificationBell />
 
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="inline-flex items-center px-3.5 py-1.5 bg-civic-canvas text-civic-textDark hover:bg-slate-200 text-xs font-medium border border-civic-border rounded-lg transition-colors cursor-pointer shadow-xs"
+              className="inline-flex items-center px-3.5 py-1.5 bg-civic-canvas text-civic-textDark hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-medium border border-civic-border rounded-lg transition-colors cursor-pointer shadow-xs"
             >
               <LogOut className="w-3.5 h-3.5 mr-1.5 text-civic-textMuted" />
               {isLoggingOut ? "Signing Out..." : "Sign Out"}

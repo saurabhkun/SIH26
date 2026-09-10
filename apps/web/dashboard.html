@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stakeholder Dashboard | CivicResolve Jharkhand</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/auth.js"></script>
+  <script src="js/database.js"></script>
+</head>
+<body>
+  <!-- Top Gov Bar -->
+  <div style="background:var(--brand-primary); color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <span>GOVERNMENT OF JHARKHAND &bull; RESEARCH ORGANIZATION &amp; CSR PORTAL</span>
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <button onclick="CivicAuth.toggleTheme()" class="theme-toggle-btn">🌓 Toggle Dark Mode</button>
+      <button onclick="CivicAuth.logout()" class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem;">Sign Out</button>
+    </div>
+  </div>
+
+  <header style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:0.8rem 1.5rem;">
+    <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>
+        <h1 style="font-size:1.4rem; color:var(--brand-primary);">Research Organization &amp; CSR Workspace</h1>
+        <p style="font-size:0.8rem; color:var(--text-secondary);" id="user-info">Loading session...</p>
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <a href="reports.html" class="btn btn-secondary">Global Verified Directory</a>
+        <a href="super_admin.html" class="btn btn-secondary">Super Admin Portal</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1200px; margin:1.5rem auto; padding:0 1rem;">
+    <div class="card" style="margin-bottom:1.5rem; background:linear-gradient(135deg, var(--brand-primary), var(--brand-hover)); color:#ffffff;">
+      <h2 style="color:#ffffff; font-size:1.3rem; margin-bottom:0.25rem;">Accepted Research Organization Pipeline</h2>
+      <p style="font-size:0.85rem; color:#e2e8f0;">Explore accepted civic challenges for pattern analysis, university R&amp;D bidding, and CSR co-funding escrow.</p>
+    </div>
+
+    <div id="accepted-list"></div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const session = CivicAuth.getSession();
+      if (session) {
+        document.getElementById('user-info').textContent = session.name + ' (' + session.designation + ')';
+      }
+
+      const issues = CivicDB.getIssues().filter(i => i.status === 'accepted');
+      const container = document.getElementById('accepted-list');
+      if (issues.length === 0) {
+        container.innerHTML = '<div class="card" style="text-align:center; padding:2rem; color:var(--text-secondary);">No accepted research organization issues yet. Accepted issues from Super Admin appear here automatically.</div>';
+      } else {
+        container.innerHTML = issues.map(i => `
+          <div class="card" style="margin-bottom:1rem; border-left:4px solid var(--status-accepted);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+              <span style="font-family:monospace; font-weight:bold; color:var(--brand-primary);">${i.trackingCode}</span>
+              <span class="badge badge-accepted">Accepted For Research</span>
+            </div>
+            <h3 style="font-size:1.1rem; margin-bottom:0.3rem;">${i.title}</h3>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem;">${i.description}</p>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">District: ${i.district} &bull; Category: ${i.category}</div>
+          </div>
+        `).join('');
+      }
+    });
+  </script>
+</body>
+</html>

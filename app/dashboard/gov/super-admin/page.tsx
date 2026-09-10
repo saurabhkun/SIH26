@@ -1,24 +1,28 @@
 import React from "react";
 import { getCurrentUser } from "@/lib/auth/session";
 import DashboardShell, { NavItem } from "@/components/DashboardShell";
-import RODashboardClient from "@/components/panels/RODashboardClient";
+import SuperAdminDashboardClient from "@/components/panels/SuperAdminDashboardClient";
 
 export const dynamic = "force-dynamic";
 
-export default function GovRODashboardPage() {
+export default function SuperAdminPage() {
   const user = getCurrentUser();
 
   const navItems: NavItem[] = [
-    { label: "State Overview", href: "/dashboard/gov", iconName: "dashboard" },
+    {
+      label: "Master Triage Queue",
+      href: "/dashboard/gov/super-admin",
+      iconName: "shield",
+    },
     {
       label: "Research Org Portal",
       href: "/dashboard/gov/ro",
       iconName: "flask",
     },
     {
-      label: "Master Super Admin",
-      href: "/dashboard/gov/super-admin",
-      iconName: "shield",
+      label: "Govt Dept Queues",
+      href: "/dashboard/gov",
+      iconName: "dashboard",
     },
     {
       label: "Project Allocations",
@@ -40,14 +44,14 @@ export default function GovRODashboardPage() {
   return (
     <DashboardShell
       role="gov"
-      roleTitle="Research Organization Portal"
-      userName={user?.name || "Dr. Birendra Mahato"}
-      userEmail={user?.email || "ro.evaluator@jharkhand.gov.in"}
-      designation={user?.designation || "State Research Organization Evaluator"}
-      organizationOrCollege={user?.organizationName || "Jharkhand State Council for Science & Tech"}
+      roleTitle="Chief Super Admin Portal"
+      userName={user?.name || "Sri Sunil Kumar, IAS"}
+      userEmail={user?.email || "superadmin@jharkhand.gov.in"}
+      designation={user?.designation || "Principal Secretary & Chief Super Administrator"}
+      organizationOrCollege="Cabinet Secretariat, Government of Jharkhand"
       navItems={navItems}
     >
-      <RODashboardClient />
+      <SuperAdminDashboardClient />
     </DashboardShell>
   );
 }

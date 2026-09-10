@@ -62,6 +62,12 @@ export interface IIssue extends Document {
   aiAnalysisReason?: string;
   suggestedDepartment?: string;
 
+  // Super Admin Triage & Routing
+  triageAction?: "pending_super_admin_review" | "accepted" | "rejected" | "assigned_to_govt_dept";
+  rejectionReason?: string;
+  assignedDepartment?: string;
+  maintenanceNotes?: string;
+
   // Triage & Circuit-Breaker Engine
   urgencyTrack: UrgencyTrack;
   triageRationale?: string;
@@ -195,6 +201,17 @@ const IssueSchema = new Schema<IIssue>(
     },
     aiAnalysisReason: { type: String, default: "" },
     suggestedDepartment: { type: String, default: "Higher & Technical Education" },
+
+    // Super Admin Triage & Lifecycle Routing
+    triageAction: {
+      type: String,
+      enum: ["pending_super_admin_review", "accepted", "rejected", "assigned_to_govt_dept"],
+      default: "pending_super_admin_review",
+      index: true,
+    },
+    rejectionReason: { type: String, default: "" },
+    assignedDepartment: { type: String, default: "" },
+    maintenanceNotes: { type: String, default: "" },
 
     // Triage & Circuit Breaker
     urgencyTrack: {

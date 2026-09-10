@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin Portal | CivicResolve Jharkhand</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/auth.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/super_admin.js" defer></script>
+</head>
+<body>
+  <!-- Top Gov Bar -->
+  <div style="background:var(--brand-primary); color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <span>GOVERNMENT OF JHARKHAND &bull; CABINET SECRETARIAT &bull; SUPER ADMIN APEX OVERSIGHT</span>
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <button onclick="CivicAuth.toggleTheme()" class="theme-toggle-btn">🌓 Toggle Dark Mode</button>
+      <button onclick="CivicAuth.logout()" class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem;">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:0.8rem 1.5rem;">
+    <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>
+        <h1 style="font-size:1.4rem; color:var(--brand-primary);">CivicResolve &bull; Chief Super Admin Portal</h1>
+        <p style="font-size:0.8rem; color:var(--text-secondary);" id="user-display">Loading Administrator Profile...</p>
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <a href="dashboard.html" class="btn btn-secondary">Research Org &amp; CSR View</a>
+        <a href="reports.html" class="btn btn-secondary">Public Reports Directory</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main style="max-width:1200px; margin:1.5rem auto; padding:0 1rem;">
+    <!-- Stats Row -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+      <div class="card">
+        <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Global Pipeline</span>
+        <div style="font-size:1.8rem; font-weight:900; color:var(--text-primary);" id="stat-total">0</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--status-pending);">
+        <span style="font-size:0.75rem; color:var(--status-pending); text-transform:uppercase; font-weight:700;">Pending Super Admin</span>
+        <div style="font-size:1.8rem; font-weight:900; color:var(--status-pending);" id="stat-pending">0</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--status-accepted);">
+        <span style="font-size:0.75rem; color:var(--status-accepted); text-transform:uppercase; font-weight:700;">Accepted (Research Org)</span>
+        <div style="font-size:1.8rem; font-weight:900; color:var(--status-accepted);" id="stat-accepted">0</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--status-dept);">
+        <span style="font-size:0.75rem; color:var(--status-dept); text-transform:uppercase; font-weight:700;">Assigned to Depts</span>
+        <div style="font-size:1.8rem; font-weight:900; color:var(--status-dept);" id="stat-dept">0</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--status-rejected);">
+        <span style="font-size:0.75rem; color:var(--status-rejected); text-transform:uppercase; font-weight:700;">Rejected / Filtered</span>
+        <div style="font-size:1.8rem; font-weight:900; color:var(--status-rejected);" id="stat-rejected">0</div>
+      </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div style="display:flex; gap:0.5rem; margin-bottom:1.2rem; flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="filterStatus('all')">All Grievances</button>
+      <button class="btn btn-secondary" onclick="filterStatus('pending_super_admin_review')">⏳ Pending Review</button>
+      <button class="btn btn-secondary" onclick="filterStatus('accepted')">✓ Accepted (Research Org)</button>
+      <button class="btn btn-secondary" onclick="filterStatus('assigned_to_govt_dept')">🏢 Govt Dept Maintenance</button>
+      <button class="btn btn-secondary" onclick="filterStatus('rejected')">✕ Rejected</button>
+    </div>
+
+    <!-- Master Triage List Container -->
+    <div id="triage-list">
+      <div class="card" style="text-align:center; padding:2rem;">Loading master complaints pipeline...</div>
+    </div>
+  </main>
+</body>
+</html>

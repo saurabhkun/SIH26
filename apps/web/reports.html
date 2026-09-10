@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Reports Directory | CivicResolve</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/auth.js"></script>
+  <script src="js/database.js"></script>
+</head>
+<body>
+  <!-- Top Gov Bar -->
+  <div style="background:var(--brand-primary); color:#ffffff; padding:0.4rem 1.5rem; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+    <span>GOVERNMENT OF JHARKHAND &bull; PUBLIC VERIFIED COMPLAINTS DIRECTORY</span>
+    <button onclick="CivicAuth.toggleTheme()" class="theme-toggle-btn">🌓 Toggle Theme</button>
+  </div>
+
+  <header style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:0.8rem 1.5rem;">
+    <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <h1 style="font-size:1.4rem; color:var(--brand-primary);">Global Verified Issues Directory</h1>
+      <div style="display:flex; gap:0.5rem;">
+        <a href="super_admin.html" class="btn btn-secondary">Super Admin</a>
+        <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1200px; margin:1.5rem auto; padding:0 1rem;">
+    <div class="card" style="margin-bottom:1.5rem;">
+      <h2 style="font-size:1.2rem; margin-bottom:0.25rem;">Verified Public Directory</h2>
+      <p style="font-size:0.85rem; color:var(--text-secondary);">Browse active, accepted, and department-assigned civic grievances with transparent resolution tracking.</p>
+    </div>
+
+    <div id="public-list"></div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const issues = CivicDB.getIssues().filter(i => i.status === 'accepted' || i.status === 'assigned_to_govt_dept');
+      const container = document.getElementById('public-list');
+
+      if (issues.length === 0) {
+        container.innerHTML = '<div class="card" style="text-align:center; padding:2rem; color:var(--text-secondary);">No accepted public issues at this time.</div>';
+      } else {
+        container.innerHTML = issues.map(i => `
+          <div class="card" style="margin-bottom:1rem; border-left:4px solid ${i.status === 'accepted' ? 'var(--status-accepted)' : 'var(--status-dept)'};">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+              <span style="font-family:monospace; font-weight:bold; color:var(--brand-primary);">${i.trackingCode}</span>
+              <span class="badge ${i.status === 'accepted' ? 'badge-accepted' : 'badge-dept'}">${i.status.replace(/_/g, ' ')}</span>
+            </div>
+            <h3 style="font-size:1.1rem; margin-bottom:0.3rem;">${i.title}</h3>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem;">${i.description}</p>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">District: ${i.district} &bull; Category: ${i.category}</div>
+          </div>
+        `).join('');
+      }
+    });
+  </script>
+</body>
+</html>
