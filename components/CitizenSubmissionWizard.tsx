@@ -278,38 +278,117 @@ export default function CitizenSubmissionWizard({
     setHeadline(cat.hindiTitle || cat.title);
   };
 
-  // Handle File Upload & Convert to Data URL
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Client-Side Image Compression using Canvas (Max 1280px, Quality 0.75)
+  const compressImageFile = (
+    file: File,
+    maxDimension = 1280,
+    quality = 0.75
+  ): Promise<{ dataUrl: string; sizeFormatted: string }> => {
+    return new Promise((resolve) => {
+      // If not an image (e.g. PDF/DOC/Video), fall back to direct Base64 Data URL
+      if (!file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = (e.target?.result as string) || "";
+          const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+          resolve({ dataUrl: result, sizeFormatted: `${sizeMb} MB` });
+        };
+        reader.onerror = () => resolve({ dataUrl: "", sizeFormatted: "0 MB" });
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > height) {
+            if (width > maxDimension) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            }
+          } else {
+            if (height > maxDimension) {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            const result = (e.target?.result as string) || "";
+            resolve({
+              dataUrl: result,
+              sizeFormatted: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+            });
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+          // Calculate formatted size
+          const base64Length =
+            compressedDataUrl.length -
+            (compressedDataUrl.indexOf(",") + 1);
+          const approxBytes = (base64Length * 3) / 4;
+          const sizeKb = Math.round(approxBytes / 1024);
+          const sizeFormatted =
+            sizeKb > 1024
+              ? `${(sizeKb / 1024).toFixed(1)} MB`
+              : `${sizeKb} KB`;
+
+          resolve({ dataUrl: compressedDataUrl, sizeFormatted });
+        };
+        img.onerror = () => {
+          const result = (e.target?.result as string) || "";
+          resolve({
+            dataUrl: result,
+            sizeFormatted: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+          });
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve({ dataUrl: "", sizeFormatted: "0 MB" });
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle File Upload & Convert to Compressed Data URL
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
-      selectedFiles.forEach((f) => {
+      for (const f of selectedFiles) {
         const isDoc =
           f.name.endsWith(".pdf") ||
           f.name.endsWith(".doc") ||
           f.name.endsWith(".docx");
         const isVid = f.name.endsWith(".mp4") || f.name.endsWith(".mov");
-        const sizeMb = (f.size / (1024 * 1024)).toFixed(1);
         const fileType: "photo" | "document" | "video" = isDoc
           ? "document"
           : isVid
           ? "video"
           : "photo";
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const base64Url = event.target?.result as string;
-          setFiles((prev) => [
-            ...prev,
-            {
-              name: f.name,
-              size: `${sizeMb} MB`,
-              type: fileType,
-              dataUrl: base64Url || "",
-            },
-          ]);
-        };
-        reader.readAsDataURL(f);
-      });
+        const { dataUrl, sizeFormatted } = await compressImageFile(
+          f,
+          1280,
+          0.75
+        );
+        setFiles((prev) => [
+          ...prev,
+          {
+            name: f.name,
+            size: sizeFormatted,
+            type: fileType,
+            dataUrl,
+          },
+        ]);
+      }
     }
   };
 
@@ -385,16 +464,34 @@ export default function CitizenSubmissionWizard({
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: {
+        success?: boolean;
+        error?: string;
+        message?: string;
+        trackingCode?: string;
+        isDuplicateFlagged?: boolean;
+        submissionIndexForMobile?: number;
+      };
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(
+          `Server returned non-JSON response (${res.status}): ${text.slice(0, 120)}`
+        );
+      }
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to submit issue");
+        throw new Error(
+          data?.error || data?.message || `Submission failed with status ${res.status}`
+        );
       }
 
       setSubmissionResult({
-        trackingCode: data.trackingCode,
-        isDuplicateFlagged: data.isDuplicateFlagged,
-        submissionIndexForMobile: data.submissionIndexForMobile,
+        trackingCode: data.trackingCode || "",
+        isDuplicateFlagged: Boolean(data.isDuplicateFlagged),
+        submissionIndexForMobile: Number(data.submissionIndexForMobile) || 1,
         district,
       });
 
@@ -402,7 +499,7 @@ export default function CitizenSubmissionWizard({
       router.refresh();
 
       setStep(4);
-      if (onSuccess) {
+      if (onSuccess && data.trackingCode) {
         onSuccess(data.trackingCode, district);
       }
     } catch (err: unknown) {
