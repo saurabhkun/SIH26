@@ -223,7 +223,7 @@ export default function LoginPage() {
 
       {/* Main Login Workspace */}
       <main className="max-w-6xl mx-auto px-4 py-8 flex-1 w-full flex flex-col justify-center">
-        <div className="text-center max-w-2xl mx-auto mb-6">
+        <div className="text-center max-w-3xl mx-auto mb-8">
           <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-civic-primaryHover dark:text-amber-300 bg-civic-accent/25 dark:bg-amber-950/40 border border-civic-accent dark:border-amber-500/30 px-2.5 py-0.5 uppercase tracking-wider mb-2 rounded-full">
             <Sparkles className="w-3 h-3 text-amber-400" />
             <span>Unified Stakeholder &amp; Super Admin Portal</span>
@@ -248,37 +248,35 @@ export default function LoginPage() {
                   type="button"
                   key={r.id}
                   onClick={() => handleRoleSelect(r.id)}
-                  className={`text-left p-3.5 border transition-all focus:outline-hidden rounded-xl cursor-pointer shadow-xs flex flex-col justify-between h-full min-h-[140px] ${
+                  className={`text-left flex flex-col justify-between h-full rounded-xl border p-4 shadow-sm transition hover:shadow-md cursor-pointer ${
                     isSelected
-                      ? "bg-civic-surface dark:bg-[#1E293B] border-civic-primary dark:border-blue-400 ring-2 ring-civic-primary dark:ring-blue-400 shadow-sm"
-                      : "bg-civic-surface dark:bg-[#1E293B] border-civic-border dark:border-[#334155] hover:bg-slate-50 dark:hover:bg-slate-800"
+                      ? "border-civic-primary dark:border-blue-400 bg-white dark:bg-slate-800 ring-2 ring-civic-primary dark:ring-blue-400"
+                      : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                   }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <div
-                        className={`p-2 rounded-lg border ${
-                          isSelected
-                            ? "bg-civic-primary dark:bg-blue-600 text-white border-civic-primary"
-                            : "bg-civic-canvas dark:bg-[#0B0F17] text-civic-primary dark:text-[#A3CEF1] border-civic-border dark:border-[#334155]"
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </div>
+                    <div
+                      className={`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg ${
+                        isSelected
+                          ? "bg-civic-primary text-white dark:bg-blue-600"
+                          : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
                     </div>
-                    <h2 className="font-serif text-xs font-bold text-civic-textDark dark:text-[#F8FAFC]">
+                    <h4 className="text-sm font-bold leading-snug text-slate-900 dark:text-white line-clamp-1">
                       {r.title}
-                    </h2>
-                    <span className="text-[9.5px] font-bold text-civic-secondary block mt-0.5">
+                    </h4>
+                    <p className="mt-0.5 text-[11px] leading-tight text-slate-500 dark:text-slate-400 line-clamp-2">
                       {r.badge}
-                    </span>
+                    </p>
                   </div>
 
-                  <div className="mt-2.5 pt-1.5 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
-                    <span className={isSelected ? "text-civic-primary dark:text-blue-300 font-bold" : "text-slate-400"}>
+                  <div className="mt-4 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700/50 text-[11px] font-medium text-slate-400">
+                    <span className={isSelected ? "text-civic-primary dark:text-blue-300 font-bold" : ""}>
                       {isSelected ? "Active" : "Auto Fill"}
                     </span>
-                    <ArrowRight className={`w-3 h-3 ${isSelected ? "text-civic-primary dark:text-blue-300" : "text-slate-400"}`} />
+                    <span className={isSelected ? "text-civic-primary dark:text-blue-300 font-bold" : ""}>&rarr;</span>
                   </div>
                 </button>
               );
