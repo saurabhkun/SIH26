@@ -42,20 +42,32 @@
       </form>
 
       <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border-color); font-size:0.75rem; color:var(--text-secondary); text-align:center;">
-        <div style="margin-bottom:1rem;">
+        <div style="margin-bottom:1.25rem;">
           <a href="intake.html" class="btn btn-primary" style="display:block; padding:0.65rem; font-size:0.85rem; text-decoration:none;">
             🎙️ ग्रामीण नागरिक? बोलकर शिकायत दर्ज करें (Citizen Voice Portal) &rarr;
           </a>
         </div>
         <p style="margin-bottom:0.75rem; font-weight:700;">Select Enterprise Role &amp; Auto-Fill:</p>
-        <div style="display:grid; grid-template-columns:1fr; gap:0.6rem; text-align:left;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:0.6rem; text-align:left;">
           <!-- Super Admin Card -->
           <div class="card" style="padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color);" onclick="CivicAuth.autoFillRole('super_admin')">
             <div style="display:flex; align-items:center; gap:0.6rem;">
               <span style="font-size:1.2rem;">🏛️</span>
               <div>
                 <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Chief Super Admin</strong>
-                <span style="font-size:0.7rem; color:var(--text-secondary);">State Apex Triage &amp; Routing Matrix</span>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">State Apex Triage</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
+          </div>
+
+          <!-- Gov Nodal & Depts Card -->
+          <div class="card" style="padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color);" onclick="setDemo('officer@jharkhand.gov.in')">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span style="font-size:1.2rem;">🏢</span>
+              <div>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Gov Nodal &amp; Depts</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">PWD &amp; Urban Works</span>
               </div>
             </div>
             <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
@@ -66,8 +78,8 @@
             <div style="display:flex; align-items:center; gap:0.6rem;">
               <span style="font-size:1.2rem;">🔬</span>
               <div>
-                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Research Organization</strong>
-                <span style="font-size:0.7rem; color:var(--text-secondary);">Pattern Analysis &amp; R&amp;D Certification</span>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Research Org</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">Pattern Analysis &amp; R&amp;D</span>
               </div>
             </div>
             <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
@@ -76,10 +88,10 @@
           <!-- Combined Industry & Tech Partners Card -->
           <div class="card" style="padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:var(--bg-surface); border:1px solid var(--brand-primary); outline:1px solid var(--brand-primary);" data-role="industry_tech" onclick="CivicAuth.autoFillRole('industry_tech')">
             <div style="display:flex; align-items:center; gap:0.6rem;">
-              <span style="font-size:1.2rem;">🏢</span>
+              <span style="font-size:1.2rem;">🏭</span>
               <div>
-                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Industry &amp; Tech Partners</strong>
-                <span style="font-size:0.7rem; color:var(--text-secondary);">Corporate Co-Funders &amp; NABL / QCI Audits</span>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Industry &amp; Tech</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">CSR &amp; NABL Audits</span>
               </div>
             </div>
             <button type="button" class="btn btn-primary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
@@ -90,8 +102,8 @@
             <div style="display:flex; align-items:center; gap:0.6rem;">
               <span style="font-size:1.2rem;">🎓</span>
               <div>
-                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">University &amp; College (HEI)</strong>
-                <span style="font-size:0.7rem; color:var(--text-secondary);">Academic Consortium &amp; Lab Prototype Bidding</span>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">University &amp; HEI</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">Academic Consortium</span>
               </div>
             </div>
             <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>

@@ -236,52 +236,54 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* 6 Profile / Role Selection Tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-6">
-          {ROLES.map((r) => {
-            const Icon = r.icon;
-            const isSelected = selectedRole === r.id;
+        {/* 5 Profile / Role Selection Tiles */}
+        <div className="mx-auto w-full max-w-5xl px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-8">
+            {ROLES.map((r) => {
+              const Icon = r.icon;
+              const isSelected = selectedRole === r.id;
 
-            return (
-              <button
-                type="button"
-                key={r.id}
-                onClick={() => handleRoleSelect(r.id)}
-                className={`text-left p-3.5 border transition-all focus:outline-hidden rounded-xl cursor-pointer shadow-xs flex flex-col justify-between ${
-                  isSelected
-                    ? "bg-civic-surface dark:bg-[#1E293B] border-civic-primary dark:border-blue-400 ring-2 ring-civic-primary dark:ring-blue-400 shadow-sm"
-                    : "bg-civic-surface dark:bg-[#1E293B] border-civic-border dark:border-[#334155] hover:bg-slate-50 dark:hover:bg-slate-800"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <div
-                      className={`p-2 rounded-lg border ${
-                        isSelected
-                          ? "bg-civic-primary dark:bg-blue-600 text-white border-civic-primary"
-                          : "bg-civic-canvas dark:bg-[#0B0F17] text-civic-primary dark:text-[#A3CEF1] border-civic-border dark:border-[#334155]"
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
+              return (
+                <button
+                  type="button"
+                  key={r.id}
+                  onClick={() => handleRoleSelect(r.id)}
+                  className={`text-left p-3.5 border transition-all focus:outline-hidden rounded-xl cursor-pointer shadow-xs flex flex-col justify-between h-full min-h-[140px] ${
+                    isSelected
+                      ? "bg-civic-surface dark:bg-[#1E293B] border-civic-primary dark:border-blue-400 ring-2 ring-civic-primary dark:ring-blue-400 shadow-sm"
+                      : "bg-civic-surface dark:bg-[#1E293B] border-civic-border dark:border-[#334155] hover:bg-slate-50 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div
+                        className={`p-2 rounded-lg border ${
+                          isSelected
+                            ? "bg-civic-primary dark:bg-blue-600 text-white border-civic-primary"
+                            : "bg-civic-canvas dark:bg-[#0B0F17] text-civic-primary dark:text-[#A3CEF1] border-civic-border dark:border-[#334155]"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </div>
                     </div>
+                    <h2 className="font-serif text-xs font-bold text-civic-textDark dark:text-[#F8FAFC]">
+                      {r.title}
+                    </h2>
+                    <span className="text-[9.5px] font-bold text-civic-secondary block mt-0.5">
+                      {r.badge}
+                    </span>
                   </div>
-                  <h2 className="font-serif text-xs font-bold text-civic-textDark dark:text-[#F8FAFC]">
-                    {r.title}
-                  </h2>
-                  <span className="text-[9.5px] font-bold text-civic-secondary block mt-0.5">
-                    {r.badge}
-                  </span>
-                </div>
 
-                <div className="mt-2.5 pt-1.5 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
-                  <span className={isSelected ? "text-civic-primary dark:text-blue-300 font-bold" : "text-slate-400"}>
-                    {isSelected ? "Active" : "Auto Fill"}
-                  </span>
-                  <ArrowRight className={`w-3 h-3 ${isSelected ? "text-civic-primary dark:text-blue-300" : "text-slate-400"}`} />
-                </div>
-              </button>
-            );
-          })}
+                  <div className="mt-2.5 pt-1.5 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
+                    <span className={isSelected ? "text-civic-primary dark:text-blue-300 font-bold" : "text-slate-400"}>
+                      {isSelected ? "Active" : "Auto Fill"}
+                    </span>
+                    <ArrowRight className={`w-3 h-3 ${isSelected ? "text-civic-primary dark:text-blue-300" : "text-slate-400"}`} />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Unified Credentials Form */}
