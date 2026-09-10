@@ -67,6 +67,20 @@ export interface IIssue extends Document {
   rejectionReason?: string;
   assignedDepartment?: string;
   maintenanceNotes?: string;
+  routingRecommendation?: {
+    routingDecision: "GOVT_DEPT" | "GOVT_RO" | "UNIVERSITY_RESEARCH_ORG";
+    confidenceScore: number;
+    factors: {
+      isSensitive: boolean;
+      sensitivityLevel: string;
+      existingGovtRO: boolean;
+      hasDedicatedBudget: boolean;
+      govtCapacityStatus: string;
+      uniCapabilityScore: number;
+      eligibleUniversities: string[];
+    };
+    rationale: string;
+  };
 
   // Triage & Circuit-Breaker Engine
   urgencyTrack: UrgencyTrack;
@@ -212,6 +226,23 @@ const IssueSchema = new Schema<IIssue>(
     rejectionReason: { type: String, default: "" },
     assignedDepartment: { type: String, default: "" },
     maintenanceNotes: { type: String, default: "" },
+    routingRecommendation: {
+      routingDecision: {
+        type: String,
+        enum: ["GOVT_DEPT", "GOVT_RO", "UNIVERSITY_RESEARCH_ORG"],
+      },
+      confidenceScore: { type: Number },
+      factors: {
+        isSensitive: { type: Boolean },
+        sensitivityLevel: { type: String },
+        existingGovtRO: { type: Boolean },
+        hasDedicatedBudget: { type: Boolean },
+        govtCapacityStatus: { type: String },
+        uniCapabilityScore: { type: Number },
+        eligibleUniversities: [{ type: String }],
+      },
+      rationale: { type: String },
+    },
 
     // Triage & Circuit Breaker
     urgencyTrack: {

@@ -4,6 +4,7 @@ import Issue from "@/lib/models/Issue";
 import User from "@/lib/models/User";
 import { getCurrentUser } from "@/lib/auth/session";
 import { syncIssueToReport } from "@/lib/utils/reportsAdapter";
+import { evaluateRoutingDestination } from "@/lib/triage/institutionalRouting";
 
 export const dynamic = "force-dynamic";
 
@@ -118,10 +119,28 @@ export async function GET(request: NextRequest) {
       query.triageAction = filterStatus;
     }
 
-    const issues = await Issue.find(query)
+    const rawIssues = await Issue.find(query)
       .sort({ createdAt: -1 })
       .limit(100)
       .lean();
+
+    const issues = rawIssues.map((issue) => {
+      if (!issue.routingRecommendation) {
+        return {
+          ...issue,
+          routingRecommendation: evaluateRoutingDestination({
+            title: issue.title || "",
+            description: issue.description || "",
+            domain: issue.domain || "",
+            severityScore: issue.severityScore || 3,
+            priority: issue.priority || "MEDIUM",
+            aiTags: issue.aiTags || [],
+            district: issue.district || "",
+          }),
+        };
+      }
+      return issue;
+    });
 
     const users = await User.find({})
       .select("-passwordHash")
@@ -187,6 +206,70 @@ export async function POST(request: NextRequest) {
     }
 
     const actorName = user?.name || "Super Admin Desk";
+
+    // Auto-Route based on 5-factor deterministic routing engine
+    if (action === "auto_route") {
+      const rec = evaluateRoutingDestination({
+        title: issue.title,
+        description: issue.description,
+        domain: issue.domain,
+        severityScore: issue.severityScore,
+        priority: issue.priority,
+        aiTags: issue.aiTags,
+        district: issue.district,
+      });
+
+      issue.routingRecommendation = rec;
+      issue.reviewedBy = `${actorName} (Auto-Triage Engine)`;
+
+      if (rec.routingDecision === "UNIVERSITY_RESEARCH_ORG") {
+        issue.triageAction = "accepted";
+        issue.status = "Accepted";
+        issue.urgencyTrack = "RO_INNOVATION_PIPELINE";
+        issue.triageRationale = rec.rationale;
+      } else if (rec.routingDecision === "GOVT_DEPT") {
+        issue.triageAction = "assigned_to_govt_dept";
+        issue.status = "Assigned_Govt_Dept";
+        // Map domain to department
+        const d = (issue.domain || "").toLowerCase();
+        let assignedDept = "Public Works Department (PWD - Roads & Bridges)";
+        if (d.includes("water")) {
+          assignedDept = "Drinking Water & Sanitation Department (DWSD)";
+        } else if (d.includes("electric") || d.includes("power") || d.includes("light")) {
+          assignedDept = "Jharkhand Urja Vikas Nigam (JUVNL - Electricity & Streetlights)";
+        } else if (d.includes("health")) {
+          assignedDept = "Health, Medical Education & Family Welfare";
+        }
+        issue.assignedDepartment = assignedDept;
+        issue.maintenanceNotes = rec.rationale;
+        issue.triageRationale = rec.rationale;
+      } else {
+        // GOVT_RO
+        issue.triageAction = "accepted";
+        issue.status = "Accepted";
+        issue.urgencyTrack = "RO_INNOVATION_PIPELINE";
+        issue.assignedDepartment = "State Research Organization (SRO / Nodal Lab)";
+        issue.triageRationale = rec.rationale;
+      }
+
+      await issue.save();
+      await syncIssueToReport(issue);
+
+      SYSTEM_AUDIT_LOGS.unshift({
+        id: `log-${Date.now()}`,
+        action: `AUTO_ROUTE_${rec.routingDecision}`,
+        issueCode: issue.trackingCode,
+        performedBy: actorName,
+        details: `Auto-routed via 5-Factor Decision Engine to ${rec.routingDecision} (${(rec.confidenceScore * 100).toFixed(0)}% confidence). Rationale: ${rec.rationale}`,
+        timestamp: new Date().toISOString(),
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: `✓ Issue ${issue.trackingCode} auto-routed to ${rec.routingDecision}!`,
+        data: issue,
+      });
+    }
 
     if (action === "accept") {
       issue.triageAction = "accepted";

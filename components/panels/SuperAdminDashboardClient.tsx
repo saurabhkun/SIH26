@@ -14,9 +14,28 @@ import {
   X,
   Star,
   Send,
+  Sparkles,
 } from "lucide-react";
 import { EvidenceMediaViewer } from "@/components/EvidenceMediaViewer";
 import { VoiceAudioPlayer } from "@/components/VoiceAudioPlayer";
+import { evaluateRoutingDestination } from "@/lib/triage/institutionalRouting";
+
+export interface RoutingFactors {
+  isSensitive: boolean;
+  sensitivityLevel: string;
+  existingGovtRO: boolean;
+  hasDedicatedBudget: boolean;
+  govtCapacityStatus: string;
+  uniCapabilityScore: number;
+  eligibleUniversities: string[];
+}
+
+export interface RoutingRecommendation {
+  routingDecision: "GOVT_DEPT" | "GOVT_RO" | "UNIVERSITY_RESEARCH_ORG";
+  confidenceScore: number;
+  factors: RoutingFactors;
+  rationale: string;
+}
 
 interface IssueItem {
   _id: string;
@@ -34,6 +53,7 @@ interface IssueItem {
   assignedDepartment?: string;
   rejectionReason?: string;
   maintenanceNotes?: string;
+  routingRecommendation?: RoutingRecommendation;
   status: string;
   citizenName: string;
   citizenPhone?: string;
@@ -41,6 +61,7 @@ interface IssueItem {
   mediaUrls?: string[];
   attachments?: { url: string; type: "photo" | "video" | "document" }[];
   audioUrl?: string;
+  aiTags?: string[];
   reviewedBy?: string;
   createdAt: string;
 }
@@ -105,6 +126,53 @@ export default function SuperAdminDashboardClient() {
   const [selectedDeptId, setSelectedDeptId] = useState("pwd-roads");
   const [deptNotes, setDeptNotes] = useState("");
 
+  // Interactive Smart Routing Overrides & College Multi-Select
+  const [triageSensOverride, setTriageSensOverride] = useState<boolean | null>(null);
+  const [triageBudgetOverride, setTriageBudgetOverride] = useState<boolean | null>(null);
+  const [triageCapacityOverride, setTriageCapacityOverride] = useState<"Available" | "High / Saturated" | null>(null);
+  const [selectedCollegesForAllocation, setSelectedCollegesForAllocation] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (selectedIssue?.routingRecommendation) {
+      setTriageSensOverride(selectedIssue.routingRecommendation.factors.isSensitive);
+      setTriageBudgetOverride(selectedIssue.routingRecommendation.factors.hasDedicatedBudget);
+      setTriageCapacityOverride(
+        selectedIssue.routingRecommendation.factors.govtCapacityStatus === "High / Saturated"
+          ? "High / Saturated"
+          : "Available"
+      );
+      setSelectedCollegesForAllocation(
+        selectedIssue.routingRecommendation.factors.eligibleUniversities || []
+      );
+    } else {
+      setTriageSensOverride(null);
+      setTriageBudgetOverride(null);
+      setTriageCapacityOverride(null);
+      setSelectedCollegesForAllocation([]);
+    }
+  }, [selectedIssue]);
+
+  const activeRoutingEval = selectedIssue
+    ? evaluateRoutingDestination(
+        {
+          title: selectedIssue.title,
+          description: selectedIssue.description,
+          domain: selectedIssue.domain,
+          severityScore: selectedIssue.severityScore,
+          priority: selectedIssue.priority,
+          aiTags: selectedIssue.aiTags,
+          district: selectedIssue.district,
+          sensitivityLevel: triageSensOverride ? "Policy Sensitive" : "Public",
+          hasYearlyBudget: triageBudgetOverride ?? undefined,
+        },
+        {
+          hasDedicatedBudget: triageBudgetOverride ?? undefined,
+          govtROCapacity: triageCapacityOverride ?? undefined,
+          sensitivityLevel: triageSensOverride ? "Policy Sensitive" : "Public",
+        }
+      )
+    : null;
+
   const loadData = useCallback(async () => {
     try {
       setRefreshing(true);
@@ -136,13 +204,13 @@ export default function SuperAdminDashboardClient() {
     setTimeout(() => setFeedback(null), 5000);
   };
 
-  const handleAccept = async (issueId: string) => {
+  const handleAccept = async (issueId: string, assignedColleges?: string[]) => {
     try {
       setActionInProgress(`accept-${issueId}`);
       const res = await fetch("/api/gov/super-admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "accept", issueId }),
+        body: JSON.stringify({ action: "accept", issueId, assignedColleges }),
       });
       const data = await res.json();
       if (data.success) {
@@ -548,6 +616,180 @@ export default function SuperAdminDashboardClient() {
                       }
                     />
                   </div>
+
+                  {/* Smart Routing Matrix Decision Panel */}
+                  {activeRoutingEval && (
+                    <div className="p-4 bg-slate-50 dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-[#334155] space-y-3.5">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center space-x-2">
+                          <Sparkles className="w-4 h-4 text-amber-400" />
+                          <span className="text-xs font-serif font-bold text-slate-900 dark:text-slate-100">
+                            Smart Routing Matrix
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            {(activeRoutingEval.confidenceScore * 100).toFixed(0)}% Score
+                          </span>
+                        </div>
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-1 rounded-lg ${
+                            activeRoutingEval.routingDecision === "UNIVERSITY_RESEARCH_ORG"
+                              ? "bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800"
+                              : activeRoutingEval.routingDecision === "GOVT_DEPT"
+                              ? "bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
+                              : "bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800"
+                          }`}
+                        >
+                          {activeRoutingEval.routingDecision === "UNIVERSITY_RESEARCH_ORG"
+                            ? "🎓 Academia / University Route"
+                            : activeRoutingEval.routingDecision === "GOVT_DEPT"
+                            ? "🏢 Government Department Route"
+                            : "🔬 State Government RO Route"}
+                        </span>
+                      </div>
+
+                      {/* 4 Interactive Toggle Chips / Scores */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {/* Chip 1: Security/Policy Sensitive */}
+                        <button
+                          type="button"
+                          onClick={() => setTriageSensOverride(!triageSensOverride)}
+                          className={`p-2 rounded-lg border text-left transition cursor-pointer flex flex-col justify-between ${
+                            triageSensOverride
+                              ? "bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200"
+                              : "bg-white dark:bg-[#1E293B] border-slate-200 dark:border-[#334155] text-slate-700 dark:text-slate-300 hover:border-slate-300"
+                          }`}
+                        >
+                          <span className="text-[10px] text-slate-500 block">Security/Policy</span>
+                          <span className="text-[11px] font-bold mt-0.5">
+                            {triageSensOverride ? "Sensitive: Yes 🛑" : "Sensitive: No ✓"}
+                          </span>
+                        </button>
+
+                        {/* Chip 2: Annual Scheme Budget */}
+                        <button
+                          type="button"
+                          onClick={() => setTriageBudgetOverride(!triageBudgetOverride)}
+                          className={`p-2 rounded-lg border text-left transition cursor-pointer flex flex-col justify-between ${
+                            triageBudgetOverride
+                              ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200"
+                              : "bg-white dark:bg-[#1E293B] border-slate-200 dark:border-[#334155] text-slate-700 dark:text-slate-300 hover:border-slate-300"
+                          }`}
+                        >
+                          <span className="text-[10px] text-slate-500 block">Annual Budget</span>
+                          <span className="text-[11px] font-bold mt-0.5">
+                            {triageBudgetOverride ? "Allocated ✓" : "None / Grant ✕"}
+                          </span>
+                        </button>
+
+                        {/* Chip 3: Govt Lab Capacity */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setTriageCapacityOverride(
+                              triageCapacityOverride === "High / Saturated" ? "Available" : "High / Saturated"
+                            )
+                          }
+                          className={`p-2 rounded-lg border text-left transition cursor-pointer flex flex-col justify-between ${
+                            triageCapacityOverride === "High / Saturated"
+                              ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200"
+                              : "bg-white dark:bg-[#1E293B] border-slate-200 dark:border-[#334155] text-slate-700 dark:text-slate-300 hover:border-slate-300"
+                          }`}
+                        >
+                          <span className="text-[10px] text-slate-500 block">Govt Lab Load</span>
+                          <span className="text-[11px] font-bold mt-0.5">
+                            {triageCapacityOverride === "High / Saturated" ? "Saturated ⚠️" : "Optimal ✓"}
+                          </span>
+                        </button>
+
+                        {/* Chip 4: Capable University Labs */}
+                        <div className="p-2 rounded-lg border bg-white dark:bg-[#1E293B] border-slate-200 dark:border-[#334155] flex flex-col justify-between">
+                          <span className="text-[10px] text-slate-500 block">Capable Uni Labs</span>
+                          <span
+                            className={`text-[11px] font-bold mt-0.5 ${
+                              activeRoutingEval.factors.eligibleUniversities.length > 0
+                                ? "text-blue-600 dark:text-blue-400"
+                                : "text-slate-400"
+                            }`}
+                          >
+                            {activeRoutingEval.factors.eligibleUniversities.length > 0
+                              ? `Found (${activeRoutingEval.factors.eligibleUniversities.length})`
+                              : "None"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Rationale description */}
+                      <div className="p-2.5 bg-white dark:bg-[#1E293B] rounded-lg border border-slate-200 dark:border-[#334155] text-[11.5px] text-slate-700 dark:text-slate-300 leading-relaxed">
+                        <strong className="text-slate-900 dark:text-slate-100">Decision Rationale:</strong>{" "}
+                        {activeRoutingEval.rationale}
+                      </div>
+
+                      {/* Primary Suggested CTA Action Container */}
+                      <div className="pt-2">
+                        {activeRoutingEval.routingDecision === "UNIVERSITY_RESEARCH_ORG" ? (
+                          <div className="space-y-2.5">
+                            {activeRoutingEval.factors.eligibleUniversities.length > 0 && (
+                              <div className="p-2.5 bg-purple-50/70 dark:bg-purple-950/40 rounded-lg border border-purple-200 dark:border-purple-800">
+                                <span className="text-[11px] font-bold text-purple-900 dark:text-purple-300 block mb-1.5">
+                                  Select Empaneled Universities for Allocation:
+                                </span>
+                                <div className="space-y-1.5">
+                                  {activeRoutingEval.factors.eligibleUniversities.map((uni) => {
+                                    const isChecked = selectedCollegesForAllocation.includes(uni);
+                                    return (
+                                      <label
+                                        key={uni}
+                                        className="flex items-center space-x-2 text-xs text-slate-800 dark:text-slate-200 cursor-pointer"
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={isChecked}
+                                          onChange={() => {
+                                            if (isChecked) {
+                                              setSelectedCollegesForAllocation((prev) =>
+                                                prev.filter((c) => c !== uni)
+                                              );
+                                            } else {
+                                              setSelectedCollegesForAllocation((prev) => [...prev, uni]);
+                                            }
+                                          }}
+                                          className="rounded text-purple-600 focus:ring-purple-500"
+                                        />
+                                        <span className="font-medium text-[11.5px]">{uni}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleAccept(selectedIssue._id, selectedCollegesForAllocation)}
+                              disabled={actionInProgress !== null}
+                              className="w-full py-3 px-4 bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-60"
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-purple-200" />
+                              <span>
+                                Allocate to Empaneled University / Research Org (
+                                {selectedCollegesForAllocation.length} selected)
+                              </span>
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setRouteModalOpen(true)}
+                            disabled={actionInProgress !== null}
+                            className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-60"
+                          >
+                            <Building2 className="w-4 h-4 text-emerald-200" />
+                            <span>Confirm Dispatch to Govt Dept / State RO</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Super Admin Triage Action Bar */}
                   <div className="pt-4 border-t border-slate-200 dark:border-[#334155] space-y-3">

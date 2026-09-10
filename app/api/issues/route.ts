@@ -16,6 +16,7 @@ import {
   syncIssueToReport,
 } from "@/lib/utils/reportsAdapter";
 import { analyzeIssueCriticality } from "@/lib/aiTriage";
+import { evaluateRoutingDestination } from "@/lib/triage/institutionalRouting";
 
 /**
  * GET /api/issues?district=X&status=Y&domain=Z
@@ -224,6 +225,17 @@ export async function POST(request: NextRequest) {
       aiTriage.severityScore ||
       Math.min(5, Math.max(1, Number(severityScore) || 3));
 
+    // 7.5 Compute Deterministic Institutional Routing Recommendation (5 Factors)
+    const routingRecommendation = evaluateRoutingDestination({
+      title: title.trim(),
+      description: description.trim(),
+      domain,
+      severityScore: calculatedSeverity,
+      priority: aiTriage.priority,
+      aiTags: aiTags || [],
+      district: district.trim(),
+    });
+
     // 8. Save Issue Document with Idempotency & Collision Retry Wrapper
     let newIssue;
     let attempts = 0;
@@ -244,6 +256,7 @@ export async function POST(request: NextRequest) {
           aiAnalysisReason: aiTriage.aiAnalysisReason || "",
           suggestedDepartment: aiTriage.suggestedDepartment || "Higher & Technical Education",
           triageRationale: aiTriage.aiAnalysisReason,
+          routingRecommendation,
           aiTags: Array.from(new Set([...(aiTags || []), ...(aiTriage.isStarred ? ["AI_CRITICAL_STAR", "URGENT_TRIAGE"] : [])])),
           district: district.trim(),
           pincode: pincode?.trim(),
