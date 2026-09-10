@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import Issue from "@/lib/models/Issue";
 import User from "@/lib/models/User";
 import { getCurrentUser } from "@/lib/auth/session";
+import { syncIssueToReport } from "@/lib/utils/reportsAdapter";
 
 export const dynamic = "force-dynamic";
 
@@ -189,9 +190,17 @@ export async function POST(request: NextRequest) {
 
     if (action === "accept") {
       issue.triageAction = "accepted";
-      issue.status = "Accepted_Verified";
+      issue.status = "Accepted";
       issue.reviewedBy = actorName;
+
+      // Allow assigning research institutions/colleges for grassroots research studies
+      if (Array.isArray(body.assignedColleges) && body.assignedColleges.length > 0) {
+        issue.assignedColleges = body.assignedColleges;
+      }
+
       await issue.save();
+      // Insert / link issue into the directories collection for public and institutional visibility
+      await syncIssueToReport(issue);
 
       SYSTEM_AUDIT_LOGS.unshift({
         id: `log-${Date.now()}`,
@@ -215,6 +224,7 @@ export async function POST(request: NextRequest) {
       issue.rejectionReason = reason || "Out of administrative jurisdiction";
       issue.reviewedBy = actorName;
       await issue.save();
+      await syncIssueToReport(issue);
 
       SYSTEM_AUDIT_LOGS.unshift({
         id: `log-${Date.now()}`,
@@ -233,8 +243,27 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "assign_dept") {
-      const dept = DEPARTMENTS_ROUTING_MATRIX.find((d) => d.id === departmentId);
-      const deptName = dept ? dept.name : departmentId || "Urban Municipal Works";
+      let deptName = "";
+      if (departmentId) {
+        const dept = DEPARTMENTS_ROUTING_MATRIX.find((d) => d.id === departmentId);
+        deptName = dept ? dept.name : departmentId;
+      } else {
+        // Automatically determine department based on domain
+        const d = (issue.domain || "").toLowerCase();
+        if (d.includes("water")) {
+          deptName = "Drinking Water & Sanitation Department (DWSD)";
+        } else if (d.includes("road") || d.includes("transport")) {
+          deptName = "Public Works Department (PWD - Roads & Bridges)";
+        } else if (d.includes("health")) {
+          deptName = "Health, Medical Education & Family Welfare";
+        } else if (d.includes("environment") || d.includes("mining")) {
+          deptName = "Urban Development & Housing (Solid Waste & Environment)";
+        } else if (d.includes("electricity") || d.includes("energy")) {
+          deptName = "Jharkhand Urja Vikas Nigam (JUVNL - Electricity)";
+        } else {
+          deptName = "Urban Development & Municipal Works";
+        }
+      }
 
       issue.triageAction = "assigned_to_govt_dept";
       issue.status = "Assigned_Govt_Dept";
@@ -242,6 +271,7 @@ export async function POST(request: NextRequest) {
       issue.maintenanceNotes = notes || "Routine department maintenance and repair SLA active.";
       issue.reviewedBy = actorName;
       await issue.save();
+      await syncIssueToReport(issue);
 
       SYSTEM_AUDIT_LOGS.unshift({
         id: `log-${Date.now()}`,

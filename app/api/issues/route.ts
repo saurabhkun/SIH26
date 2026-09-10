@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Types } from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import Issue, { ISSUE_DOMAINS, FACING_SINCE_OPTIONS } from "@/lib/models/Issue";
-import {
-  generateDedupFingerprint,
-  generateUniqueTrackingCode,
-} from "@/lib/utils/dedup";
+import { generateDedupFingerprint } from "@/lib/utils/dedup";
 import { createNotification } from "@/lib/notifications";
 import {
   sanitizeMediaUrl,
@@ -160,9 +158,10 @@ export async function POST(request: NextRequest) {
         ? "Under_Review"
         : "Reported";
 
-    // 4. Robust Collision-Free Tracking Code generation
-    const currentYear = new Date().getFullYear();
-    let trackingCode = generateUniqueTrackingCode(currentYear);
+    // 4. Generate MongoDB _id first & derive unique trackingCode from its hex string
+    let objectId = new Types.ObjectId();
+    let hexSuffix = objectId.toString().slice(-6).toUpperCase();
+    let trackingCode = `CR-JH-${hexSuffix}`; // e.g., CR-JH-24501A
 
     // 5. Repeat reporter check (Issues from this mobile number in last 24h)
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -233,6 +232,7 @@ export async function POST(request: NextRequest) {
     while (attempts < maxAttempts) {
       try {
         newIssue = await Issue.create({
+          _id: objectId,
           title: title.trim(),
           description: description.trim(),
           attachments: sanitizedAttachments,
@@ -272,8 +272,10 @@ export async function POST(request: NextRequest) {
           (mongoErr?.code === 11000 || mongoErr?.message?.includes("E11000") || mongoErr?.message?.includes("trackingCode")) &&
           attempts < maxAttempts
         ) {
-          console.warn(`[Tracking Code Collision] Code ${trackingCode} collided. Regenerating and retrying (attempt ${attempts}/${maxAttempts})...`);
-          trackingCode = generateUniqueTrackingCode(currentYear);
+          console.warn(`[Tracking Code Collision] Code ${trackingCode} collided. Regenerating ObjectId and retrying (attempt ${attempts}/${maxAttempts})...`);
+          objectId = new Types.ObjectId();
+          hexSuffix = objectId.toString().slice(-6).toUpperCase();
+          trackingCode = `CR-JH-${hexSuffix}`;
         } else {
           throw err;
         }
