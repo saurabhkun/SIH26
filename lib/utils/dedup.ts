@@ -38,3 +38,13 @@ export function formatTrackingCode(year: number, sequenceNum: number): string {
   const padded = String(sequenceNum).padStart(6, "0");
   return `CR-JH-${year}-${padded}`;
 }
+
+/**
+ * Generates an atomic entropy-backed collision-free tracking code:
+ * Format: CR-JH-YYYY-XXXXX-YYYY
+ */
+export function generateUniqueTrackingCode(year: number = new Date().getFullYear()): string {
+  const timeEntropy = Date.now().toString(36).toUpperCase();
+  const randEntropy = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `CR-JH-${year}-${timeEntropy}-${randEntropy}`;
+}

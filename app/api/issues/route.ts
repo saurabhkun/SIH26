@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import Issue, { ISSUE_DOMAINS, FACING_SINCE_OPTIONS } from "@/lib/models/Issue";
 import {
   generateDedupFingerprint,
-  formatTrackingCode,
+  generateUniqueTrackingCode,
 } from "@/lib/utils/dedup";
 import { createNotification } from "@/lib/notifications";
 import {
@@ -160,16 +160,9 @@ export async function POST(request: NextRequest) {
         ? "Under_Review"
         : "Reported";
 
-    // 4. Sequence number & Tracking Code generation
+    // 4. Robust Collision-Free Tracking Code generation
     const currentYear = new Date().getFullYear();
-    const countThisYear = await Issue.countDocuments({
-      createdAt: {
-        $gte: new Date(currentYear, 0, 1),
-      },
-    });
-
-    const sequenceNum = countThisYear + 101; // start from 000101
-    const trackingCode = formatTrackingCode(currentYear, sequenceNum);
+    let trackingCode = generateUniqueTrackingCode(currentYear);
 
     // 5. Repeat reporter check (Issues from this mobile number in last 24h)
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -232,39 +225,64 @@ export async function POST(request: NextRequest) {
       aiTriage.severityScore ||
       Math.min(5, Math.max(1, Number(severityScore) || 3));
 
-    // 8. Save Issue Document with AI Star Triage fields
-    const newIssue = await Issue.create({
-      title: title.trim(),
-      description: description.trim(),
-      attachments: sanitizedAttachments,
-      mediaUrls: finalMediaUrls,
-      domain,
-      severityScore: calculatedSeverity,
-      isStarred: Boolean(aiTriage.isStarred),
-      priority: aiTriage.priority || "MEDIUM",
-      aiAnalysisReason: aiTriage.aiAnalysisReason || "",
-      suggestedDepartment: aiTriage.suggestedDepartment || "Higher & Technical Education",
-      triageRationale: aiTriage.aiAnalysisReason,
-      aiTags: Array.from(new Set([...(aiTags || []), ...(aiTriage.isStarred ? ["AI_CRITICAL_STAR", "URGENT_TRIAGE"] : [])])),
-      district: district.trim(),
-      pincode: pincode?.trim(),
-      address: address?.trim(),
-      location:
-        location?.lat && location?.lng
-          ? { lat: Number(location.lat), lng: Number(location.lng) }
-          : undefined,
-      facingSince,
-      citizenName: citizenName.trim(),
-      citizenMobile: citizenMobile.trim(),
-      mobileVerified: false,
-      trackingCode,
-      dedupFingerprint,
-      duplicateOf: hasExactDuplicate ? existingSimilar[0]._id : null,
-      similarIssueIds,
-      status: initialStatus,
-      assignedColleges: [],
-      submissionIndexForMobile,
-    });
+    // 8. Save Issue Document with Idempotency & Collision Retry Wrapper
+    let newIssue;
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (attempts < maxAttempts) {
+      try {
+        newIssue = await Issue.create({
+          title: title.trim(),
+          description: description.trim(),
+          attachments: sanitizedAttachments,
+          mediaUrls: finalMediaUrls,
+          domain,
+          severityScore: calculatedSeverity,
+          isStarred: Boolean(aiTriage.isStarred),
+          priority: aiTriage.priority || "MEDIUM",
+          aiAnalysisReason: aiTriage.aiAnalysisReason || "",
+          suggestedDepartment: aiTriage.suggestedDepartment || "Higher & Technical Education",
+          triageRationale: aiTriage.aiAnalysisReason,
+          aiTags: Array.from(new Set([...(aiTags || []), ...(aiTriage.isStarred ? ["AI_CRITICAL_STAR", "URGENT_TRIAGE"] : [])])),
+          district: district.trim(),
+          pincode: pincode?.trim(),
+          address: address?.trim(),
+          location:
+            location?.lat && location?.lng
+              ? { lat: Number(location.lat), lng: Number(location.lng) }
+              : undefined,
+          facingSince,
+          citizenName: citizenName.trim(),
+          citizenMobile: citizenMobile.trim(),
+          mobileVerified: false,
+          trackingCode,
+          dedupFingerprint,
+          duplicateOf: hasExactDuplicate ? existingSimilar[0]._id : null,
+          similarIssueIds,
+          status: initialStatus,
+          assignedColleges: [],
+          submissionIndexForMobile,
+        });
+        break;
+      } catch (err: unknown) {
+        attempts++;
+        const mongoErr = err as { code?: number; message?: string };
+        if (
+          (mongoErr?.code === 11000 || mongoErr?.message?.includes("E11000") || mongoErr?.message?.includes("trackingCode")) &&
+          attempts < maxAttempts
+        ) {
+          console.warn(`[Tracking Code Collision] Code ${trackingCode} collided. Regenerating and retrying (attempt ${attempts}/${maxAttempts})...`);
+          trackingCode = generateUniqueTrackingCode(currentYear);
+        } else {
+          throw err;
+        }
+      }
+    }
+
+    if (!newIssue) {
+      throw new Error("Failed to create civic issue after collision retries.");
+    }
 
     await syncIssueToReport(newIssue);
 

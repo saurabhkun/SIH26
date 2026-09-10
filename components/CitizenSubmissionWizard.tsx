@@ -340,6 +340,7 @@ export default function CitizenSubmissionWizard({
   // Final Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!mobileVerified) {
       setSubmitError(
         "Please verify your mobile number with OTP before submitting.",
