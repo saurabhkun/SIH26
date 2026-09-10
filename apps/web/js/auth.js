@@ -10,13 +10,19 @@ const CivicAuth = {
       redirect: 'super_admin.html'
     },
     'csr.head@tatasteel.com': {
-      role: 'csr_partner',
+      role: 'industry_tech',
       name: 'Sanjay Chatterjee',
-      designation: 'Head of CSR & Sustainability (Tata Steel)',
+      designation: 'Head of CSR & Tech Partner (Tata Steel & CMPDI)',
+      redirect: 'dashboard.html'
+    },
+    'audit.lead@cmpdi.co.in': {
+      role: 'industry_tech',
+      name: 'Dr. Alok K. Mishra',
+      designation: 'Technical Consultancy & NABL Auditor (CMPDI)',
       redirect: 'dashboard.html'
     },
     'director.rnd@bitmesra.ac.in': {
-      role: 'tech_admin',
+      role: 'college',
       name: 'Dr. Ananya Sen',
       designation: 'Dean of Research & Innovation (BIT Mesra)',
       redirect: 'dashboard.html'
@@ -26,6 +32,26 @@ const CivicAuth = {
       name: 'Dr. Birendra Mahato',
       designation: 'Research Organization Evaluator',
       redirect: 'dashboard.html'
+    }
+  },
+
+  autoFillRole(roleId) {
+    const emailInput = document.getElementById('email');
+    const passInput = document.getElementById('password');
+    if (!emailInput || !passInput) return;
+
+    if (roleId === 'industry_tech' || roleId === 'csr_tech') {
+      emailInput.value = 'csr.head@tatasteel.com';
+      passInput.value = 'Industry@1234';
+    } else if (roleId === 'super_admin') {
+      emailInput.value = 'superadmin@jharkhand.gov.in';
+      passInput.value = 'SuperAdmin@1234';
+    } else if (roleId === 'research_org' || roleId === 'gov_ro') {
+      emailInput.value = 'ro.evaluator@jharkhand.gov.in';
+      passInput.value = 'Ro@1234';
+    } else if (roleId === 'college') {
+      emailInput.value = 'director.rnd@bitmesra.ac.in';
+      passInput.value = 'College@1234';
     }
   },
 

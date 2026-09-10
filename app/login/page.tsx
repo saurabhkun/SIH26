@@ -8,7 +8,6 @@ import {
   Landmark,
   FlaskConical,
   GraduationCap,
-  Briefcase,
   Building2,
   ArrowLeft,
   ArrowRight,
@@ -18,7 +17,7 @@ import {
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
-type PortalRole = "auto" | "super_admin" | "gov" | "gov_ro" | "college" | "industry" | "consultancy";
+type PortalRole = "auto" | "super_admin" | "gov" | "gov_ro" | "college" | "industry_tech" | "industry" | "consultancy";
 
 interface RoleOption {
   id: PortalRole;
@@ -78,26 +77,15 @@ const ROLES: RoleOption[] = [
     targetPath: "/dashboard/college",
   },
   {
-    id: "industry",
-    title: "Industry & CSR",
-    badge: "Corporate Co-Funders",
-    description: "Corporate sponsors funding verified research and third-party audits.",
-    icon: Briefcase,
+    id: "industry_tech",
+    title: "Industry & Tech Partners",
+    badge: "Corporate Co-Funders & NABL / QCI Audits",
+    description: "Corporate co-funders, CSR escrow partners & empanelled technical laboratory auditors.",
+    icon: Building2,
     demoEmail: "csr.head@tatasteel.com",
     demoPass: "Industry@1234",
-    demoUser: "Sanjay Chatterjee (Tata Steel CSR)",
+    demoUser: "Sanjay Chatterjee (Tata Steel CSR & Tech Lead)",
     targetPath: "/dashboard/industry",
-  },
-  {
-    id: "consultancy",
-    title: "Technical Consultancy",
-    badge: "NABL / QCI Audits",
-    description: "Empanelled third-party engineering auditors and laboratory assayers.",
-    icon: Building2,
-    demoEmail: "audit.lead@cmpdi.co.in",
-    demoPass: "Consultancy@1234",
-    demoUser: "Dr. Alok K. Mishra (CMPDI Technical Lead)",
-    targetPath: "/dashboard/consultancy",
   },
 ];
 

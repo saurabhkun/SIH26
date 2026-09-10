@@ -47,12 +47,55 @@
             🎙️ ग्रामीण नागरिक? बोलकर शिकायत दर्ज करें (Citizen Voice Portal) &rarr;
           </a>
         </div>
-        <p style="margin-bottom:0.5rem;"><strong>1-Click Quick Demo Switchers:</strong></p>
-        <div style="display:flex; gap:0.4rem; justify-content:center; flex-wrap:wrap;">
-          <button class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.7rem;" onclick="setDemo('superadmin@jharkhand.gov.in')">Super Admin</button>
-          <button class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.7rem;" onclick="setDemo('ro.evaluator@jharkhand.gov.in')">Research Org</button>
-          <button class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.7rem;" onclick="setDemo('csr.head@tatasteel.com')">CSR Partner</button>
-          <button class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.7rem;" onclick="setDemo('director.rnd@bitmesra.ac.in')">Tech / College</button>
+        <p style="margin-bottom:0.75rem; font-weight:700;">Select Enterprise Role &amp; Auto-Fill:</p>
+        <div style="display:grid; grid-template-columns:1fr; gap:0.6rem; text-align:left;">
+          <!-- Super Admin Card -->
+          <div class="card" style="padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color);" onclick="CivicAuth.autoFillRole('super_admin')">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span style="font-size:1.2rem;">🏛️</span>
+              <div>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Chief Super Admin</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">State Apex Triage &amp; Routing Matrix</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
+          </div>
+
+          <!-- Research Org Card -->
+          <div class="card" style="padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color);" onclick="CivicAuth.autoFillRole('research_org')">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span style="font-size:1.2rem;">🔬</span>
+              <div>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Research Organization</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">Pattern Analysis &amp; R&amp;D Certification</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
+          </div>
+
+          <!-- Combined Industry & Tech Partners Card -->
+          <div class="card" style="padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:var(--bg-surface); border:1px solid var(--brand-primary); outline:1px solid var(--brand-primary);" data-role="industry_tech" onclick="CivicAuth.autoFillRole('industry_tech')">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span style="font-size:1.2rem;">🏢</span>
+              <div>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">Industry &amp; Tech Partners</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">Corporate Co-Funders &amp; NABL / QCI Audits</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
+          </div>
+
+          <!-- University / College Card -->
+          <div class="card" style="padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color);" onclick="CivicAuth.autoFillRole('college')">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span style="font-size:1.2rem;">🎓</span>
+              <div>
+                <strong style="font-size:0.8rem; color:var(--text-primary); display:block;">University &amp; College (HEI)</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">Academic Consortium &amp; Lab Prototype Bidding</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;">Auto Fill &rarr;</button>
+          </div>
         </div>
       </div>
     </div>
